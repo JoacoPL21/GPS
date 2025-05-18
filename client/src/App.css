@@ -1,0 +1,65 @@
+.App {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  background-color: #fdfcfb;
+  color: #333;
+}
+
+.header {
+  background-color: #8b5e3c;
+  color: white;
+  padding: 1rem 0;
+}
+
+.header nav a {
+  margin: 0 15px;
+  color: #fff5e6;
+  text-decoration: none;
+}
+
+.hero {
+  padding: 2rem;
+  background-color: #fff5e6;
+}
+
+.productos {
+  padding: 2rem;
+}
+
+.producto-lista {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.producto {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  width: 200px;
+  background-color: white;
+}
+
+.producto img {
+  width: 100%;
+  height: auto;
+}
+
+button {
+  background-color: #8b5e3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #a47148;
+}
+
+footer {
+  background-color: #eee;
+  padding: 1rem;
+  margin-top: 2rem;
+}
