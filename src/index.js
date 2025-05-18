@@ -14,9 +14,11 @@ app.use(routes);
 
 async function initialSetup() {
   try {
-    console.log('🔗 Conectando a la base de datos...');
-    await connectDB(); 
+    console.log('1. Iniciando conexión a DB...');
+    await connectDB();
+    console.log('2. Conexión exitosa. Creando usuarios...');
     await createUser(); 
+    console.log('3. Usuarios creados. Iniciando servidor...');
     
     app.listen(4000, () => {
       console.log('🚀 Servidor corriendo en el puerto 4000');
