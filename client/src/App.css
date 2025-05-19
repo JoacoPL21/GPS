@@ -1,65 +1,89 @@
-.App {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  text-align: center;
-  background-color: #fdfcfb;
-  color: #333;
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff8f0;
+  display: flex;
+  flex-direction: column;
+  color: #3b2f2f;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 1rem;
 }
 
 .header {
-  background-color: #8b5e3c;
+  background-color: #a47148;
   color: white;
-  padding: 1rem 0;
+  padding: 1rem;
+  text-align: center;
 }
 
 .header nav a {
-  margin: 0 15px;
-  color: #fff5e6;
+  margin: 0 1rem;
+  color: white;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .hero {
-  padding: 2rem;
-  background-color: #fff5e6;
+  background-color: #f5e1d4;
+  padding: 3rem;
+  text-align: center;
+  border-radius: 10px;
+  margin-top: 1rem;
+}
+
+.hero button {
+  background-color: #a47148;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  cursor: pointer;
 }
 
 .productos {
-  padding: 2rem;
+  margin: 2rem 0;
 }
 
 .producto-lista {
   display: flex;
-  justify-content: center;
-  gap: 2rem;
   flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
 }
 
 .producto {
+  background-color: #fff;
+  padding: 1rem;
   border: 1px solid #ddd;
-  padding: 1rem;
+  border-radius: 8px;
   width: 200px;
-  background-color: white;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.producto img {
-  width: 100%;
-  height: auto;
+.image {
+width: 200px;
+height: 200px;
 }
 
-button {
-  background-color: #8b5e3c;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  margin-top: 0.5rem;
-  cursor: pointer;
+.nosotros, .contacto {
+  padding: 2rem 0;
+  background-color: #fdf7f0;
+  margin-top: 1rem;
+  border-radius: 10px;
+  text-align: center;
 }
 
-button:hover {
-  background-color: #a47148;
-}
-
-footer {
-  background-color: #eee;
-  padding: 1rem;
+.footer {
   margin-top: 2rem;
+  text-align: center;
+  padding: 1rem;
+  background-color: #a47148;
+  color: white;
 }
