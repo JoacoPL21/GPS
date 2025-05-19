@@ -9,12 +9,11 @@ const envFilePath = path.resolve(__dirname, "../../.env");
 
 dotenv.config({ path: envFilePath });
 
-const PORT = process.env.PORT;
-const HOST = process.env.HOST;
+const PORT = process.env.DB_PORT;
+const HOST = process.env.DB_HOST;
 const DB_USER = process.env.DB_USER;
-const PASSWORD = process.env.PASSWORD;
-const DATABASE = process.env.DATABASE;
-
+const PASSWORD = process.env.DB_PASSWORD;
+const DATABASE = process.env.DB_DATABASE;
 export {
   PORT,
   HOST,
