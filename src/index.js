@@ -20,8 +20,8 @@ async function initialSetup() {
     await createUser(); 
     console.log('3. Usuarios creados. Iniciando servidor...');
     
-    app.listen(4000, () => {
-      console.log('🚀 Servidor corriendo en el puerto 4000');
+    app.listen(1214, () => {
+      console.log('🚀 Servidor corriendo en el puerto 1214');
     });
   } catch (error) {
     console.error('❌ Error en la configuración inicial:', error);
