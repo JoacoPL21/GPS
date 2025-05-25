@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import routes from './routes/routes.js';
 import cors from 'cors';
 import { connectDB } from './config/configDB.js';
-import createUser from './config/initialSetup.js';
+import { createUser, createProductos } from './config/initialSetup.js';
 
 const app = express();
 app.use(express.json());
@@ -16,9 +16,10 @@ async function initialSetup() {
   try {
     console.log('1. Iniciando conexión a DB...');
     await connectDB();
-    console.log('2. Conexión exitosa. Creando usuarios...');
+    console.log('2. Conexión exitosa. Creando datos iniciales...');
     await createUser(); 
-    console.log('3. Usuarios creados. Iniciando servidor...');
+    await createProductos();
+    console.log('3. Datos creados. Iniciando servidor...');
     
     app.listen(1214, () => {
       console.log('🚀 Servidor corriendo en el puerto 1214');
