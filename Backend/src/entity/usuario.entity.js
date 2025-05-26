@@ -29,7 +29,7 @@ const Usuarios = new EntitySchema({
         },
         password: {
             type: "varchar",
-            length: 20,
+            length: 120,
             nullable: false,
         },
         rol: {
@@ -51,19 +51,7 @@ const Usuarios = new EntitySchema({
         },
     },
 
-    indices: [
-        {
-            name: "IDX_USER",
-            columns: ["id_cliente"],
-            unique: true,
-        },
-
-        {
-            name: "IDX_EMAIL",
-            columns: ["email"],
-            unique: true,
-        },
-    ],
+   
 });
 
 export default Usuarios;
