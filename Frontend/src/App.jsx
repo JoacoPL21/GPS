@@ -11,6 +11,7 @@ function App() {
           <a href="#nosotros">Nosotros</a>
           <a href="#contacto">Contacto</a>
           <Link to="/cart">Carrito</Link>
+          <Link to="/shopping-cart">Carrito de compras</Link>
         </nav>
       </header>
 
