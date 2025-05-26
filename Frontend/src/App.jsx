@@ -1,4 +1,5 @@
 import './App.css'
+import { Link } from 'react-router-dom'
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
           <a href="#productos">Productos</a>
           <a href="#nosotros">Nosotros</a>
           <a href="#contacto">Contacto</a>
+          <Link to="/cart">Carrito</Link>
         </nav>
       </header>
 
