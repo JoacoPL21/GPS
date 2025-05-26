@@ -7,7 +7,7 @@ function App() {
       <header className="header">
         <h1>Artesanías en Madera</h1>
         <nav>
-          <a href="#productos">Productos</a>
+           <Link to="/productos">Productos</Link>
           <a href="#nosotros">Nosotros</a>
           <a href="#contacto">Contacto</a>
           <Link to="/cart">Carrito</Link>
