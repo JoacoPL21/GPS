@@ -1,32 +1,35 @@
 'use strict';
 import chalk from 'chalk';
 import { AppDataSource } from './configDB.js';
-import User from '../entity/User.js';
 import Productos from '../entity/Productos.js';
+import Usuarios from '../entity/usuario.entity.js';
+import { encryptPassword } from '../helpers/bcrypt.helper.js';
 
 async function createUser() {
   try {
-    const UserRepository = AppDataSource.getRepository(User);
+    const UserRepository = AppDataSource.getRepository(Usuarios);
 
     const count = await UserRepository.count();
     if (count > 0) {
-      console.log(chalk.yellow("ℹ️  Cursos ya existen. Se omite creación."));
+      console.log(chalk.yellow("ℹ️  Usuarios ya existen. Se omite creación."));
       return;
     }
 
     await Promise.all([
       UserRepository.save(UserRepository.create({
-        name: "SkibidiDop",
-        email: "skibidi@gmail.com"
+        nombreCompleto: "Admin",
+        email: "admin2025@gmail.com",
+        telefono: "966433091",
+        password: await encryptPassword("admin123"),
+        rol: "admin",
       })),
       UserRepository.save(UserRepository.create({
-        name: "Toilete",
-        email: "toilete@gmail.com"
-      })),
-      UserRepository.save(UserRepository.create({
-        name: "SigmaBoy",
-        email: "sigmaboy@gmail.com"
-      })),
+        nombreCompleto: "Cliente",
+        email: "cliente2025@gmail.com",
+        telefono: "984764839",
+        password: await encryptPassword("cliente123"),
+        rol: "cliente",
+      }))
     ]);
 
     console.log(chalk.green("✅ Usuarios creados exitosamente."));
