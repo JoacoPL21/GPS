@@ -1,32 +1,25 @@
-// configDB.js
+"use strict";
 import { DataSource } from "typeorm";
-import { DATABASE, DB_USER, HOST, PASSWORD, PORT } from "./configENV.js";
-import path from 'path';
-import { fileURLToPath } from 'url';
-import chalk from 'chalk';
+import { DATABASE, DB_USERNAME, HOST, PASSWORD } from "./configENV.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const AppDataSource = new DataSource({
-    type: "postgres",
-    host: HOST,
-    port: PORT,
-    username: DB_USER,
-    password: PASSWORD,
-    database: DATABASE,
-    synchronize: true,
-    logging: false,
-    schema: "public",
-    entities: [path.join(__dirname, '../entity/**/*.js')],
+export const AppDataSource = new DataSource({
+  type: "postgres",
+  host: `${HOST}`,
+  port: 5432,
+  username: `${DB_USERNAME}`,
+  password: `${PASSWORD}`,
+  database: `${DATABASE}`,
+  entities: ["src/entity/**/*.js"],
+  synchronize: true,
+  logging: false,
 });
 
 export async function connectDB() {
-    try {
-        await AppDataSource.initialize();
-        console.log(chalk.green("🔗 Conectado a la base de datos"));
-    } catch (error) {
-        console.error(chalk.red("❌ Error al conectar a la base de datos", error));
-    }
+  try {
+    await AppDataSource.initialize();
+    console.log("=> Conexión exitosa a la base de datos!");
+  } catch (error) {
+    console.error("Error al conectar con la base de datos:", error);
+    process.exit(1);
+  }
 }
-
-export { AppDataSource };

@@ -1,37 +1,71 @@
 'use strict';
 import chalk from 'chalk';
 import { AppDataSource } from './configDB.js';
-import User from '../entity/User.js';
 import Productos from '../entity/Productos.js';
+import Usuarios from '../entity/usuario.entity.js';
+import Categoria from '../entity/Categoria.js';
+import { encryptPassword } from '../helpers/bcrypt.helper.js';
 
 async function createUser() {
   try {
-    const UserRepository = AppDataSource.getRepository(User);
+    const UserRepository = AppDataSource.getRepository(Usuarios);
 
     const count = await UserRepository.count();
     if (count > 0) {
-      console.log(chalk.yellow("ℹ️  Cursos ya existen. Se omite creación."));
+      console.log(chalk.yellow("ℹ️  Usuarios ya existen. Se omite creación."));
       return;
     }
 
     await Promise.all([
       UserRepository.save(UserRepository.create({
-        name: "SkibidiDop",
-        email: "skibidi@gmail.com"
+        nombreCompleto: "Admin",
+        email: "admin2025@gmail.com",
+        telefono: "966433091",
+        password: await encryptPassword("admin123"),
+        rol: "admin",
       })),
       UserRepository.save(UserRepository.create({
-        name: "Toilete",
-        email: "toilete@gmail.com"
-      })),
-      UserRepository.save(UserRepository.create({
-        name: "SigmaBoy",
-        email: "sigmaboy@gmail.com"
-      })),
+        nombreCompleto: "Cliente",
+        email: "cliente2025@gmail.com",
+        telefono: "984764839",
+        password: await encryptPassword("cliente123"),
+        rol: "cliente",
+      }))
     ]);
 
     console.log(chalk.green("✅ Usuarios creados exitosamente."));
   } catch (error) {
     console.error(chalk.red("❌ Error al crear usuarios:", error));
+  }
+}
+async function createCategoria() {
+  try {
+    const CategoriaRepository = AppDataSource.getRepository(Categoria);
+
+    const count = await CategoriaRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Categorías ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      CategoriaRepository.save(CategoriaRepository.create({
+        nombre: "Juguetes",
+        descripcion: "Juguetes de madera para niños"
+      })),
+      CategoriaRepository.save(CategoriaRepository.create({
+        nombre: "Decoración",
+        descripcion: "Artículos decorativos de madera"
+      })),
+      CategoriaRepository.save(CategoriaRepository.create({
+        nombre: "Artesanía",
+        descripcion: "Piezas artesanales únicas"
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Categorías creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear categorías:", error));
   }
 }
 
@@ -51,21 +85,24 @@ async function createProductos() {
         precio: 12000,
         stock: 10,
         descripcion: "Artesania Tipica",
-        estado: "disponible"
+        estado: "disponible",
+        id_categoria:1
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Tung",
         precio: 8500,
         stock: 20,
         descripcion: "Juguete de Madera",
-        estado: "disponible"
+        estado: "disponible",
+        id_categoria:2
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Tralalero",
         precio: 18000,
         stock: 5,
         descripcion: "Tralalero Decorativo",
-        estado: "disponible"
+        estado: "disponible",
+        id_categoria:3
       })),
     ]);
 
@@ -74,4 +111,5 @@ async function createProductos() {
     console.error(chalk.red("❌ Error al crear productos:", error));
   }
 }
-export { createUser, createProductos };
+
+export { createUser,  createCategoria, createProductos, };
