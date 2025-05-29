@@ -27,3 +27,4 @@ const Categoria = new EntitySchema({
         }
     }
 });
+export default Categoria;
