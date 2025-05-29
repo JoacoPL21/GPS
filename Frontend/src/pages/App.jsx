@@ -1,4 +1,4 @@
-import './App.css'
+import './../styles/App.css'
 import { Link } from 'react-router-dom'
 
 function App() {
@@ -7,11 +7,11 @@ function App() {
       <header className="header">
         <h1>Artesanías en Madera</h1>
         <nav>
-          <a href="#productos">Productos</a>
+           <Link to="/productos">Productos</Link>
           <a href="#nosotros">Nosotros</a>
           <a href="#contacto">Contacto</a>
           <Link to="/cart">Carrito</Link>
-          <Link to="/shopping-cart">Carrito de compras</Link>
+          <Link to="/login">Iniciar Sesión</Link>
         </nav>
       </header>
 
