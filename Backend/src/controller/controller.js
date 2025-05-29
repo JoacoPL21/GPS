@@ -1,10 +1,10 @@
 import express from 'express';
 import { AppDataSource } from '../config/configDB.js';
-import User from '../entity/User.js';
+import Usuarios from '../entity/usuario.entity.js';
 
 async function getAllUser(req, res) {
   try {
-    const UserRepository = AppDataSource.getRepository(User);
+    const UserRepository = AppDataSource.getRepository(Usuarios);
     const users = await UserRepository.find();
     res.json({ success: true, data: users });
   } catch (error) {
