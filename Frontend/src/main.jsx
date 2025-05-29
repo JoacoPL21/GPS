@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import './index.css'
-import App from './App.jsx'
-import Cart from './Carrito/cart.jsx' 
-import Productos from './Catalogo/Productos.jsx'
-import ProductoInfo from './Catalogo/ProductoInfo.jsx'
-import Login from './User/login.jsx'
+import './../src/styles/index.css'
+import App from './pages/App.jsx'
+import Cart from './pages/Carrito/cart.jsx' 
+import Productos from './pages/Catalogo/Productos.jsx'
+import ProductoInfo from './pages/Catalogo/ProductoInfo.jsx'
+import Login from './pages/User/login.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
