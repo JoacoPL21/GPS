@@ -1,22 +1,26 @@
-
 import { ShoppingCart } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 const productosDisponibles = [
     {
         id: 1,
         nombre: 'Caja tallada a mano',
         precio: 15000,
+        stock: 10,
         imagen: '/images/picaro.jpg',
     },
     {
         id: 2,
         nombre: 'Escultura de roble',
         precio: 25000,
+        stock: 5,
         imagen: '/images/tung.png',
     },
     {
         id: 3,
         nombre: 'Cuenco rústico',
         precio: 12000,
+        stock: 8,
         imagen: '/images/tralalero.jpg',
     },
 ];
@@ -27,32 +31,29 @@ export default function Productos() {
         <div className="p-6 max-w-4xl mx-auto">
         <header className="header">
            <h1 className="text-3xl font-bold mb-6 text-center">Artesanías de Madera</h1>
-            <nav>
-            <a href="#productos">Productos</a>
-            <a href="#nosotros">Nosotros</a>
-            <a href="#contacto">Contacto</a>
-            </nav>
+           
         </header>
         
          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
         {productosDisponibles.map((producto) => (
-          <div
-            key={producto.id}
-            className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center"
-          >
-            <img
-              src={producto.imagen}
-              alt={producto.nombre}
-              className="w-full h-40 object-cover rounded-xl mb-4"
-            />
-            <h2 className="text-xl font-semibold">{producto.nombre}</h2>
-            <p className="text-gray-600 mb-4">${producto.precio.toLocaleString()}</p>
-                <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center transition-colors"
-            >
-              <ShoppingCart className="mr-2 w-4 h-4" /> Agregar
-            </button>
-          </div>
+         <div
+          key={producto.id}
+          className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center"
+>
+          <Link to={`/productos/${producto.id}`} className="w-full">
+          <img
+            src={producto.imagen}
+            alt={producto.nombre}
+            className="w-full h-40 object-cover rounded-xl mb-4"
+          />
+            <h2 className="text-xl font-bold text-black text-center">{producto.nombre}</h2>
+          </Link>
+          <p className="text-gray-600 mb-4">${producto.precio.toLocaleString()}</p>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center transition-colors">
+            <ShoppingCart className="mr-2 w-4 h-4" /> Agregar
+          </button>
+        </div>
+
         ))}
       </div>   
   
