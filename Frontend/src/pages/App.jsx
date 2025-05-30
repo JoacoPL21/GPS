@@ -1,5 +1,6 @@
 import './../styles/App.css'
 import { Link } from 'react-router-dom'
+import ContactSection from './Contact/contact_us'
 
 function App() {
   return (
@@ -51,9 +52,7 @@ function App() {
       </section>
 
       <section id="contacto" className="contacto">
-        <h3>Contacto</h3>
-        <p>📞 +56 9 1234 5678</p>
-        <p>📧 contacto@artesaniamadera.cl</p>
+      <ContactSection />
       </section>
 
       <footer className="footer">
