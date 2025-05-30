@@ -6,7 +6,7 @@ import useLogin from "../hooks/auth/useLogin";
 
 const Login = () => {
     const navigate = useNavigate();
-    const { errorEmail, errorPassword, errorData, handleInputChange } =
+    const { errorEmail, errorPassword, errorData, handleInputChange, inputData } =
         useLogin();
 
     useEffect(() => {
@@ -43,15 +43,27 @@ const Login = () => {
     }, []);
 
     const loginSubmit = async (data) => {
-       try {
+        try {
             const response = await login(data);
             if (response.status === 200) {
+                localStorage.setItem("token", response.data.token);
                 navigate("/");
             } else {
-                console.error("Error en el inicio de sesión:", response.message);
+                // Si tu backend responde con { dataInfo: 'email'/'password', message: '...' }
+                if (response.data && response.data.dataInfo && response.data.message) {
+                    errorData(response.data);
+                } else {
+                    // Error genérico
+                    errorData({ dataInfo: "email", message: "ocurrio un problema al iniciar sesion" });
+                }
             }
         } catch (error) {
-            console.error("Error al iniciar sesión:", error);
+            // Si el error viene en error.response.data
+            if (error.response && error.response.data && error.response.data.dataInfo && error.response.data.message) {
+                errorData(error.response.data);
+            } else {
+                errorData({ dataInfo: "email", message: "Error de red o servidor" });
+            }
         }
     }
 
@@ -63,8 +75,10 @@ const Login = () => {
                     <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
                     <form
                         onSubmit={(e) => {
+                            console.log("inputData", inputData);
                             e.preventDefault();
-                            navigate("/");
+                            loginSubmit(inputData);
+
                         }}
                     >
                         <div className="mb-4">
@@ -75,7 +89,7 @@ const Login = () => {
                                 type="email"
                                 id="email"
                                 name="email"
-                                onChange={handleInputChange}
+                                onChange={(e) => handleInputChange("email", e.target.value)}
                                 className={`w-full p-2 border rounded ${
                                     errorEmail ? "border-red-500" : "border-gray-300"
                                 }`}
@@ -93,7 +107,7 @@ const Login = () => {
                                 type="password"
                                 id="password"
                                 name="password"
-                                onChange={handleInputChange}
+                                onChange={e => handleInputChange("password", e.target.value)}
                                 className={`w-full p-2 border rounded ${
                                     errorPassword ? "border-red-500" : "border-gray-300"
                                 }`}
@@ -103,13 +117,10 @@ const Login = () => {
                                 <p className="text-red-500 text-xs mt-1">{errorPassword}</p>
                             )}
                         </div>
-                        {errorData && (
-                            <p className="text-red-500 text-xs mb-4">{errorData}</p>
-                        )}
+                        
                         <button
                             type="submit"
                             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
-                            onClick={() => loginSubmit({ email: document.getElementById("email").value, password: document.getElementById("password").value })}
                         >
                             Iniciar Sesión
                         </button>
