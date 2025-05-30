@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import {login}  from "../services/auth.service";
-import useLogin from "../hooks/auth/useLogin";
+import {login}  from "../../services/auth.service";
+import useLogin from "../../hooks/auth/useLogin";
 
 
 const Login = () => {

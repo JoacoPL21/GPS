@@ -26,6 +26,32 @@ const Productos = new EntitySchema({
         estado: {
         type:"varchar",
         },
+        id_categoria: {
+        type: "int",
+        nullable: false,
+        },
+        created_at: {
+            type: "timestamp",
+            default: () => "CURRENT_TIMESTAMP",
+            nullable: false,
+        },
+        updated_at: {
+            type: "timestamp",
+            default: () => "CURRENT_TIMESTAMP",
+            onUpdate: "CURRENT_TIMESTAMP",
+            nullable: false,
+        }
+        
     },
-    });
+    relations: {
+        categoria: {
+            type: "many-to-one",
+            target: "Categoria",
+            joinColumn: {
+                name: "id_categoria",
+            },
+            onDelete: "CASCADE"
+        }
+    }
+});
 export default Productos;
