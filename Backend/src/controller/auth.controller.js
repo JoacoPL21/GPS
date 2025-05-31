@@ -37,8 +37,10 @@ export async function login(req, res) {
 export async function register(req, res) {
   try {
     const { body } = req;
-
+    
     const { error } = registerValidation.validate(body);
+    // Validación de los datos del usuario  
+    // Si hay un error de validación, se maneja el error y se envía una respuesta al cliente
 
     if (error)
       return handleErrorClient(res, 400, "Error de validación", error.message);
