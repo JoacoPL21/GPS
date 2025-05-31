@@ -83,6 +83,7 @@ function App() {
       <section id="contacto" className="contacto">
       <ContactSection />
       </section>
+      </main>
 
       <footer className="footer bg-gray-100 text-center py-4">
         © 2025 Artesanías en Madera. Todos los derechos reservados.
