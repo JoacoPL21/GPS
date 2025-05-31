@@ -8,7 +8,7 @@ const router = Router();
 
 router
   .post("/login", login)
-  .post("/register", authenticateJwt, isAdmin, register)
+  .post("/register",register)
   .post("/logout", logout);
 
 export default router;
