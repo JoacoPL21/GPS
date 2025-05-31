@@ -1,47 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import {login}  from "../../services/auth.service";
 import useLogin from "../../hooks/auth/useLogin";
 
 
 const Login = () => {
     const navigate = useNavigate();
-    const { errorEmail, errorPassword, errorData, handleInputChange } =
-        useLogin();
+    const { errorEmail, errorPassword, errorData, handleInputChange } = useLogin();
 
-    useEffect(() => {
-        document.documentElement.classList.add(
-            "h-full",
-            "w-full",
-            "overflow-hidden"
-        );
-        document.body.classList.add("h-full", "w-full", "overflow-hidden", "m-0");
-
-        const root = document.getElementById("root");
-
-        if (root) {
-            root.classList.add("login-root");
-        }
-
-        return () => {
-            document.documentElement.classList.remove(
-                "h-full",
-                "w-full",
-                "overflow-hidden"
-            );
-            document.body.classList.remove(
-                "h-full",
-                "w-full",
-                "overflow-hidden",
-                "m-0"
-            );
-
-            if (root) {
-                root.classList.remove("login-root");
-            }
-        };
-    }, []);
-
+    // Función para manejar el envío del formulario de inicio de sesión
     const loginSubmit = async (data) => {
        try {
             const response = await login(data);
@@ -54,8 +20,7 @@ const Login = () => {
             console.error("Error al iniciar sesión:", error);
         }
     }
-
-
+    
     return (
         <div className="">
             <div className="flex items-center justify-center h-screen ">

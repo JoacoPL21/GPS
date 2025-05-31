@@ -13,6 +13,7 @@ function App() {
           <a href="#contacto">Contacto</a>
           <Link to="/cart">Carrito</Link>
           <Link to="/login">Iniciar Sesión</Link>
+          <Link to="/register">Registrarse</Link>
         </nav>
       </header>
 

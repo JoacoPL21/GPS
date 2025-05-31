@@ -2,7 +2,7 @@
 import Joi from "joi";
 export const authValidation = Joi.object({
   email: Joi.string()
-    .pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+    .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
     .email()
     .required()
     .messages({
@@ -45,7 +45,8 @@ export const registerValidation = Joi.object({
       "string.base": "El nombre completo debe ser una cadena de texto",
     }),
   telefono: Joi.string()
-    .pattern(/^\d{9}$/)
+    .pattern(/^9[0-9]{8}$/)
+    .length(9)
     .required()
     .messages({
       "string.pattern.base": "El teléfono debe tener exactamente 9 dígitos",
