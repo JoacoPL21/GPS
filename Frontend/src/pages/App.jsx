@@ -1,8 +1,11 @@
+
 import './../styles/App.css';
 import { Link } from 'react-router-dom';
 import { Sling as Hamburger } from 'hamburger-react';
 import { useState, useEffect } from 'react'; // <-- importamos useEffect
 import Sidebar from '../components/Sidebar';
+import ContactSection from './Contact/contact_us'
+
 
 function App() {
   const [isOpen, setOpen] = useState(false);
@@ -20,7 +23,6 @@ function App() {
     <div className="relative">
       {/* Sidebar */}
       <Sidebar isOpen={isOpen} toggle={() => setOpen(false)} />
-
       {/* Navbar sticky */}
       <header className="navbar_md sticky top-0 bg-white shadow z-40 p-4">
   <div className="relative flex items-center justify-center">
@@ -78,12 +80,9 @@ function App() {
           </p>
         </section>
 
-        <section id="contacto" className="contacto mb-12">
-          <h3 className="text-xl font-bold mb-2">Contacto</h3>
-          <p>📞 +56 9 1234 5678</p>
-          <p>📧 contacto@artesaniamadera.cl</p>
-        </section>
-      </main>
+      <section id="contacto" className="contacto">
+      <ContactSection />
+      </section>
 
       <footer className="footer bg-gray-100 text-center py-4">
         © 2025 Artesanías en Madera. Todos los derechos reservados.
