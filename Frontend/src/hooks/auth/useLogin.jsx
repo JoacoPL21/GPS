@@ -5,11 +5,13 @@ const useLogin = () => {
     const [errorPassword, setErrorPassword] = useState('');
     const [inputData, setInputData] = useState({ email: '', password: '' });
 
+
+   
     useEffect(() => {
         if (inputData.email) setErrorEmail('');
         if (inputData.password) setErrorPassword('');
     }, [inputData.email, inputData.password]);
-
+    
     const errorData = (dataMessage) => {
         if (dataMessage.dataInfo === 'email') {
             setErrorEmail(dataMessage.message);
