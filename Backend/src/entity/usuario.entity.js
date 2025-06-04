@@ -11,6 +11,10 @@ const Usuarios = new EntitySchema({
             type: "int",
             generated: true,
         },
+        id_direccion: {
+            type: "int",
+            nullable: true,
+        },
         nombreCompleto: { 
             type: "varchar",
             length: 100,
@@ -50,6 +54,19 @@ const Usuarios = new EntitySchema({
             nullable: false,
         },
     },
+
+    relations: {
+        direcciones: {
+            type: "one-to-many",
+            target: "Direccion",
+            inverseSide: "usuario",
+            cascade: true,
+            joinColumn: {
+                name: "id_usuario",
+                referencedColumnName: "id_usuario",
+            },
+        },
+    }
 
    
 });

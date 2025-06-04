@@ -3,12 +3,14 @@ import chalk from 'chalk';
 import { AppDataSource } from './configDB.js';
 import Productos from '../entity/Productos.js';
 import Usuarios from '../entity/usuario.entity.js';
+import Direccion from '../entity/direccion.entity.js';
 import Categoria from '../entity/Categoria.js';
 import { encryptPassword } from '../helpers/bcrypt.helper.js';
 
 async function createUser() {
   try {
     const UserRepository = AppDataSource.getRepository(Usuarios);
+    const DireccionRepository = AppDataSource.getRepository(Direccion);
 
     const count = await UserRepository.count();
     if (count > 0) {
@@ -23,13 +25,16 @@ async function createUser() {
         telefono: "966433091",
         password: await encryptPassword("admin123"),
         rol: "admin",
+        id_direccion: 1
+        
       })),
-      UserRepository.save(UserRepository.create({
-        nombreCompleto: "Cliente",
-        email: "cliente2025@gmail.com",
-        telefono: "984764839",
-        password: await encryptPassword("cliente123"),
-        rol: "cliente",
+      DireccionRepository.save(DireccionRepository.create({
+        calle: "Avnda Los carreras",
+        numero: "505",
+        ciudad: "Concepcion",
+        region: "Biobio",
+        codigo_postal: "1234567",
+        tipo_de_direccion: "envio"
       }))
     ]);
 

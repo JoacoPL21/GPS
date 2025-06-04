@@ -43,6 +43,9 @@ const Productos = new EntitySchema({
         }
         
     },
+    // Relacion entre Producto y Categoria
+    // Un producto pertenece a una categoria
+    // Una categoria puede tener varios productos
     relations: {
         categoria: {
             type: "many-to-one",

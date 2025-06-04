@@ -9,6 +9,7 @@ import ProductoInfo from './pages/Catalogo/ProductoInfo.jsx'
 import Login from './pages/User/login.jsx'
 import Error404 from './pages/Error404.jsx'
 import Register from './pages/User/register.jsx' // Assuming you have a register component
+import Logout from './pages/User/logout.jsx' // Assuming you have a logout component
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -20,7 +21,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/productos/:id" element={<ProductoInfo />} />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Error404 />} />
-        <Route path="/register" element={<Register />} /> {/* Assuming you want to use the same component for registration */}
+        <Route path="/register" element={<Register />} /> 
+        <Route path="/logout" element={<Logout />} /> 
       </Routes>
     </BrowserRouter>
   </StrictMode>,
