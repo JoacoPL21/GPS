@@ -73,6 +73,7 @@ async function setupServer() {
     app.use("/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
+   
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
     });
