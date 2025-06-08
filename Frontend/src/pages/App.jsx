@@ -20,29 +20,29 @@ function App() {
   }, [isOpen]);
 
   return (
-    <div className="relative">
+    <div className="full_navbar" >
       {/* Sidebar */}
       <Sidebar isOpen={isOpen} toggle={() => setOpen(false)} />
       {/* Navbar sticky */}
       <header className="navbar_md sticky top-0 bg-white shadow z-40 p-4">
-  <div className="relative flex items-center justify-center">
-    {/* Botón hamburguesa siempre visible a la izquierda */}
-    <div className="absolute left-4 z-30">
-      <Hamburger toggled={isOpen} toggle={setOpen} />
-    </div>
+        <div className="relative flex items-center justify-center">
+          {/* Botón hamburguesa siempre visible a la izquierda */}
+          <div className="absolute left-4 z-30">
+            <Hamburger toggled={isOpen} toggle={setOpen} />
+          </div>
 
-    {/* Título centrado */}
-    <h1 className="text-xl font-bold">Maderas Lemaco</h1>
+          {/* Título centrado */}
+          <h1 className="text-xl font-bold">Maderas Lemaco</h1>
 
-    {/* Menú oculto en pantallas pequeñas, visible a partir de md */}
-    <nav className="hidden md:flex absolute right-4 gap-4">
-      <Link to="/login" className="navbar_text">Iniciar Sesión</Link>
-      <Link to="/cart" className="navbar_text">Carrito</Link>
-    </nav>
-  </div>
-</header>
+          {/* Menú oculto en pantallas pequeñas, visible a partir de md */}
+          <nav className="hidden md:flex absolute right-4 gap-4">
+            <Link to="/login" className="navbar_text">Iniciar Sesión</Link>
+            <Link to="/cart" className="navbar_text">Carrito</Link>
+          </nav>
+        </div>
+      </header>
       {/* Contenido principal */}
-      <main className="p-4">
+      <main className="main_content p-4">
         <section className="hero mb-8">
           <h2 className="text-2xl font-bold mb-2">Hecho a mano con dedicación</h2>
           <p className="mb-4">Descubre nuestras piezas únicas de artesanía en madera.</p>
@@ -80,9 +80,9 @@ function App() {
           </p>
         </section>
 
-      <section id="contacto" className="contacto">
-      <ContactSection />
-      </section>
+        <section id="contacto" className="contacto">
+          <ContactSection />
+        </section>
       </main>
 
       <footer className="footer bg-gray-100 text-center py-4">
