@@ -1,6 +1,5 @@
 "use strict"
 import { EntitySchema } from "typeorm";
-
 const Usuarios = new EntitySchema({
     name: "Usuario",
     //nombre de la tabla en la base de datos
