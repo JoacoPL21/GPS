@@ -11,10 +11,13 @@ import { connectDB } from "./config/configDB.js";
 import { createProductos,createUser, createCategoria } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
+import dotenv from 'dotenv';
+import paymentRoutes from './routes/payment.routes.js';
 
 
 async function setupServer() {
   try {
+    dotenv.config();
     const app = express();
 
     // Deshabilita el encabezado "x-powered-by" por seguridad
@@ -66,6 +69,8 @@ async function setupServer() {
 
     // Otras rutas generales
     app.use("/api", indexRoutes);
+    app.use(express.json());
+    app.use('/api/payments', paymentRoutes);
 
     const uploadPath = path.resolve("src/public/uploads");
 
@@ -73,8 +78,8 @@ async function setupServer() {
     app.use("/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
-    app.listen(PORT, () => {
-      console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
+    app.listen(3000, () => {
+      console.log(`=> Servidor corriendo en ${HOST}:3000/api`);
     });
   } catch (error) {
     console.log("Error en index.js -> setupServer(), el error es: ", error);
