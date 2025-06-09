@@ -14,6 +14,7 @@
     "@formspree/react": "^3.0.0",
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
+    "@mercadopago/sdk-react": "^1.0.3",
     "@tailwindcss/vite": "^4.1.7",
     "axios": "^1.9.0",
     "hamburger-react": "^2.5.2",
