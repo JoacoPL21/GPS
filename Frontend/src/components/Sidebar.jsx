@@ -11,7 +11,7 @@ export default function Sidebar({ isOpen, toggle }) {
       >
         <ul className="p-6 space-y-4">
           <li><a href="#" onClick={toggle} className="sidebar_text hover:underline">Inicio</a></li>
-          <li><a href="#productos" onClick={toggle} className="sidebar_text hover:underline">Productos</a></li>
+          <li><a href="/catalogo" onClick={toggle} className="sidebar_text hover:underline">Productos</a></li>
           <li><a href="#nosotros" onClick={toggle} className="sidebar_text hover:underline">Nosotros</a></li>
           <li><a href="#contacto" onClick={toggle} className="sidebar_text hover:underline">Contacto</a></li>
           <li><a href="/login" onClick={toggle} className="sidebar_text hover:underline">Iniciar Sesión</a></li>

@@ -86,6 +86,7 @@ async function createProductos() {
         stock: 10,
         descripcion: "Artesania Tipica",
         estado: "disponible",
+        image_url: "picaro.jpg",
         id_categoria:1
       })),
       ProductosRepository.save(ProductosRepository.create({
@@ -94,6 +95,7 @@ async function createProductos() {
         stock: 20,
         descripcion: "Juguete de Madera",
         estado: "disponible",
+        image_url:"tung.png",
         id_categoria:2
       })),
       ProductosRepository.save(ProductosRepository.create({
@@ -102,6 +104,7 @@ async function createProductos() {
         stock: 5,
         descripcion: "Tralalero Decorativo",
         estado: "disponible",
+        image_url:"tralalero.jpg",
         id_categoria:3
       })),
     ]);
