@@ -23,7 +23,7 @@ const ContactSection = () => {
 
   const handleWhatsAppClick = () => {
     const message = encodeURIComponent('Hola! Me interesa conocer más sobre sus artesanías en madera.');
-    window.open(`https://wa.me/56912345678?text=${message}`, '_blank');
+    window.open(`https://wa.me/56945451849?text=${message}`, '_blank');
   };
 
   // Resetear formulario después del éxito

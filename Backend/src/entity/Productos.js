@@ -14,6 +14,11 @@ const Productos = new EntitySchema({
         type: "varchar",
         length: 255,
         },
+        image_url: {
+        type: "varchar",
+        length: 255,
+        nullable: true,
+        },
         precio: {
         type: "decimal",
         },
