@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 const Login = () => {
     
     const navigate = useNavigate();
-
+    
     const { errorEmail, errorPassword, errorData, handleInputChange, inputData } =
         useLogin();
     // Estado para manejar el éxito del inicio de sesión
