@@ -67,7 +67,7 @@ async function setupServer() {
     // Otras rutas generales
     app.use("/api", indexRoutes);
 
-    const uploadPath = path.resolve("src/public/uploads");
+    const uploadPath = path.resolve("src/uploads");
 
     // Servir archivos estáticos desde el directorio 'uploads'
     app.use("/uploads", express.static(uploadPath));

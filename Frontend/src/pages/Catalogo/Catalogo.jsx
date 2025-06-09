@@ -2,9 +2,9 @@ import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useProductosDispo from "../../hooks/productos/useProductosDispo";
 
-const Productos = () => {
-  const { productosDisponibles, loading } = useProductosDispo();
-  
+const Catalogo = () => {
+const { productosDisponibles, loading } = useProductosDispo();
+
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -17,15 +17,16 @@ const Productos = () => {
           <p className="col-span-full text-center text-gray-500">Cargando productos...</p>
         ) : productosDisponibles && productosDisponibles.length > 0 ? (
           productosDisponibles.map((producto) => (
+      
             <div
               key={producto.id_producto}
               className="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center"
             >
-              <Link to={`/productos/${producto.id_producto}`} className="w-full">
+              <Link to={`/producto/${producto.id}`} className="w-full">
                 <img
-                  src={producto.imagen}
-                  alt={producto.nombre}
-                  className="w-full h-48 object-cover rounded-xl mb-4"
+                src={`http://localhost:3000/uploads/${producto.imagen}`}
+                alt={producto.nombre}
+                className="w-full h-48 object-cover rounded-xl mb-4"
                 />
                 <h2 className="text-lg font-semibold text-black text-center">{producto.nombre}</h2>
               </Link>
@@ -59,4 +60,4 @@ const Productos = () => {
   );
 };
 
-export default Productos;
+export default Catalogo;
