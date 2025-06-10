@@ -12,8 +12,6 @@ const envFilePath = path.resolve(_dirname, ".env");
 dotenv.config({ path: envFilePath });
 
 
-console.log("PORT",process.env.DB_PORT);
-
 
 
 export const PORT = process.env.DB_PORT;

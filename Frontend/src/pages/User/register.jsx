@@ -1,16 +1,26 @@
-import { useState,useEffect } from 'react';
+import { useState,useEffect, } from 'react';
 import { Send } from 'lucide-react';
 import { register } from '../../services/auth.service';
 import Swal from 'sweetalert2';
-
-
+import {useNavigate} from 'react-router-dom';
 
 const Register = () => {
+
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombreCompleto: '',
     email: '',
     password: '',
-    telefono: ''
+    telefono: '',
+    direccion: {
+      calle: '',
+      numero: '',
+      ciudad: '',
+      region: '',
+      codigo_postal: '',
+      tipo_de_direccion: 'envio' // Valor por defecto
+    }
+
   });
 
   const [errors, setErrors] = useState({});
@@ -30,7 +40,12 @@ useEffect(() => {
       confirmButtonColor: "#f59e0b", // Color del botón de confirmación
 
     });
+    setSuccess(false); // Limpia el estado de éxito para evitar que se muestre la alerta nuevamente
+    setTimeout(() => {
+      navigate('/login'); // Redirige al usuario a la página de inicio de sesión después de mostrar la alerta
+    }, 2000); // Espera 2 segundos antes de redirigir
   }
+  // Limpia el estado de éxito después de mostrar la alerta
 }, [success]);
 
 
@@ -39,14 +54,19 @@ useEffect(() => {
   // Maneja los cambios en los campos del formulario (avisa sobre errores)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [name]: ''
-    }));
+    });
+    // Limpia el error del campo correspondiente al cambiar su valor
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: ''
+      });
+    }
+
+    
   };
 
   // Valida los campos del formulario y devuelve un objeto con los errores
@@ -76,6 +96,7 @@ useEffect(() => {
     if (!telefonoRegex.test(formData.telefono)) {
       newErrors.telefono = 'El teléfono debe tener 9 dígitos y comenzar con 9';
     }
+    // Si hay algún error, se devuelve el objeto de errores
     return newErrors;
   };
 
@@ -83,7 +104,6 @@ useEffect(() => {
   // Maneja el envío del formulario
   const handleRegister = async (e) => {
     e.preventDefault();
-    setSuccess(false);
     const validationErrors = validate();
     //si existe al menos un error, no se envía el formulario 
     if (Object.keys(validationErrors).length > 0) {
@@ -92,20 +112,24 @@ useEffect(() => {
     }
     // Si no hay errores, se procede a enviar el formulario
     setSubmitting(true);
+    console.log('Datos del formulario:', formData);
     try {
       const response = await register(formData);
-      console.log('Respuesta del registro:', response);
       if (response.status === 'Success') {
         setSuccess(true);
         setFormData({
           nombreCompleto: '',
           email: '',
           password: '',
-          telefono: ''
+          telefono: '',
+        
         });
         setErrors({});
 
         console.log('Registro exitoso:', response);
+        
+
+      
       } else {
         setErrors({ general: response.message || 'Error al registrar' });
         console.error('Error al registrar:', response.message);
@@ -190,6 +214,12 @@ useEffect(() => {
               />
               {errors.telefono && <p className="text-red-600 text-sm mt-1">{errors.telefono}</p>}
             </div>
+            <div>
+            </div>
+            
+            
+
+
             <div className="mt-6 pt-6 border-t border-amber-200">
               <button
                 type="submit"

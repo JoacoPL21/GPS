@@ -1,53 +1,52 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {login}  from "../../services/auth.service";
 import useLogin from "../../hooks/auth/useLogin";
+import Swal from "sweetalert2";
 
 
 const Login = () => {
+    
     const navigate = useNavigate();
+    
     const { errorEmail, errorPassword, errorData, handleInputChange, inputData } =
         useLogin();
-
+    // Estado para manejar el éxito del inicio de sesión
+    const [success, setSuccess] = useState(false);
+    // Manejo de la alerta de SweetAlert2
     useEffect(() => {
-        document.documentElement.classList.add(
-            "h-full",
-            "w-full",
-            "overflow-hidden"
-        );
-        document.body.classList.add("h-full", "w-full", "overflow-hidden", "m-0");
-
-        const root = document.getElementById("root");
-
-        if (root) {
-            root.classList.add("login-root");
+        if (success) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Inicio de sesión exitoso",
+                text: "Bienvenido de nuevo",
+                showConfirmButton: true,
+                confirmButtonText: "Aceptar",
+                confirmButtonColor: "#f59e0b", // Color del botón de confirmación
+            });
         }
-
-        return () => {
-            document.documentElement.classList.remove(
-                "h-full",
-                "w-full",
-                "overflow-hidden"
-            );
-            document.body.classList.remove(
-                "h-full",
-                "w-full",
-                "overflow-hidden",
-                "m-0"
-            );
-
-            if (root) {
-                root.classList.remove("login-root");
-            }
-        };
-    }, []);
+    }, [success]);
+    // Verificar si el usuario ya está autenticado
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/dashboard");
+        }
+        
+    }, [navigate]);
 
     // Función para manejar el envío del formulario de inicio de sesión
     const loginSubmit = async (data) => {
+        // Validar los campos antes de enviar
         try {
             const response = await login(data);
-            if (response.status === 200) {
+            if (response.status === 'Success') {
+                setSuccess(true);
+                // Guardamos el token en el localStorage
                 localStorage.setItem("token", response.data.token);
-                navigate("/");
+               // Redirigir al usuario a la página principal o dashboard
+                navigate("/dashboard");
             } else {
                 // Si tu backend responde con { dataInfo: 'email'/'password', message: '...' }
                 if (response.data && response.data.dataInfo && response.data.message) {
@@ -72,14 +71,10 @@ const Login = () => {
             <div className="flex items-center justify-center h-screen ">
                 <div className="bg-white p-8 rounded-lg shadow-md w-96">
                     <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
-                    <form
-                        onSubmit={(e) => {
-                            console.log("inputData", inputData);
-                            e.preventDefault();
-                            loginSubmit(inputData);
-
-                        }}
-                    >
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        loginSubmit(inputData);
+                    }}>
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2" htmlFor="email">
                                 Correo Electrónico

@@ -9,7 +9,6 @@ import ContactSection from './Contact/contact_us'
 
 function App() {
   const [isOpen, setOpen] = useState(false);
-
   // Evitar scroll al abrir el sidebar
   useEffect(() => {
     if (isOpen) {
@@ -38,6 +37,7 @@ function App() {
     <nav className="hidden md:flex absolute right-4 gap-4">
       <Link to="/login" className="navbar_text">Iniciar Sesión</Link>
       <Link to="/cart" className="navbar_text">Carrito</Link>
+      <Link to='/logout' className="navbar_text">Cerrar Sesión</Link>
     </nav>
   </div>
 </header>
