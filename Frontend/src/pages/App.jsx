@@ -9,7 +9,6 @@ import ContactSection from './Contact/contact_us'
 
 function App() {
   const [isOpen, setOpen] = useState(false);
-
   // Evitar scroll al abrir el sidebar
   useEffect(() => {
     if (isOpen) {
@@ -34,13 +33,14 @@ function App() {
           {/* Título centrado */}
           <h1 className="text-xl font-bold">Maderas Lemaco</h1>
 
-          {/* Menú oculto en pantallas pequeñas, visible a partir de md */}
-          <nav className="hidden md:flex absolute right-4 gap-4">
-            <Link to="/login" className="navbar_text">Iniciar Sesión</Link>
-            <Link to="/cart" className="navbar_text">Carrito</Link>
-          </nav>
-        </div>
-      </header>
+    {/* Menú oculto en pantallas pequeñas, visible a partir de md */}
+    <nav className="hidden md:flex absolute right-4 gap-4">
+      <Link to="/login" className="navbar_text">Iniciar Sesión</Link>
+      <Link to="/cart" className="navbar_text">Carrito</Link>
+      <Link to='/logout' className="navbar_text">Cerrar Sesión</Link>
+    </nav>
+  </div>
+</header>
       {/* Contenido principal */}
       <main className="main_content p-4">
         <section className="hero mb-8">

@@ -22,6 +22,7 @@ export async function getProductosDisponibles() {
             stock: producto.stock,
             descripcion: producto.descripcion,
             estado: producto.estado,
+            imagen: producto.image_url,
             categoria:producto.categoria?.nombre
         }));
         return [productosData, null];

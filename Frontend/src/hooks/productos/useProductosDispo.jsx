@@ -11,12 +11,13 @@ const useProductosDispo = () => {
   const { data, error } = await getProductosDisponibles();
 
     if (data) {
-
     setProductosDisponibles(data.data);
       } else {
         console.error("Error al obtener productos:", error);
       }
+      setLoading(false);
     };
+    
 
     fetchProductos();
   }, []);

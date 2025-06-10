@@ -1,6 +1,5 @@
 "use strict"
 import { EntitySchema } from "typeorm";
-
 const Usuarios = new EntitySchema({
     name: "Usuario",
     //nombre de la tabla en la base de datos
@@ -10,6 +9,10 @@ const Usuarios = new EntitySchema({
             primary: true,
             type: "int",
             generated: true,
+        },
+        id_direccion: {
+            type: "int",
+            nullable: true,
         },
         nombreCompleto: { 
             type: "varchar",
@@ -50,6 +53,19 @@ const Usuarios = new EntitySchema({
             nullable: false,
         },
     },
+
+    relations: {
+        direcciones: {
+            type: "one-to-many",
+            target: "Direccion",
+            inverseSide: "usuario",
+            cascade: true,
+            joinColumn: {
+                name: "id_usuario",
+                referencedColumnName: "id_usuario",
+            },
+        },
+    }
 
    
 });
