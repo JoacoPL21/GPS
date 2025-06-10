@@ -4,9 +4,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './../src/styles/index.css'
 import App from './pages/App.jsx'
 import Cart from './pages/Carrito/shopping_cart.jsx'
-import Productos from './pages/Catalogo/Productos.jsx'
-import ProductoInfo from './pages/Catalogo/ProductoInfo.jsx'
-import Cart from './pages/Carrito/shopping_cart.jsx'
 import Catalogo from './pages/Catalogo/Catalogo.jsx'
 import Producto from './pages/Catalogo/Producto.jsx'
 import Login from './pages/User/login.jsx'
@@ -24,8 +21,8 @@ createRoot(document.getElementById('root')).render(
                 <Routes>
                     <Route path="/" element={<App />} />
                     <Route path="/cart" element={<Cart />} />
-                    <Route path="/catalogo" element={<Productos />} />
-                    <Route path="/productos/:id_producto" element={<ProductoInfo />} />
+                    <Route path="/catalogo" element={<Catalogo />} />
+                    <Route path="/producto/:id_producto" element={<Producto />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="*" element={<Error404 />} />
                     <Route path="/register" element={<Register />} />
