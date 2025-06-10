@@ -46,9 +46,10 @@ function App() {
         <section className="hero mb-8">
           <h2 className="text-2xl font-bold mb-2">Hecho a mano con dedicación</h2>
           <p className="mb-4">Descubre nuestras piezas únicas de artesanía en madera.</p>
-          <button className="bg-[#a47148] text-white py-2 px-4 rounded hover:bg-[#8a5e3c]">
+          <a href="/catalogo"><button className="bg-[#a47148] text-white py-2 px-4 rounded hover:bg-[#8a5e3c]" href="/catalogo">
             Ver catálogo
-          </button>
+          </button></a>
+          
         </section>
 
         <section id="productos" className="productos mb-12">
