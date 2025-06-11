@@ -103,6 +103,15 @@ height: 200px;
   text-decoration: none;
 }
 
+.button_login {
+  background-color: #fff;
+}
+
+.button_login:hover {
+  background-color: #fff;
+  border-color: #ffa726;
+}
+
 @media (max-width: 768px) {
   .navbar_md {
     height: 72px;

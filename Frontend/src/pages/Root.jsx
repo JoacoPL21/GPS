@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import { Sling as Hamburger } from "hamburger-react";
+import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
 import "../styles/App.css";
 
@@ -15,20 +15,10 @@ function Root() {
   }, [isOpen]);
 
   return (
-    <div className="full_navbar">
+    <div className="full_navbar flex flex-col min-h-screen bg-[#fff8f0]">
       <Sidebar isOpen={isOpen} toggle={() => setOpen(false)} />
-      <header className="navbar_md sticky top-0 bg-white shadow z-40 p-4">
-        <div className="relative flex items-center justify-center">
-          <div className="absolute left-4 z-30">
-            <Hamburger toggled={isOpen} toggle={setOpen} />
-          </div>
-          <h1 className="text-xl font-bold">Maderas Lemaco</h1>
-          <nav className="hidden md:flex absolute right-4 gap-4">
-            {/* Puedes agregar aquí tus links globales */}
-          </nav>
-        </div>
-      </header>
-      <main className="main_content p-4">
+      <Navbar isOpen={isOpen} setOpen={setOpen} />
+      <main className="main_content p-4 flex-1">
         <Outlet />
       </main>
       <footer className="footer bg-gray-100 text-center py-4">
