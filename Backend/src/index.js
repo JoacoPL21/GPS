@@ -72,14 +72,15 @@ async function setupServer() {
     app.use(express.json());
     app.use('/api/payments', paymentRoutes);
 
-    const uploadPath = path.resolve("src/public/uploads");
+    const uploadPath = path.resolve("src/uploads");
 
     // Servir archivos estáticos desde el directorio 'uploads'
     app.use("/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
-    app.listen(3000, () => {
-      console.log(`=> Servidor corriendo en ${HOST}:3000/api`);
+   
+    app.listen(PORT, () => {
+      console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
     });
   } catch (error) {
     console.log("Error en index.js -> setupServer(), el error es: ", error);
