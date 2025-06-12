@@ -61,3 +61,64 @@ export const registerValidation = Joi.object({
     "any.required": "Todos los campos son obligatorios",
 
 });
+
+
+export const direccionValidation = Joi.object({
+  calle: Joi.string()
+    .min(3)
+    .max(100)
+    .required()
+    .messages({
+      "string.min": "La calle debe tener al menos 3 caracteres",
+      "any.required": "La calle es obligatoria",
+      "string.max": "La calle no puede tener más de 100 caracteres",
+      "string.empty": "La calle no puede estar vacía",
+      "string.base": "La calle debe ser una cadena de texto",
+    }),
+  numero: Joi.string()
+    .min(1)
+    .max(10)
+    .required()
+    .messages({
+      "string.min": "El número debe tener al menos 1 carácter",
+      "any.required": "El número es obligatorio",
+      "string.max": "El número no puede tener más de 10 caracteres",
+      "string.empty": "El número no puede estar vacío",
+      "string.base": "El número debe ser una cadena de texto",
+    }),
+  ciudad: Joi.string()
+    .min(2)
+    .max(50)
+    .required()
+    .messages({
+      "string.min": "La ciudad debe tener al menos 2 caracteres",
+      "any.required": "La ciudad es obligatoria",
+      "string.max": "La ciudad no puede tener más de 50 caracteres",
+      "string.empty": "La ciudad no puede estar vacía",
+      "string.base": "La ciudad debe ser una cadena de texto",
+    }),
+  region: Joi.string()
+    .min(2)
+    .max(50)
+    .required()
+    .messages({
+      "string.min": "La región debe tener al menos 2 caracteres",
+      "any.required": "La región es obligatoria",
+      "string.max": "La región no puede tener más de 50 caracteres",
+      "string.empty": "La región no puede estar vacía",
+      "string.base": "La región debe ser una cadena de texto",
+    }),
+  codigo_postal: Joi.string()
+    .pattern(/^\d{3}0000$/)
+    .required()
+    .messages({
+      "string.pattern.base": "El código postal debe tener el formato XXX0000",
+      "any.required": "El código postal es obligatorio",
+      "string.empty": "El código postal no puede estar vacío",
+      "string.base": "El código postal debe ser una cadena de texto",
+
+    }),
+}).unknown(false).messages({
+    "object.unknown": "Los campos adicionales no están permitidos",
+    "any.required": "Todos los campos son obligatorios",
+});

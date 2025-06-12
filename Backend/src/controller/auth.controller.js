@@ -3,6 +3,7 @@ import { loginService, registerService } from "../services/auth.service.js";
 import {
   authValidation,
   registerValidation,
+  direccionValidation
 } from "../validations/auth.validation.js";
 import {
   handleErrorClient,
@@ -35,15 +36,16 @@ export async function login(req, res) {
 }
 
 export async function register(req, res) {
+  console.log("Datos del usuario:", req.body);
   try {
     const { body } = req;
-    
+    // Validación de los datos del usuario
     const { error } = registerValidation.validate(body);
     // Validación de los datos del usuario  
     // Si hay un error de validación, se maneja el error y se envía una respuesta al cliente
 
     if (error)
-      return handleErrorClient(res, 400, "Error de validación", error.message);
+      return handleErrorClient(res, 400, "Error de validación auth controller", error.message);
 
     const [newUser, errorNewUser] = await registerService(body);
 

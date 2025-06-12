@@ -1,16 +1,26 @@
-import { useState,useEffect } from 'react';
+import { useState,useEffect, } from 'react';
 import { Send } from 'lucide-react';
 import { register } from '../../services/auth.service';
 import Swal from 'sweetalert2';
-
-
+import {useNavigate} from 'react-router-dom';
 
 const Register = () => {
+
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombreCompleto: '',
     email: '',
     password: '',
-    telefono: ''
+    telefono: '',
+    direccion: {
+      calle: '',
+      numero: '',
+      ciudad: '',
+      region: '',
+      codigo_postal: '',
+      tipo_de_direccion: 'envio' // Valor por defecto
+    }
+
   });
 
   const [errors, setErrors] = useState({});
@@ -30,7 +40,12 @@ useEffect(() => {
       confirmButtonColor: "#f59e0b", // Color del botón de confirmación
 
     });
+    setSuccess(false); // Limpia el estado de éxito para evitar que se muestre la alerta nuevamente
+    setTimeout(() => {
+      navigate('/login'); // Redirige al usuario a la página de inicio de sesión después de mostrar la alerta
+    }, 2000); // Espera 2 segundos antes de redirigir
   }
+  // Limpia el estado de éxito después de mostrar la alerta
 }, [success]);
 
 
@@ -39,14 +54,19 @@ useEffect(() => {
   // Maneja los cambios en los campos del formulario (avisa sobre errores)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [name]: ''
-    }));
+    });
+    // Limpia el error del campo correspondiente al cambiar su valor
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: ''
+      });
+    }
+
+    
   };
 
   // Valida los campos del formulario y devuelve un objeto con los errores
@@ -76,6 +96,7 @@ useEffect(() => {
     if (!telefonoRegex.test(formData.telefono)) {
       newErrors.telefono = 'El teléfono debe tener 9 dígitos y comenzar con 9';
     }
+    // Si hay algún error, se devuelve el objeto de errores
     return newErrors;
   };
 
@@ -83,7 +104,6 @@ useEffect(() => {
   // Maneja el envío del formulario
   const handleRegister = async (e) => {
     e.preventDefault();
-    setSuccess(false);
     const validationErrors = validate();
     //si existe al menos un error, no se envía el formulario 
     if (Object.keys(validationErrors).length > 0) {
@@ -92,20 +112,24 @@ useEffect(() => {
     }
     // Si no hay errores, se procede a enviar el formulario
     setSubmitting(true);
+    console.log('Datos del formulario:', formData);
     try {
       const response = await register(formData);
-      console.log('Respuesta del registro:', response);
       if (response.status === 'Success') {
         setSuccess(true);
         setFormData({
           nombreCompleto: '',
           email: '',
           password: '',
-          telefono: ''
+          telefono: '',
+        
         });
         setErrors({});
 
         console.log('Registro exitoso:', response);
+        
+
+      
       } else {
         setErrors({ general: response.message || 'Error al registrar' });
         console.error('Error al registrar:', response.message);
@@ -119,103 +143,135 @@ useEffect(() => {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-br from-amber-50 to-orange-50 min-h-screen">
-      <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-amber-100 flex flex-col">
-          <h2 className="text-4xl font-bold text-amber-900 mb-4 text-center">
-            Crear Cuenta
-          </h2>
-          <p className="text-lg text-amber-700 mb-8 text-center">
-            Regístrate para acceder a todas las funcionalidades.
-          </p>
-          <form onSubmit={handleRegister} className="space-y-6 flex flex-col flex-grow">
-            <div>
-              <label htmlFor="nombreCompleto" className="block text-sm font-medium text-amber-900 mb-2">
-                Nombre Completo *
-              </label>
-              <input
-                type="text"
-                id="nombreCompleto"
-                name="nombreCompleto"
-                value={formData.nombreCompleto}
-                onChange={handleInputChange}
-                className={`w-full px-4 py-3 border ${errors.nombreCompleto ? 'border-red-400' : 'border-amber-200'} rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors`}
-                placeholder="Tu nombre"
-              />
-              {errors.nombreCompleto && <p className="text-red-600 text-sm mt-1">{errors.nombreCompleto}</p>}
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-amber-900 mb-2">
-                Correo Electrónico *
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className={`w-full px-4 py-3 border ${errors.email ? 'border-red-400' : 'border-amber-200'} rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors`}
-                placeholder="ejemplo@gmail.com"
-              />
-              {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-amber-900 mb-2">
-                Contraseña *
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className={`w-full px-4 py-3 border ${errors.password ? 'border-red-400' : 'border-amber-200'} rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors`}
-                placeholder="Contraseña"
-              />
-              {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
-            </div>
-            <div>
-              <label htmlFor="telefono" className="block text-sm font-medium text-amber-900 mb-2">
-                Telefono *
-              </label>
-              <input
-                type="text"
-                id="telefono"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleInputChange}
-                maxLength={9}
-                className={`w-full px-4 py-3 border ${errors.telefono ? 'border-red-400' : 'border-amber-200'} rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors`}
-                placeholder="123456789"
-              />
-              {errors.telefono && <p className="text-red-600 text-sm mt-1">{errors.telefono}</p>}
-            </div>
-            <div className="mt-6 pt-6 border-t border-amber-200">
-              <button
-                type="submit"
-                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2 disabled:transform-none disabled:cursor-not-allowed"
-              >
-                {submitting ? (
-                  <span>Cargando...</span>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5" />
-                    <span>Registrarse</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-amber-700 text-sm">
-              ¿Ya tienes una cuenta? <a href="/login" className="text-amber-900 font-semibold hover:underline">Inicia sesión</a>
-            </p>
+  <div className="">
+    <div className="flex items-center justify-center h-[75vh]">
+      <div className="bg-white p-8 rounded-2xl shadow-md w-96">
+        <h2 className="text-4xl pb-4 font-bold mb-6 text-center">Crear Cuenta</h2>
+        <form onSubmit={handleRegister}>
+          {/* Nombre Completo */}
+          <div className="relative mb-6">
+            <input
+              type="text"
+              id="nombreCompleto"
+              name="nombreCompleto"
+              value={formData.nombreCompleto}
+              onChange={handleInputChange}
+              placeholder=""
+              required
+              className={`peer w-full border-2 rounded-md px-3 pt-2 pb-3 text-sm bg-white text-gray-900 focus:outline-none focus:border-orange-500 transition-all
+                ${errors.nombreCompleto ? "border-red-500" : "border-gray-400"}`}
+            />
+            <label
+              htmlFor="nombreCompleto"
+              className="absolute left-2 -top-2 px-1 text-xs bg-white text-gray-600 peer-placeholder-shown:top-2 peer-placeholder-shown:text-base 
+                peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-orange-500 transition-all duration-200 z-10"
+            >
+              Nombre Completo
+            </label>
+            {errors.nombreCompleto && (
+              <p className="text-red-500 text-xs mt-1">{errors.nombreCompleto}</p>
+            )}
           </div>
-        </div>
+
+          {/* Email */}
+          <div className="relative mb-6">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder=""
+              required
+              className={`peer w-full border-2 rounded-md px-3 pt-2 pb-3 text-sm bg-white text-gray-900 focus:outline-none focus:border-orange-500 transition-all
+                ${errors.email ? "border-red-500" : "border-gray-400"}`}
+            />
+            <label
+              htmlFor="email"
+              className="absolute left-2 -top-2 px-1 text-xs bg-white text-gray-600 peer-placeholder-shown:top-2 peer-placeholder-shown:text-base 
+                peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-orange-500 transition-all duration-200 z-10"
+            >
+              Correo Electrónico
+            </label>
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          {/* Contraseña */}
+          <div className="relative mb-6">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder=""
+              required
+              className={`peer w-full border-2 rounded-md px-3 pt-2 pb-3 text-sm bg-white text-gray-900 focus:outline-none focus:border-orange-500 transition-all
+                ${errors.password ? "border-red-500" : "border-gray-400"}`}
+            />
+            <label
+              htmlFor="password"
+              className="absolute left-2 -top-2.5 px-1 text-xs bg-white text-gray-600 peer-placeholder-shown:top-2 peer-placeholder-shown:text-base 
+                peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-orange-500 transition-all duration-200 z-10"
+            >
+              Contraseña
+            </label>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          {/* Teléfono */}
+          <div className="relative mb-6">
+            <input
+              type="text"
+              id="telefono"
+              name="telefono"
+              value={formData.telefono}
+              onChange={handleInputChange}
+              maxLength={9}
+              placeholder=""
+              required
+              className={`peer w-full border-2 rounded-md px-3 pt-2 pb-3 text-sm bg-white text-gray-900 focus:outline-none focus:border-orange-500 transition-all
+                ${errors.telefono ? "border-red-500" : "border-gray-400"}`}
+            />
+            <label
+              htmlFor="telefono"
+              className="absolute left-2 -top-2.5 px-1 text-xs bg-white text-gray-600 peer-placeholder-shown:top-2 peer-placeholder-shown:text-base 
+                peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-orange-500 transition-all duration-200 z-10"
+            >
+              Teléfono
+            </label>
+            {errors.telefono && (
+              <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>
+            )}
+          </div>
+
+          {/* Mensaje de error general */}
+          {errors.general && (
+            <p className="text-red-500 text-xs mb-4">{errors.general}</p>
+          )}
+
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-2 rounded hover:bg-orange-400 transition-colors"
+            disabled={submitting}
+          >
+            {submitting ? "Cargando..." : "Registrarse"}
+          </button>
+        </form>
+        <p className="text-center text-sm mt-4">
+          ¿Ya tienes una cuenta?{" "}
+          <a href="/login" className="text-blue-600 hover:underline">
+            Inicia sesión
+          </a>
+        </p>
       </div>
-    </section>
-  );
+    </div>
+  </div>
+);
 };
 
 export default Register;
