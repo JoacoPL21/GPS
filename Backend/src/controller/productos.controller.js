@@ -1,5 +1,5 @@
 "use strict";
-import { getProductosDisponibles, createProducto } from "../services/productos.service.js";
+import { getProductosDisponibles, getProductoById, createProducto } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
 
@@ -12,8 +12,20 @@ export async function getProductosDisponiblesController(req, res) {
     }
     return handleSuccess(res, 200, "Productos disponibles obtenidos exitosamente", productos);
   } catch (error) {
-    console.error("Error en getProductosDisponiblesController:", error);
     return handleErrorServer(res, 500, "Error interno del servidor al obtener productos");
+  }
+}
+
+export async function getProductoByIdController(req, res) {
+  const { id } = req.params;
+  try {
+    const [producto, error] = await getProductoById(id);
+    if (error) {
+      return handleErrorClient(res, 404, error);
+    }
+    return handleSuccess(res, 200, "Producto obtenido exitosamente", producto);
+  } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al obtener el producto");
   }
 }
 
@@ -33,7 +45,7 @@ export async function createProductoController(req, res) {
         }
     return handleSuccess(res, 201, "Producto creado exitosamente", nuevoProducto);
   } catch (error) {
-    console.error("Error en createProductoController:", error);
+   
     return handleErrorServer(res, 500, "Error interno del servidor al crear producto");
   }
 }

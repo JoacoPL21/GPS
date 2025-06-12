@@ -1,13 +1,13 @@
 import { useParams } from 'react-router-dom';
-import useProductosDispo from "../../hooks/productos/useProductosDispo";
+import useProductosbyId from '../../hooks/productos/useProductosId';
 
 const Producto = () => {
   const { id } = useParams();
-  const { productosDisponibles, loading } = useProductosDispo();
+  const { producto, loading } = useProductosbyId(id);
 
   if (loading) return <p className="text-center mt-10">Cargando producto...</p>;
 
-  const producto = productosDisponibles.find(p => p.id === parseInt(id));
+
 console.log(producto);
   if (!producto) {
     return <p className="text-center mt-10">Producto no encontrado.</p>;

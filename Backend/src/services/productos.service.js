@@ -32,6 +32,36 @@ export async function getProductosDisponibles() {
     }
 }
 
+export async function getProductoById(id) {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        const producto = await productoRepository.findOne({
+            where: { id_producto: id, estado: "disponible" },
+            relations: ["categoria"]
+        });
+
+        if (!producto) {
+            return [null, "Producto no encontrado"];
+        }
+
+        const productoData = {
+            id: producto.id_producto,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            stock: producto.stock,
+            descripcion: producto.descripcion,
+            estado: producto.estado,
+            imagen: producto.image_url,
+            categoria: producto.categoria?.nombre
+        };
+
+        return [productoData, null];
+    } catch (error) {
+        console.error("Error al obtener el producto:", error);
+        return [null, "Error al obtener el producto"];
+    }
+}
+
 export async function createProducto(productoData) {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
