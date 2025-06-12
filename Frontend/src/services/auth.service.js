@@ -13,7 +13,11 @@ export async function login(dataUser) {
         if (status === 200) {
             const { nombreCompleto, email,rol } = jwtDecode(data.data.token);
             const userData = { nombreCompleto, email,rol };
+
             sessionStorage.setItem('usuario', JSON.stringify(userData));
+            // Guardar el token en localStorage
+            localStorage.setItem('token', data.data.token);
+
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
             cookies.set('jwt-auth', data.data.token, {path:'/'});
             return response.data

@@ -3,13 +3,16 @@ import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar({ isOpen, setOpen }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { isAuthenticated } = useAuth();
 
   // Cierra el dropdown si se hace clic fuera
   useEffect(() => {
+    
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
@@ -45,27 +48,39 @@ function Navbar({ isOpen, setOpen }) {
 
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-44 bg-white text-black border border-orange-400 rounded-lg shadow-lg z-50">
-                <Link
-                  to="/login"
-                  className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-t-lg transition"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  Iniciar Sesión
-                </Link>
-                <Link
-                  to="/register"
-                  className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-b-lg transition"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  Registrarse
-                </Link>
+                {!isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/login"
+                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-t-lg transition"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Iniciar Sesión
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-b-lg transition"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Registrarse
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    to="/logout"
+                    className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Cerrar Sesión
+                  </Link>
+                )}
               </div>
             )}
           </div>
 
           {/* Otros enlaces */}
           <Link to="/cart" className="navbar_text">Carrito</Link>
-          <Link to="/logout" className="navbar_text">Cerrar Sesión</Link>
+          
         </nav>
       </div>
     </header>

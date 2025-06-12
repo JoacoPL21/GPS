@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, authUser } = useAuth();
     
     if (!isAuthenticated) {
         return <Navigate to="/login" />;
@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     // se verifica si el usuario tiene un rol permitido 
     // si no se especifican roles permitidos, se permite el acceso
 
-    if (allowedRoles && !allowedRoles.includes(user?.rol)) {
+    if (allowedRoles && !allowedRoles.includes(authUser?.rol)) {
         return <Navigate to="/" />;
     }
 

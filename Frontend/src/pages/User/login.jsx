@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import useLogin from "../../hooks/auth/useLogin";
 import Swal from "sweetalert2";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const Login = () => {
     inputData
   } = useLogin();
 
+  const {  setIsAuthenticated,isAuthenticated } = useAuth();
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -30,20 +32,21 @@ const Login = () => {
     }
   }, [success]);
 
+  //redirigir al usuario si ya está autenticado
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/dashboard");
+    console.log("isAuthenticated:", isAuthenticated);
+    if (isAuthenticated) {
+      navigate("/");
     }
-  }, [navigate]);
-
+  }, [isAuthenticated, navigate]);
   const loginSubmit = async (data) => {
     try {
       const response = await login(data);
       if (response.status === "Success") {
         setSuccess(true);
-        localStorage.setItem("token", response.data.token);
-        navigate("/dashboard");
+        // Actualizar el estado de autenticación
+        setIsAuthenticated(true);
+        navigate("/");
       } else {
         if (response.data?.dataInfo && response.data?.message) {
           errorData(response.data);
