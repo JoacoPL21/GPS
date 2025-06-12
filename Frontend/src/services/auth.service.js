@@ -11,8 +11,8 @@ export async function login(dataUser) {
         });
         const { status, data } = response;
         if (status === 200) {
-            const { nombreCompleto, email,rol } = jwtDecode(data.data.token);
-            const userData = { nombreCompleto, email,rol };
+            const { nombreCompleto, email, rut, rol } = jwtDecode(data.data.token);
+            const userData = { nombreCompleto, email, rut, rol };
             sessionStorage.setItem('usuario', JSON.stringify(userData));
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
             cookies.set('jwt-auth', data.data.token, {path:'/'});
@@ -24,18 +24,14 @@ export async function login(dataUser) {
 }
 
 export async function register(data) {
-   console.log('Datos del usuario service frot:', data);
     try {
-       
-        const data_register = convertirMinusculas(data);
-        console.log('Datos del usuario service front:', data_register);
-        
-        const { nombreCompleto, email, telefono, password } = data_register;
+        const dataRegister = convertirMinusculas(data);
+        const { nombreCompleto, email, telefono, password } = dataRegister
         const response = await axios.post('/auth/register', {
             nombreCompleto,
             email,
             telefono,
-            password,
+            password
         });
         return response.data;
     } catch (error) {
@@ -49,9 +45,6 @@ export async function logout() {
     try {
         await axios.post('auth/logout');
         sessionStorage.removeItem('usuario');
-        // Eliminar el token del localStorage
-        localStorage.removeItem('token');
-        // Eliminar el token de las cookies
         cookies.remove('jwt');
         cookies.remove('jwt-auth');
     } catch (error) {
