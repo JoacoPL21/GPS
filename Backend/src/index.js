@@ -72,7 +72,7 @@ async function setupServer() {
     app.use(express.json());
     app.use('/api/payments', paymentRoutes);
 
-    const uploadPath = path.resolve("src/uploads");
+    const uploadPath = path.resolve("src/public/uploads");
 
     // Servir archivos estáticos desde el directorio 'uploads'
     app.use("/uploads", express.static(uploadPath));
