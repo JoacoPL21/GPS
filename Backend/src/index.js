@@ -78,9 +78,8 @@ async function setupServer() {
     app.use("/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
-   
-    app.listen(PORT, () => {
-      console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
+    app.listen(3000, () => {
+      console.log(`=> Servidor corriendo en ${HOST}:3000/api`);
     });
   } catch (error) {
     console.log("Error en index.js -> setupServer(), el error es: ", error);
