@@ -1,63 +1,33 @@
-'use client'
+'use client';
 
-import { useState } from 'react';
-import { ShoppingCart, Trash2 } from 'lucide-react';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { ShoppingCart, Trash2, X } from 'lucide-react';
+import { useCarrito } from '../../components/CartProvider';
 
-const productosDisponibles = [
-    {
-        id: 1,
-        nombre: 'Caja tallada a mano',
-        precio: 15000,
-        imagen: '/images/picaro.jpg',
-    },
-    {
-        id: 2,
-        nombre: 'Escultura de roble',
-        precio: 25000,
-        imagen: '/images/tung.png',
-    },
-    {
-        id: 3,
-        nombre: 'Cuenco rústico',
-        precio: 12000,
-        imagen: '/images/tralalero.jpg',
-    },
-];
-
-export default function CarritoDeCompras() {
-  const [carrito, setCarrito] = useState([]);
-  const [open, setOpen] = useState(false);
-
-  const agregarAlCarrito = (producto) => {
-    setCarrito((prev) => [...prev, producto]);
-  };
-
-  const eliminarDelCarrito = (index) => {
-    setCarrito((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const total = carrito.reduce((acc, item) => acc + item.precio, 0);
+export default function Carrito() {
+  const {
+    carrito,
+    eliminarDelCarrito,
+    open,
+    setOpen,
+    total,
+  } = useCarrito();
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center">Artesanías de Madera</h1>
-
+    <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 p-4 rounded-full text-white shadow-lg flex items-center hover:bg-blue-700 transition-colors"
+        className="fixed bottom-6 right-6 bg-blue-600 p-4 rounded-full text-white shadow-lg flex items-center hover:bg-blue-700 transition-colors z-50"
       >
         <ShoppingCart className="w-6 h-6" />
         <span className="ml-2">{carrito.length}</span>
       </button>
 
-      <Dialog open={open} onClose={() => setOpen(false)} className="relative z-10">
+      <Dialog open={open} onClose={() => setOpen(false)} className="relative z-40">
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0"
         />
-
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
             <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
@@ -77,7 +47,7 @@ export default function CarritoDeCompras() {
                         className="text-gray-400 hover:text-gray-500"
                       >
                         <span className="sr-only">Cerrar</span>
-                        <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                        <X className="h-6 w-6" aria-hidden="true" />
                       </button>
                     </div>
 
@@ -134,12 +104,12 @@ export default function CarritoDeCompras() {
                         Los impuestos se calculan al finalizar la compra.
                       </p>
                       <div className="mt-6">
-                        <button
-                          onClick={() => setOpen(false)}
-                          className="flex w-full justify-center rounded-md bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+                        <a
+                          href="/cart"
+                          className="flex w-full justify-center rounded-md bg-black px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-yellow-700"
                         >
                           Pagar
-                        </button>
+                        </a>
                       </div>
                       <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                         <p>
@@ -162,29 +132,6 @@ export default function CarritoDeCompras() {
           </div>
         </div>
       </Dialog>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        {productosDisponibles.map((producto) => (
-          <div
-            key={producto.id}
-            className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center"
-          >
-            <img
-              src={producto.imagen}
-              alt={producto.nombre}
-              className="w-full h-40 object-cover rounded-xl mb-4"
-            />
-            <h2 className="text-xl font-semibold">{producto.nombre}</h2>
-            <p className="text-gray-600 mb-4">${producto.precio.toLocaleString()}</p>
-            <button
-              onClick={() => agregarAlCarrito(producto)}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center transition-colors"
-            >
-              <ShoppingCart className="mr-2 w-4 h-4" /> Agregar
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }

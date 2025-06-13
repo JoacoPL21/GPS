@@ -250,7 +250,7 @@ const ShoppingCart = () => {
         </div>
 
         <div className="mt-6 flex-grow sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
-          <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
+          <div className="mx-auto w-full lg:max-w-2xl xl:max-w-4xl">
             <div className="space-y-6">
               {cartItems.map((item) => (
                 <CartItem
