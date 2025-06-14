@@ -7,7 +7,6 @@ import { useCarrito } from '../../components/CartProvider';
 const Catalogo = () => {
   const { productosDisponibles, loading } = useProductosDispo();
   const { agregarAlCarrito } = useCarrito();
-    console.log("productosDisponibles:", productosDisponibles); // <-- Agregado
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -24,7 +23,7 @@ const Catalogo = () => {
               key={producto.id_producto}
               className="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center"
             >
-              <Link to={`/producto/${producto.id}`} className="w-full">
+              <Link to={`/producto/${producto.id_producto}`} className="w-full">
                 <img
                   src={`http://localhost:3000/uploads/${producto.imagen}`}
                   alt={producto.nombre}
@@ -36,7 +35,11 @@ const Catalogo = () => {
                 ${producto.precio != null ? producto.precio.toLocaleString() : 'Precio no disponible'}
               </p>
               <button
-                onClick={() => agregarAlCarrito(producto)} // <-- agrega producto al carrito
+                onClick={() => agregarAlCarrito({
+                  ...producto,
+                  id: producto.id_producto,
+                  imagen: `http://localhost:3000/uploads/${producto.imagen}`
+                })}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center transition-colors"
               >
                 <ShoppingCart className="mr-2 w-4 h-4" /> Agregar
@@ -48,21 +51,7 @@ const Catalogo = () => {
         )}
       </div>
 
-      <section id="nosotros" className="mb-8">
-        <h3 className="text-2xl font-semibold mb-2">Sobre Nosotros</h3>
-        <p>
-          Somos una empresa familiar dedicada a la creación de artesanías con madera local chilena.
-          Cada pieza es elaborada con amor y respeto por la naturaleza.
-        </p>
-      </section>
-
-      <section id="contacto">
-        <h3 className="text-2xl font-semibold mb-2">Contacto</h3>
-        <p>📞 +56 9 1234 5678</p>
-        <p>📧 contacto@artesaniamadera.cl</p>
-      </section>
-
-      <Carrito /> {/* <-- Carrito flotante */}
+      <Carrito />
     </div>
   );
 };

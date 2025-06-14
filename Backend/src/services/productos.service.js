@@ -16,7 +16,7 @@ export async function getProductosDisponibles() {
        
 
         const productosData = productos.map(producto => ({
-            id: producto.id_producto,
+            id_producto: producto.id_producto,
             nombre: producto.nombre,
             precio: producto.precio,
             stock: producto.stock,
