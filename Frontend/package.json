@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "test": "echo \"No hay tests definidos aún\" && exit 0",
     "lint": "eslint .",
     "preview": "vite preview"
   },
