@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import useProductosbyId from '../../hooks/productos/useProductosId';
+const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 const Producto = () => {
   const { id } = useParams();
@@ -17,7 +18,7 @@ console.log(producto);
     <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-10">
       <div>
         <img
-          src={`http://localhost:3000/uploads/${producto.imagen}`}
+          src={`${API_URL}/uploads/${producto.imagen}`}
           alt={producto.nombre}
           className="w-full h-[500px] object-cover rounded-2xl shadow-lg"
         />

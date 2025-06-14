@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import useProductosDispo from "../../hooks/productos/useProductosDispo";
 import Carrito from '../Carrito/CarritoFunction'; 
 import { useCarrito } from '../../components/CartProvider';
+import Sidebar from '../../components/Sidebar';
 
 const Catalogo = () => {
   const { productosDisponibles, loading } = useProductosDispo();

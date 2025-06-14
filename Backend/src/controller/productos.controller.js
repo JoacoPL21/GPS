@@ -19,7 +19,7 @@ export async function getProductosDisponiblesController(req, res) {
 export async function getProductoByIdController(req, res) {
   const { id } = req.params;
   try {
-    const [producto, error] = await getProductoById(id);
+    const {data:producto, error} = await getProductoById(id);
     if (error) {
       return handleErrorClient(res, 404, error);
     }

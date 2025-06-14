@@ -6,6 +6,10 @@ const useProductoById = (id) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+      if (!id) {
+    setLoading(false);  
+
+  }
     const fetchProducto = async () => {
       const { data, error } = await getProductoById(id);
 

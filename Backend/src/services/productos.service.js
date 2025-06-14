@@ -2,6 +2,7 @@
 import Productos from "../entity/Productos.js";
 import { AppDataSource } from "../config/configDB.js";
 import Categorias from "../entity/Categoria.js";
+import { error } from "console";
 
 
 //Funcion para traer productos con estado Disponible Funcional
@@ -41,7 +42,7 @@ export async function getProductoById(id) {
         });
 
         if (!producto) {
-            return [null, "Producto no encontrado"];
+            return {data:null, error: "Producto no encontrado"};
         }
 
         const productoData = {
@@ -55,7 +56,7 @@ export async function getProductoById(id) {
             categoria: producto.categoria?.nombre
         };
 
-        return [productoData, null];
+        return { data: productoData,error: null };
     } catch (error) {
         console.error("Error al obtener el producto:", error);
         return [null, "Error al obtener el producto"];
