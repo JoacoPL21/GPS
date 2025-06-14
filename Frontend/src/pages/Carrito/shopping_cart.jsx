@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { useCarrito } from '../../components/CartProvider';
+import { Heart, Trash2, ArrowLeft } from 'lucide-react';
 
 const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
 initMercadoPago(mpPublicKey, { locale: 'es-CL' });
@@ -70,17 +71,17 @@ const CartItem = ({
               role="button"
               tabIndex={0}
               onClick={onAddToFavorites}
-              className="inline-flex items-center text-sm font-medium text-white bg-yellow-800 p-1.5 rounded-2xl hover:underline cursor-pointer"
+              className="inline-flex items-center text-sm font-medium text-white bg-yellow-800 p-2 rounded-2xl hover:underline cursor-pointer"
             >
-              ❤️ Añadir a favoritos
+              <Heart className="mr-1 h-5 w-5" /> Añadir a favoritos
             </div>
             <div
               role="button"
               tabIndex={0}
               onClick={onRemove}
-              className="inline-flex items-center text-sm font-medium border-red-700 border-2 rounded-2xl p-1.5 text-red-700 hover:text-red-900 hover:underline cursor-pointer"
+              className="inline-flex items-center text-sm font-medium hover:border-red-700 border-2 rounded-2xl p-2 text-yellow-800 border-yellow-700 hover:text-red-900 hover:underline cursor-pointer"
             >
-              ❌ Eliminar
+              <Trash2 className="mr-1 h-5 w-5" /> Eliminar
             </div>
           </div>
         </div>
@@ -151,8 +152,11 @@ const ShoppingCart = () => {
     <section className="min-h-screen bg-white py-8 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4">
         <div className="flex items-center gap-3 mb-6">
-          <Link to="/" className="text-yellow-700 hover:text-yellow-900">
-            ← Volver
+          <Link
+            to="/"
+            className="flex items-center hover:text-yellow-900 !no-underline !text-yellow-700"
+          >
+            <ArrowLeft className="mr-1 h-5 w-5" /> Volver
           </Link>
           <h2 className="text-xl font-semibold text-yellow-900 sm:text-2xl">
             Carrito de compras
@@ -222,24 +226,27 @@ const ShoppingCart = () => {
                   }}
                 />
               ) : (
-                <button
-                  onClick={handleCheckout}
-                  disabled={loading || carrito.length === 0}
-                  className={`w-full mt-4 py-2 px-4 text-white rounded-lg ${
+                <div
+                  onClick={() => {
+                    if (!loading && carrito.length > 0) {
+                      handleCheckout();
+                    }
+                  }}
+                  className={`w-full mt-4 py-2 px-4 text-white rounded-lg text-center ${
                     loading || carrito.length === 0
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-yellow-700 hover:bg-yellow-800"
+                      : "bg-yellow-700 hover:bg-yellow-800 cursor-pointer"
                   }`}
                 >
                   {loading ? "Procesando..." : "Proceder al pago"}
-                </button>
+                </div>
               )}
 
               <div className="flex justify-center gap-2 mt-4">
                 <span className="text-sm text-yellow-700">o</span>
                 <Link
                   to="/Productos"
-                  className="text-sm text-yellow-900 underline hover:text-yellow-800"
+                  className="text-sm underline !text-yellow-900"
                 >
                   Volver al catálogo
                 </Link>

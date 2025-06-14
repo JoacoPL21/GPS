@@ -18,13 +18,20 @@ export default function Carrito() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 p-4 rounded-full text-white shadow-lg flex items-center hover:bg-blue-700 transition-colors z-50"
-      >
-        <ShoppingCart className="w-6 h-6" />
-        <span className="ml-2">{carrito.reduce((acc, item) => acc + item.cantidad, 0)}</span>
-      </button>
+      {!open && (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setOpen(true)}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setOpen(true)}
+          className="cursor-pointer fixed bottom-6 right-6 bg-yellow-700 p-4 rounded-full text-white shadow-lg flex items-center hover:bg-yellow-800 transition-colors z-50"
+        >
+          <ShoppingCart className="w-6 h-6" />
+          <span className="ml-2">
+            {carrito.reduce((acc, item) => acc + item.cantidad, 0)}
+          </span>
+        </div>
+      )}
 
       <Dialog
         open={open}
@@ -48,14 +55,18 @@ export default function Carrito() {
                       <DialogTitle className="text-lg font-medium text-gray-900">
                         Carrito de Compras
                       </DialogTitle>
-                      <button
-                        type="button"
+                      <div
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setOpen(false)}
-                        className="text-gray-400 hover:text-gray-500"
+                        onKeyDown={(e) =>
+                          (e.key === "Enter" || e.key === " ") && setOpen(false)
+                        }
+                        className="text-white bg-yellow-700 p-2.5 rounded-3xl cursor-pointer"
                       >
                         <span className="sr-only">Cerrar</span>
                         <X className="h-6 w-6" aria-hidden="true" />
-                      </button>
+                      </div>
                     </div>
 
                     <div className="mt-8">
@@ -84,38 +95,66 @@ export default function Carrito() {
                                     <div className="flex justify-between text-base font-medium text-gray-900">
                                       <h3>{item.nombre}</h3>
                                       <p className="ml-4">
-                                        ${(item.precio * item.cantidad).toLocaleString()}
+                                        ${(
+                                          item.precio * item.cantidad
+                                        ).toLocaleString()}
                                       </p>
                                     </div>
                                     <p className="mt-1 text-sm text-gray-500">
-                                      Precio unitario: ${item.precio.toLocaleString()}
+                                      Precio unitario: $
+                                      {item.precio.toLocaleString()}
                                     </p>
                                   </div>
 
                                   <div className="flex flex-1 items-end justify-between text-sm mt-2">
                                     <div className="flex items-center gap-2">
-                                      <button
-                                        onClick={() => disminuirCantidad(item.id)}
-                                        className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                                      <div
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={() =>
+                                          disminuirCantidad(item.id)
+                                        }
+                                        onKeyDown={(e) =>
+                                          (e.key === "Enter" ||
+                                            e.key === " ") &&
+                                          disminuirCantidad(item.id)
+                                        }
+                                        className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
                                       >
                                         -
-                                      </button>
+                                      </div>
                                       <span>{item.cantidad}</span>
-                                      <button
-                                        onClick={() => aumentarCantidad(item.id)}
-                                        className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                                      <div
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={() =>
+                                          aumentarCantidad(item.id)
+                                        }
+                                        onKeyDown={(e) =>
+                                          (e.key === "Enter" ||
+                                            e.key === " ") &&
+                                          aumentarCantidad(item.id)
+                                        }
+                                        className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
                                       >
                                         +
-                                      </button>
+                                      </div>
                                     </div>
 
-                                    <button
-                                      type="button"
-                                      onClick={() => eliminarDelCarrito(item.id)}
-                                      className="font-medium text-red-600 hover:text-red-500"
+                                    <div
+                                      role="button"
+                                      tabIndex={0}
+                                      onClick={() =>
+                                        eliminarDelCarrito(item.id)
+                                      }
+                                      onKeyDown={(e) =>
+                                        (e.key === "Enter" || e.key === " ") &&
+                                        eliminarDelCarrito(item.id)
+                                      }
+                                      className="font-medium border-yellow-600 p-2 border-2 rounded-3xl text-yellow-700 hover:border-red-600 hover:text-red-600 cursor-pointer"
                                     >
                                       Eliminar
-                                    </button>
+                                    </div>
                                   </div>
                                 </div>
                               </li>
@@ -138,7 +177,7 @@ export default function Carrito() {
                       <div className="mt-6">
                         <Link
                           to="/cart"
-                          className="flex w-full justify-center rounded-md bg-black px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-yellow-700"
+                          className="flex w-full justify-center rounded-md bg-yellow-700 px-6 py-3 text-base font-medium !text-white !no-underline shadow-sm hover:bg-yellow-600"
                         >
                           Pagar
                         </Link>
@@ -146,14 +185,19 @@ export default function Carrito() {
                       <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                         <p>
                           o{" "}
-                          <button
-                            type="button"
+                          <div
+                            role="button"
+                            tabIndex={0}
                             onClick={() => setOpen(false)}
-                            className="font-medium text-blue-600 hover:text-blue-500"
+                            onKeyDown={(e) =>
+                              (e.key === "Enter" || e.key === " ") &&
+                              setOpen(false)
+                            }
+                            className="font-medium text-yellow-800 cursor-pointer inline"
                           >
                             Continuar comprando
                             <span aria-hidden="true"> &rarr;</span>
-                          </button>
+                          </div>
                         </p>
                       </div>
                     </div>
