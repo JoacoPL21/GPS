@@ -16,6 +16,7 @@ import Dashboard from './pages/Dashboard/dashboard.jsx'
 import { CarritoProvider } from './components/CartProvider.jsx'
 
 
+
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <BrowserRouter>

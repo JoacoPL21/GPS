@@ -9,14 +9,44 @@ export function CarritoProvider({ children }) {
   const [open, setOpen] = useState(false);
 
   const agregarAlCarrito = (producto) => {
-    setCarrito((prev) => [...prev, producto]);
+    setCarrito((prev) => {
+      const index = prev.findIndex(item => item.id === producto.id);
+
+      if (index !== -1) {
+        // Si el producto ya existe, aumentar la cantidad
+        const nuevoCarrito = [...prev];
+        nuevoCarrito[index].cantidad += 1;
+        return nuevoCarrito;
+      } else {
+        // Si no existe, agregarlo con cantidad = 1
+        return [...prev, { ...producto, cantidad: 1 }];
+      }
+    });
   };
 
   const eliminarDelCarrito = (index) => {
     setCarrito((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const total = carrito.reduce((acc, item) => acc + item.precio, 0);
+  const aumentarCantidad = (id) => {
+  setCarrito((prev) =>
+    prev.map((item) =>
+      item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item
+    )
+  );
+};
+
+const disminuirCantidad = (id) => {
+  setCarrito((prev) =>
+    prev
+      .map((item) =>
+        item.id === id ? { ...item, cantidad: item.cantidad - 1 } : item
+      )
+      .filter((item) => item.cantidad > 0)
+  );
+};
+
+  const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
 
   return (
     <CarritoContext.Provider value={{
@@ -25,6 +55,8 @@ export function CarritoProvider({ children }) {
       eliminarDelCarrito,
       open,
       setOpen,
+      aumentarCantidad,
+      disminuirCantidad,
       total,
     }}>
       {children}

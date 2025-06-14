@@ -7,6 +7,7 @@ import { useCarrito } from '../../components/CartProvider';
 const Catalogo = () => {
   const { productosDisponibles, loading } = useProductosDispo();
   const { agregarAlCarrito } = useCarrito();
+    console.log("productosDisponibles:", productosDisponibles); // <-- Agregado
 
   return (
     <div className="p-6 max-w-6xl mx-auto">

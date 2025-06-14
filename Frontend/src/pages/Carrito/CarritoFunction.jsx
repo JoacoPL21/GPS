@@ -3,15 +3,18 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { ShoppingCart, Trash2, X } from 'lucide-react';
 import { useCarrito } from '../../components/CartProvider';
+import { Link } from 'react-router-dom';
 
 export default function Carrito() {
-  const {
-    carrito,
-    eliminarDelCarrito,
-    open,
-    setOpen,
-    total,
-  } = useCarrito();
+const {
+  carrito,
+  eliminarDelCarrito,
+  aumentarCantidad,
+  disminuirCantidad,
+  open,
+  setOpen,
+  total,
+} = useCarrito();
 
   return (
     <>
@@ -58,36 +61,52 @@ export default function Carrito() {
                         ) : (
                           <ul role="list" className="-my-6 divide-y divide-gray-200">
                             {carrito.map((item, index) => (
-                              <li key={index} className="flex py-6">
-                                <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                  <img
-                                    src={item.imagen}
-                                    alt={item.nombre}
-                                    className="h-full w-full object-cover"
-                                  />
-                                </div>
+  <li key={index} className="flex py-6">
+    <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+      <img
+        src={item.imagen}
+        alt={item.nombre}
+        className="h-full w-full object-cover"
+      />
+    </div>
 
-                                <div className="ml-4 flex flex-1 flex-col">
-                                  <div>
-                                    <div className="flex justify-between text-base font-medium text-gray-900">
-                                      <h3>{item.nombre}</h3>
-                                      <p className="ml-4">${item.precio.toLocaleString()}</p>
-                                    </div>
-                                  </div>
-                                  <div className="flex flex-1 items-end justify-between text-sm">
-                                    <div className="flex">
-                                      <button
-                                        type="button"
-                                        onClick={() => eliminarDelCarrito(index)}
-                                        className="font-medium text-red-600 hover:text-red-500"
-                                      >
-                                        Eliminar
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </li>
-                            ))}
+    <div className="ml-4 flex flex-1 flex-col">
+      <div>
+        <div className="flex justify-between text-base font-medium text-gray-900">
+          <h3>{item.nombre}</h3>
+          <p className="ml-4">${(item.precio * item.cantidad).toLocaleString()}</p>
+        </div>
+        <p className="mt-1 text-sm text-gray-500">Precio unitario: ${item.precio.toLocaleString()}</p>
+      </div>
+
+      <div className="flex flex-1 items-end justify-between text-sm mt-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => disminuirCantidad(item.id)}
+            className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            -
+          </button>
+          <span>{item.cantidad}</span>
+          <button
+            onClick={() => aumentarCantidad(item.id)}
+            className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            +
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => eliminarDelCarrito(index)}
+          className="font-medium text-red-600 hover:text-red-500"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </li>
+))}
                           </ul>
                         )}
                       </div>
@@ -104,12 +123,12 @@ export default function Carrito() {
                         Los impuestos se calculan al finalizar la compra.
                       </p>
                       <div className="mt-6">
-                        <a
-                          href="/cart"
+                        <Link
+                          to="/cart"
                           className="flex w-full justify-center rounded-md bg-black px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-yellow-700"
                         >
                           Pagar
-                        </a>
+                        </Link>
                       </div>
                       <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                         <p>
