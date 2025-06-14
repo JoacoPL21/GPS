@@ -9,44 +9,61 @@ export function CarritoProvider({ children }) {
   const [open, setOpen] = useState(false);
 
   const agregarAlCarrito = (producto) => {
+    console.log("Intentando agregar producto:", producto.id, producto.nombre);
+    
     setCarrito((prev) => {
-      const index = prev.findIndex(item => item.id === producto.id);
+      console.log("Carrito actual:", prev);
+      const itemExistente = prev.find(item => item.id === producto.id);
 
-      if (index !== -1) {
-        // Si el producto ya existe, aumentar la cantidad
-        const nuevoCarrito = [...prev];
-        nuevoCarrito[index].cantidad += 1;
-        return nuevoCarrito;
+      if (itemExistente) {
+        console.log("Producto existente encontrado. Actualizando cantidad...");
+        return prev.map(item => 
+          item.id === producto.id 
+            ? { ...item, cantidad: item.cantidad + 1 } 
+            : item
+        );
       } else {
-        // Si no existe, agregarlo con cantidad = 1
+        console.log("Producto nuevo. Agregando al carrito...");
         return [...prev, { ...producto, cantidad: 1 }];
       }
     });
   };
 
-  const eliminarDelCarrito = (index) => {
-    setCarrito((prev) => prev.filter((_, i) => i !== index));
+  const eliminarDelCarrito = (id) => {
+    console.log("Eliminando producto:", id);
+    setCarrito(prev => prev.filter(item => item.id !== id));
   };
 
   const aumentarCantidad = (id) => {
-  setCarrito((prev) =>
-    prev.map((item) =>
-      item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item
-    )
-  );
-};
-
-const disminuirCantidad = (id) => {
-  setCarrito((prev) =>
-    prev
-      .map((item) =>
-        item.id === id ? { ...item, cantidad: item.cantidad - 1 } : item
+    console.log("Aumentando cantidad para:", id);
+    setCarrito(prev =>
+      prev.map(item =>
+        item.id === id 
+          ? { ...item, cantidad: item.cantidad + 1 } 
+          : item
       )
-      .filter((item) => item.cantidad > 0)
-  );
-};
+    );
+  };
 
-  const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+  const disminuirCantidad = (id) => {
+    console.log("Disminuyendo cantidad para:", id);
+    setCarrito(prev =>
+      prev
+        .map(item =>
+          item.id === id 
+            ? { ...item, cantidad: item.cantidad - 1 } 
+            : item
+        )
+        .filter(item => item.cantidad > 0) 
+    );
+  };
+
+  const total = carrito.reduce(
+    (acc, item) => acc + item.precio * item.cantidad, 
+    0
+  );
+
+  console.log("Estado actual del carrito:", carrito);
 
   return (
     <CarritoContext.Provider value={{
