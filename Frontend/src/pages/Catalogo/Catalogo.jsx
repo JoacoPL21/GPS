@@ -4,6 +4,7 @@ import useProductosDispo from "../../hooks/productos/useProductosDispo";
 import Carrito from '../Carrito/CarritoFunction'; 
 import { useCarrito } from '../../components/CartProvider';
 import Sidebar from '../../components/Sidebar';
+const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 const Catalogo = () => {
   const { productosDisponibles, loading } = useProductosDispo();
@@ -26,7 +27,7 @@ const Catalogo = () => {
             >
               <Link to={`/producto/${producto.id_producto}`} className="w-full">
                 <img
-                  src={`http://localhost:3000/uploads/${producto.imagen}`}
+                  src={`${API_URL}/uploads/${producto.imagen}`}
                   alt={producto.nombre}
                   className="w-full h-48 object-cover rounded-xl mb-4"
                 />

@@ -3,7 +3,7 @@ import useProductosbyId from '../../hooks/productos/useProductosId';
 const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 const Producto = () => {
-  const { id } = useParams();
+  const { id_producto: id} = useParams();
   const { producto, loading } = useProductosbyId(id);
 
   if (loading) return <p className="text-center mt-10">Cargando producto...</p>;
