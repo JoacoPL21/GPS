@@ -3,7 +3,7 @@ name: Despliegue a produccion - Nuevo Proyecto
 on:
   push:
     branches:
-      - main # Se ejecuta en cada push a la rama main del nuevo repo
+      - main
 
 jobs:
   tests:
@@ -17,11 +17,21 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias backend
         run: npm install
+        working-directory: Backend
 
-      - name: Ejecutar pruebas
+      - name: Ejecutar pruebas Backend
         run: npm test
+        working-directory: Backend
+
+      - name: Instalar dependencias frontend
+        run: npm install
+        working-directory: Frontend
+
+      - name: Ejecutar pruebas frontend
+        run: npm test
+        working-directory: Frontend
 
   deploy:
     needs: tests
@@ -49,32 +59,33 @@ jobs:
         run: rm -f /dev/shm/face-ubb.ovpn
 
       - name: Conexión SSH y Despliegue nuevo proyecto
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: |
-          sshpass -p "${{ secrets.PROD_PASSWORD }}" ssh \
-            -q \
-            -o StrictHostKeyChecking=no \
-            -p ${{ secrets.PROD_PORT }} \
-            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
-              set -euo pipefail
+            sshpass -p "${{ secrets.PROD_PASSWORD }}" ssh \
+             -q \
+             -o StrictHostKeyChecking=no \
+             -p ${{ secrets.PROD_PORT }} \
+              ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
+                set -euo pipefail
+                cd GPS-Deploy/GPS/
 
-              # Ir al directorio del proyecto ya clonado
-              cd GPS-Deploy/GPS/
+                echo "Actualizando código fuente..."
+                git fetch origin main
+                git reset --hard origin/main
 
-              echo "Actualizando código fuente..."
-              git fetch origin main
-              git reset --hard origin/main
+                echo "Instalando dependencias BACKEND..."
+                cd Backend
+                npm ci
 
-              echo "Instalando dependencias..."
-              npm ci
+                echo "Verificando y reiniciando pm2 BACKEND..."
+                pm2 status Backend-app || pm2 start npm --name Backend-app -- run start
+                pm2 restart Backend-app
 
-              echo "Arrancando PM2 si es la primera vez..."
-             if pm2 describe frontend >/dev/null; then
-                echo "El proceso ya existe, reiniciando..."
-                pm2 restart frontend
-             else
-                echo "El proceso no existe, iniciando por primera vez..."
-                pm2 start src/index.js --backend
-                pm2 save
-            fi
-          EOF
+                echo "Instalando dependencias FRONTEND..."
+                cd ../Frontend
+                npm ci
+
+                echo "Verificando y reiniciando pm2 FRONTEND..."
+                pm2 status frontend-app || pm2 start npm --name frontend-app -- run start
+                pm2 restart frontend-app
+            EOF
