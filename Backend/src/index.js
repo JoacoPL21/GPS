@@ -11,10 +11,13 @@ import { connectDB } from "./config/configDB.js";
 import { createProductos,createUser, createCategoria } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
+import dotenv from 'dotenv';
+import paymentRoutes from './routes/payment.routes.js';
 
 
 async function setupServer() {
   try {
+    dotenv.config();
     const app = express();
 
     // Deshabilita el encabezado "x-powered-by" por seguridad
@@ -66,6 +69,8 @@ async function setupServer() {
 
     // Otras rutas generales
     app.use("/api", indexRoutes);
+    app.use(express.json());
+    app.use('/api/payments', paymentRoutes);
 
     const uploadPath = path.resolve("src/uploads");
 
