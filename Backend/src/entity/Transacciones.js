@@ -54,7 +54,6 @@ const Transacciones = new EntitySchema({
             nullable: true,
             comment: "ID del usuario en nuestro sistema"
         },
-        // Campos para envío
         shipping_id: {
             type: "varchar",
             length: 255,
@@ -74,7 +73,6 @@ const Transacciones = new EntitySchema({
             type: "json",
             nullable: true,
         },
-        // ✅ AGREGADOS: Campos adicionales útiles
         payment_type: {
             type: "varchar",
             length: 50,
@@ -143,7 +141,6 @@ const Transacciones = new EntitySchema({
             },
             nullable: true
         },
-        // Si tienes una entidad de Órdenes/Pedidos
         // orden: {
         //     type: "one-to-one",
         //     target: "Orden",
