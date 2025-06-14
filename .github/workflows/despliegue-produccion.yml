@@ -18,20 +18,24 @@ jobs:
           node-version: "20"
 
       - name: Instalar dependencias backend
-        run: npm install
         working-directory: Backend
+        run: npm install
+        
 
       - name: Ejecutar pruebas Backend
-        run: npm test
         working-directory: Backend
+        run: npm test
+        
 
       - name: Instalar dependencias frontend
-        run: npm install
         working-directory: Frontend
+        run: npm install
+        
 
       - name: Ejecutar pruebas frontend
+        working-directory: Frontend 
         run: npm test
-        working-directory: Frontend
+        
 
   deploy:
     needs: tests
