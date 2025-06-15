@@ -12,7 +12,7 @@ const Dashboard = () => {
     useEffect(() => {
         
         let isMounted = true;
-        // Función para obtener todos los usuariosq
+        // Función para obtener todos los usuarios
         const fetchUsers = async () => {
             try {
                 const response = await getAllUsers();
@@ -29,7 +29,7 @@ const Dashboard = () => {
         return () => { isMounted = false; };
     }, [user]);
 
-    if (!user || user.rol !== 'admin') {
+    if (user.rol !== 'admin') {
         return <Navigate to="/" />;
     }
 

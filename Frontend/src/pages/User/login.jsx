@@ -15,7 +15,7 @@ const Login = () => {
     inputData
   } = useLogin();
 
-  const {  setIsAuthenticated,isAuthenticated } = useAuth();
+  const {  setIsAuthenticated,isAuthenticated,setAuthUser,authUser } = useAuth();
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -46,6 +46,8 @@ const Login = () => {
         setSuccess(true);
         // Actualizar el estado de autenticación
         setIsAuthenticated(true);
+        setAuthUser(response.data);
+        console.log(authUser);
         navigate("/");
       } else {
         if (response.data?.dataInfo && response.data?.message) {
