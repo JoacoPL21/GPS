@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+import { useCart } from '../../context/CartContext.jsx';
 const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
 
 initMercadoPago(mpPublicKey, { locale: 'es-CL' });
-
 
 const CartItem = ({ 
   title, 
@@ -129,6 +129,7 @@ const CartItem = ({
 };
 
 const ShoppingCart = () => {
+
   const [cartItems, setCartItems] = useState([
     {
       id: 1,
@@ -148,7 +149,8 @@ const ShoppingCart = () => {
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const { cart } = useCart();
+  console.log("Carrito:", cart);
   const handleRemoveItem = (itemId) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
   };

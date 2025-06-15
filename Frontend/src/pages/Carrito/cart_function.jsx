@@ -5,6 +5,7 @@ import { ShoppingCart, Trash2 } from 'lucide-react';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
+
 const productosDisponibles = [
     {
         id: 1,
@@ -30,6 +31,7 @@ export default function CarritoDeCompras() {
   const [carrito, setCarrito] = useState([]);
   const [open, setOpen] = useState(false);
 
+  
   const agregarAlCarrito = (producto) => {
     setCarrito((prev) => [...prev, producto]);
   };

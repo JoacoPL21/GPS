@@ -61,6 +61,7 @@ export async function logout() {
         sessionStorage.removeItem('usuario');
         // Eliminar el token del localStorage
         localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
         // Eliminar el token de las cookies
         cookies.remove('jwt');
         cookies.remove('jwt-auth');

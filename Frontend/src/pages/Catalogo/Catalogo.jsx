@@ -1,9 +1,18 @@
 import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useProductosDispo from "../../hooks/productos/useProductosDispo";
+import { useCart } from '../../context/CartContext.jsx';
 
 const Catalogo = () => {
 const { productosDisponibles, loading } = useProductosDispo();
+//desestructuramos el contexto del carrito
+const { addItemToCart } = useCart();
+
+const handleAddToCart = (producto) => {
+  addItemToCart(producto);
+  // Aquí podrías mostrar una notificación o mensaje de éxito
+  console.log(`Producto ${producto.nombre} agregado al carrito`);
+}
 
 
   return (
@@ -33,7 +42,7 @@ const { productosDisponibles, loading } = useProductosDispo();
               <p className="text-gray-600 mt-2 mb-4">
                 ${producto.precio != null ? producto.precio.toLocaleString() : 'Precio no disponible'}
               </p>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center transition-colors">
+              <button onClick={() => handleAddToCart(producto)}  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center transition-colors">
                 <ShoppingCart className="mr-2 w-4 h-4" /> Agregar
               </button>
             </div>
