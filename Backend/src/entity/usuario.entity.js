@@ -14,7 +14,7 @@ const Usuarios = new EntitySchema({
             type: "int",
             nullable: true,
         },
-        nombreCompleto: { 
+        nombreCompleto: {
             type: "varchar",
             length: 100,
             nullable: false,
@@ -65,9 +65,14 @@ const Usuarios = new EntitySchema({
                 referencedColumnName: "id_usuario",
             },
         },
+        transacciones: {
+            type: "one-to-many",
+            target: "Transaccion",
+            inverseSide: "usuario",
+        },
     }
 
-   
+
 });
 
 export default Usuarios;
