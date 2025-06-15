@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  tests:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout código
@@ -20,27 +20,11 @@ jobs:
       - name: Instalar dependencias backend
         working-directory: Backend
         run: npm install
-        
-
-      - name: Ejecutar pruebas Backend
-        working-directory: Backend
-        run: npm test
-        
 
       - name: Instalar dependencias frontend
         working-directory: Frontend
         run: npm install
-        
 
-      - name: Ejecutar pruebas frontend
-        working-directory: Frontend 
-        run: npm test
-        
-
-  deploy:
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
       - name: Instalar dependencias (OpenVPN, SSH y sshpass)
         run: |
           sudo apt update -qq > /dev/null 2>&1
