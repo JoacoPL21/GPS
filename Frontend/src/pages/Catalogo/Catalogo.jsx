@@ -1,9 +1,8 @@
 import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useProductosDispo from "../../hooks/productos/useProductosDispo";
-import Sidebar from '../../components/Sidebar';
 const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
-
+console.log(API_URL);
 import { useCart } from '../../context/CartContext.jsx';
 
 const Catalogo = () => {
@@ -20,15 +19,12 @@ const handleAddToCart = (producto) => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <header className="header mb-10">
-        <h1 className="text-4xl font-bold text-center text-gray-800">Artesanías de Madera</h1>
-      </header>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
         {loading ? (
           <p className="col-span-full text-center text-gray-500">Cargando productos...</p>
         ) : productosDisponibles && productosDisponibles.length > 0 ? (
           productosDisponibles.map((producto) => (
+            
             <div
               key={producto.id_producto}
               className="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center"
