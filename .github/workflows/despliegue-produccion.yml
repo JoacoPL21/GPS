@@ -66,7 +66,7 @@ jobs:
                 npm ci
 
                 echo "Verificando y reiniciando pm2 BACKEND..."
-                pm2 status Backend-app || pm2 start npm --name Backend-app -- run start
+                pm2 status Backend || pm2 start npm --name Backend -- run start
                 pm2 restart Backend-app
 
                 echo "Instalando dependencias FRONTEND..."
@@ -74,6 +74,6 @@ jobs:
                 npm ci
 
                 echo "Verificando y reiniciando pm2 FRONTEND..."
-                pm2 status frontend-app || pm2 start npm --name frontend-app -- run start
+                pm2 status front|| pm2 start npm --name front -- run start
                 pm2 restart frontend-app
             EOF
