@@ -15,7 +15,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Dashboard from './pages/Dashboard/dashboard.jsx'
 import { CarritoProvider } from './components/CartProvider.jsx'
 
-console.log("hola prueba");
+console.log("hola prueba1");
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
