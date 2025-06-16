@@ -1,8 +1,14 @@
 import { Router } from 'express';
-import { createPreference } from '../controller/payment.controller.js';
+import {
+    createPreference,
+    handleWebhook,
+    getTransaction
+} from '../controller/payment.controller.js';
 
 const router = Router();
 
 router.post('/create_preference', createPreference);
+router.post('/webhook', handleWebhook); 
+router.get('/transaction/:paymentId', getTransaction);
 
 export default router;
