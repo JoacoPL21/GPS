@@ -13,10 +13,20 @@ export async function login(dataUser) {
         if (status === 200) {
             const { nombreCompleto, email,rol } = jwtDecode(data.data.token);
             const userData = { nombreCompleto, email,rol };
+
             sessionStorage.setItem('usuario', JSON.stringify(userData));
+            // Guardar el token en localStorage
+            localStorage.setItem('token', data.data.token);
+            //guardar usuario en localStorage
+            localStorage.setItem('usuario', JSON.stringify(userData));
+
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
             cookies.set('jwt-auth', data.data.token, {path:'/'});
-            return response.data
+            return {
+                status: 'Success',
+                data: userData,
+                message: 'Inicio de sesión exitoso'
+            };
         }
     } catch (error) {
         return error.response.data;
@@ -51,6 +61,7 @@ export async function logout() {
         sessionStorage.removeItem('usuario');
         // Eliminar el token del localStorage
         localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
         // Eliminar el token de las cookies
         cookies.remove('jwt');
         cookies.remove('jwt-auth');

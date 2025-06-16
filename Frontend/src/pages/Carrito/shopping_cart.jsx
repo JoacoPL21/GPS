@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
-import { useCarrito } from '../../components/CartProvider';
-
+import { useCart } from '../../context/CartContext.jsx';
 const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
 initMercadoPago(mpPublicKey, { locale: 'es-CL' });
 
@@ -90,24 +89,28 @@ const CartItem = ({
 };
 
 const ShoppingCart = () => {
-  const { carrito, eliminarDelCarrito, aumentarCantidad, disminuirCantidad } = useCarrito();
+
+  const [cartItems, setCartItems] = useState([
+    {
+      id: 1,
+      title: "Estatua tipica chilena Picaro...",
+      price: "6.000",
+      quantity: 1,
+      image: "/images/picaro.jpg"
+    },
+    {
+      id: 2,
+      title: "Jueguete de madera Tralalero",
+      price: "4.000",
+      quantity: 1,
+      image: "/images/tralalero.jpg"
+    }
+  ]);
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-
-  const subtotal = carrito.reduce((acc, item) => {
-    const precioNumerico = Number(item.precio.toString().replace(/\./g, ''));
-    return acc + precioNumerico * (item.cantidad || 1);
-  }, 0);
-
-  const discount = 2000;
-  const shipping = 5000;
-  const total = subtotal - discount + shipping;
-
+  const { cart } = useCart();
+  console.log("Carrito:", cart);
   const handleRemoveItem = (itemId) => {
     eliminarDelCarrito(itemId);
   };

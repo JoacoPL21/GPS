@@ -5,16 +5,42 @@ import { ShoppingCart, X } from 'lucide-react';
 import { useCarrito } from '../../components/CartProvider';
 import { Link } from 'react-router-dom';
 
-export default function Carrito() {
-  const {
-    carrito,
-    eliminarDelCarrito,
-    aumentarCantidad,
-    disminuirCantidad,
-    open,
-    setOpen,
-    total,
-  } = useCarrito();
+
+const productosDisponibles = [
+    {
+        id: 1,
+        nombre: 'Caja tallada a mano',
+        precio: 15000,
+        imagen: '/images/picaro.jpg',
+    },
+    {
+        id: 2,
+        nombre: 'Escultura de roble',
+        precio: 25000,
+        imagen: '/images/tung.png',
+    },
+    {
+        id: 3,
+        nombre: 'Cuenco rústico',
+        precio: 12000,
+        imagen: '/images/tralalero.jpg',
+    },
+];
+
+export default function CarritoDeCompras() {
+  const [carrito, setCarrito] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  
+  const agregarAlCarrito = (producto) => {
+    setCarrito((prev) => [...prev, producto]);
+  };
+
+  const eliminarDelCarrito = (index) => {
+    setCarrito((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const total = carrito.reduce((acc, item) => acc + item.precio, 0);
 
   return (
     <>
