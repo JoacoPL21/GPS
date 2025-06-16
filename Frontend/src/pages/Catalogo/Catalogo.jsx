@@ -2,7 +2,6 @@ import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useProductosDispo from "../../hooks/productos/useProductosDispo";
 const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
-console.log(API_URL);
 import { useCart } from '../../context/CartContext.jsx';
 
 const Catalogo = () => {
