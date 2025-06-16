@@ -10,31 +10,34 @@ export function useAuth() {
 export function AuthProvider(props) {
   const [authUser, setAuthUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Recuperar usuario y token al montar
   useEffect(() => {
+    const storedUser = localStorage.getItem("usuario");
     const token = localStorage.getItem("token");
-    if ( token) {
+    if (storedUser && token) {
       try {
+        setAuthUser(JSON.parse(storedUser));
         setIsAuthenticated(true);
-      } catch (e) {
+      } catch {
         setAuthUser(null);
         setIsAuthenticated(false);
-        localStorage.removeItem("token");
-        console.error("Error al recuperar el usuario autenticado:", e);
       }
     }
+    setLoading(false); // <-- Importante: termina la carga
   }, []);
 
-  const value = {
-    authUser,
-    setAuthUser,
-    isAuthenticated,
-    setIsAuthenticated,
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        authUser,
+        setAuthUser,
+        isAuthenticated,
+        setIsAuthenticated,
+        loading,
+      }}
+    >
       {props.children}
     </AuthContext.Provider>
   );

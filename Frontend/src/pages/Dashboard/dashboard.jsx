@@ -1,13 +1,12 @@
 //pagina de dashboard para el administrador
-import { useAuth } from '../../context/AuthContext.jsx';
-import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getAllUsers } from '../../services/user.service.js';
 
 const Dashboard = () => {
-    const { user } = useAuth();
+    
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         
@@ -27,26 +26,41 @@ const Dashboard = () => {
     
         fetchUsers();
         return () => { isMounted = false; };
-    }, [user]);
+    }, [users]);
 
-    if (user.rol !== 'admin') {
-        return <Navigate to="/" />;
-    }
-
+    
     if (loading) {
         return <div>Cargando usuarios../</div>;
     }
 
     return (
-        <div className='flex flex-col items-center justify-center min-h-screen'>
-            <h1>Panel de control</h1>
-            <h2>Usuarios Registrados</h2>
-            <ul>
-                {users.map((u) => (
-                    <li key={u.id}>{u.nombreCompleto} - {u.email}</li>
+      <div className="min-h-screen flex flex-col">
+        <h1 className="text-2xl font-bold text-center mt-8 mb-8">Dashboard de Administrador</h1>
+        <div className="flex flex-1 items-start justify-center">
+          <div className="w-full max-w-3xl">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border-b">ID</th>
+                  <th className="py-2 px-4 border-b">Nombre</th>
+                  <th className="py-2 px-4 border-b">Email</th>
+                  <th className="py-2 px-4 border-b">Rol</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(user => (
+                  <tr key={user.id}>
+                    <td className="py-2 px-4 border-b">{user.id}</td>
+                    <td className="py-2 px-4 border-b">{user.nombreCompleto}</td>
+                    <td className="py-2 px-4 border-b">{user.email}</td>
+                    <td className="py-2 px-4 border-b">{user.rol}</td>
+                  </tr>
                 ))}
-            </ul>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     );
 }
 

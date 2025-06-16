@@ -1,21 +1,23 @@
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
-    const { isAuthenticated, authUser } = useAuth();
-    
-    if (!isAuthenticated) {
-        return <Navigate to="/login" />;
-    }
+const ProtectedRoute = ({ allowedRoles, children }) => {
+  const { isAuthenticated, authUser, loading } = useAuth();
 
-    // se verifica si el usuario tiene un rol permitido 
-    // si no se especifican roles permitidos, se permite el acceso
+  if (loading) {
+    // Puedes mostrar un spinner, skeleton o simplemente null
+    return null;
+  }
 
-    if (allowedRoles && !allowedRoles.includes(authUser?.rol)) {
-        return <Navigate to="/" />;
-    }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
-    return children;
+  if (allowedRoles && !allowedRoles.includes(authUser?.rol)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;
