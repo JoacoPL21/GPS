@@ -84,7 +84,7 @@ height: 200px;
 
 .nosotros, .contacto {
   padding: 2rem 0;
-  background-color: #fdf7f0;
+  background-color: #fff8f0;
   margin-top: 1rem;
   border-radius: 10px;
   text-align: center;
@@ -101,6 +101,15 @@ height: 200px;
 .navbar_text {
   color: black;
   text-decoration: none;
+}
+
+.button_login {
+  background-color: #fff;
+}
+
+.button_login:hover {
+  background-color: #fff;
+  border-color: #ffa726;
 }
 
 @media (max-width: 768px) {
