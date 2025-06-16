@@ -1,9 +1,8 @@
 import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useProductosDispo from "../../hooks/productos/useProductosDispo";
-import Carrito from '../Carrito/CarritoFunction'; 
 import Sidebar from '../../components/Sidebar';
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 
 import { useCart } from '../../context/CartContext.jsx';
 
@@ -55,7 +54,7 @@ const handleAddToCart = (producto) => {
         )}
       </div>
 
-      <Carrito />
+
     </div>
   );
 };
