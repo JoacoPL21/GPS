@@ -1,6 +1,9 @@
 import '../styles/Sidebar.css';
+import { useAuth } from '../context/AuthContext'; // Ajusta la ruta si es necesario
 
 export default function Sidebar({ isOpen, toggle }) {
+  const { user } = useAuth(); // user.rol debe ser "admin" para mostrar el link
+
   return (
     <>
       {/* Sidebar */}
@@ -15,6 +18,13 @@ export default function Sidebar({ isOpen, toggle }) {
           <li><a href="#nosotros" onClick={toggle} className="sidebar_text hover:underline">Nosotros</a></li>
           <li><a href="#contacto" onClick={toggle} className="sidebar_text hover:underline">Contacto</a></li>
           <li><a href="/login" onClick={toggle} className="sidebar_text hover:underline">Iniciar Sesión</a></li>
+          {user?.rol === "admin" && (
+            <li>
+              <a href="/productos" onClick={toggle} className="sidebar_text hover:underline">
+                Productos
+              </a>
+            </li>
+          )}
         </ul>
       </div>
 
