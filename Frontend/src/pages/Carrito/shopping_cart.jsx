@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+import { useCart } from '../../context/CartContext.jsx';
+const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
+
+initMercadoPago(mpPublicKey, { locale: 'es-CL' });
 
 const CartItem = ({ 
   title, 
-  price, 
+  price,  
   quantity,
   image,
   onRemove,
@@ -124,7 +129,7 @@ const CartItem = ({
 };
 
 const ShoppingCart = () => {
-  const navigate = useNavigate();
+
   const [cartItems, setCartItems] = useState([
     {
       id: 1,
@@ -141,7 +146,11 @@ const ShoppingCart = () => {
       image: "/images/tralalero.jpg"
     }
   ]);
-
+  const [preferenceId, setPreferenceId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { cart } = useCart();
+  console.log("Carrito:", cart);
   const handleRemoveItem = (itemId) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
   };
@@ -176,8 +185,41 @@ const ShoppingCart = () => {
   const shipping = 5000;
   const total = subtotal - discount + shipping;
 
-  const handleCheckout = () => {
-    navigate('/checkout');
+  const handleCheckout = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Preparar los items para la preferencia
+      const items = cartItems.map(item => ({
+        title: item.title,
+        unit_price: Number(item.price.replace(/\./g, '')),
+        quantity: item.quantity,
+      }));
+
+      const response = await fetch('http://localhost:3000/api/payments/create_preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items,
+          external_reference: `ORD-${Date.now()}`, // Referencia única
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear la preferencia de pago');
+      }
+
+      const data = await response.json();
+      setPreferenceId(data.preferenceId || data.id);
+    } catch (err) {
+      console.error('Checkout error:', err);
+      setError('Error al procesar el pago. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -255,20 +297,57 @@ const ShoppingCart = () => {
                 </dl>
               </div>
 
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={handleCheckout}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleCheckout();
-                  }
-                }}
-                className="flex w-full items-center justify-center rounded-lg bg-yellow-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 cursor-pointer transition-colors"
-              >
-                Proceder al pago
-              </div>
+              {error && (
+                <div className="text-red-600 bg-red-50 p-3 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              {preferenceId ? (
+                <div className="mercado-pago-button">
+                  <Wallet 
+  initialization={{ preferenceId }}
+  customization={{ 
+    texts: { valueProp: 'smart_option' },
+    theme: 'dark', 
+  }}
+  onReady={() => {
+    console.log("🟢 Wallet Brick listo");
+    // Aquí podrías ocultar un loading si tenías uno antes de mostrar el botón
+  }}
+  onError={(error) => {
+    console.error("🔴 Error en el Brick:", error);
+    setError("Ocurrió un problema al cargar el botón de pago. Intenta nuevamente.");
+  }}
+  onSubmit={(formData) => {
+    console.log("🟡 Se hizo clic en el botón Wallet:", formData);
+    // Puedes mostrar un loading o redirigir al usuario si se confirma el pago
+  }}
+/>
+                </div>
+              ) : (
+                <button
+                  onClick={handleCheckout}
+                  disabled={loading || cartItems.length === 0}
+                  className={`flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-colors ${
+                    loading || cartItems.length === 0
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-yellow-700 hover:bg-yellow-800 cursor-pointer'
+                  }`}
+                >
+                  {loading ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Procesando...
+                    </span>
+                  ) : (
+                    'Proceder al pago'
+                  )}
+                </button>
+              )}
 
               <div className="flex self-center w-100 justify-center gap-2">
                 <span className="text-sm font-normal text-yellow-700"> o </span>

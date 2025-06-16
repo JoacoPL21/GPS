@@ -1,5 +1,4 @@
 import { useState,useEffect, } from 'react';
-import { Send } from 'lucide-react';
 import { register } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import {useNavigate} from 'react-router-dom';
