@@ -10,6 +10,7 @@ import Logout from "./User/logout.jsx";
 import Error404 from "./Error404.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
+import Producto from "./Catalogo/Producto.jsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
       { path: "", element: <Homepage /> },
       { path: "cart", element: <Cart /> },
       { path: "catalogo", element: <Catalogo /> },
+      { path: "producto/:id_producto", element: <Producto /> }, 
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "logout", element: <Logout /> },
