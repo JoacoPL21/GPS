@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "echo \"No hay tests definidos aún\" && exit 0",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview --port 443",
+    "start": "vite preview --port 443"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
