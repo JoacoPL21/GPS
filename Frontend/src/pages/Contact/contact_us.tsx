@@ -34,7 +34,7 @@ const ContactSection = () => {
   }, [state.succeeded]);
 
   return (
-    <section id="contacto" className="py-16 bg-gradient-to-br from-amber-50 to-orange-50">
+    <section id="contacto" className="py-16 bg-#fff8f0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Título de la sección */}
         <div className="text-center mb-16">

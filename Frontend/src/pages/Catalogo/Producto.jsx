@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import useProductosbyId from '../../hooks/productos/useProductosId';
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 
 const Producto = () => {
   const { id_producto: id} = useParams();
@@ -9,7 +9,6 @@ const Producto = () => {
   if (loading) return <p className="text-center mt-10">Cargando producto...</p>;
 
 
-console.log(producto);
   if (!producto) {
     return <p className="text-center mt-10">Producto no encontrado.</p>;
   }
