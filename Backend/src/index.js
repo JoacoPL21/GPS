@@ -8,7 +8,7 @@ import passport from "passport";
 import express, { json, urlencoded } from "express";
 import { cookieKey, HOST, PORT } from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
-import { createProductos,createUser, createCategoria } from "./config/initialSetup.js";
+import { createProductos, createUser, createCategoria } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';
@@ -48,6 +48,22 @@ async function setupServer() {
     app.use(cookieParser());
     app.use(morgan("dev"));
 
+    // Middleware para loguear webhooks
+    app.use('/api/payments/webhook', (req, res, next) => {
+      console.log('-------------------------------------');
+      console.log(`[Webhook] ${new Date().toISOString()}`);
+      console.log('Método:', req.method);
+      console.log('URL:', req.originalUrl);
+      console.log('Headers:', req.headers);
+
+      if (req.body && Object.keys(req.body).length > 0) {
+        console.log('Body:', JSON.stringify(req.body, null, 2));
+      }
+
+      console.log('-------------------------------------');
+      next();
+    });
+
     // Configuración de la sesión
     app.use(
       session({
@@ -78,7 +94,7 @@ async function setupServer() {
     app.use("/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
-   
+
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
     });
@@ -93,7 +109,7 @@ async function setupAPI() {
     await setupServer(); // Configuración del servidor
     await createUser();
     await createCategoria(); // Creación de usuarios iniciales
-    await createProductos(); 
+    await createProductos();
   } catch (error) {
     console.log("Error en index.js -> setupAPI(), el error es: ", error);
   }
