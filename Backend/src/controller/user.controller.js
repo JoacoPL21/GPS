@@ -13,3 +13,18 @@ export async function getAllUsers(req, res) {
         handleErrorServer(res, 500, error.message);
     }
 }
+export async function getUserById(req, res) {
+    const userId = req.params.id;
+    try {
+        const [user, error] = await getAllUsersService(userId);
+        if (error) {
+            return res.status(500).json({ message: 'Error al obtener el usuario', error });
+        }
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        handleSuccess(res, 200, "Usuario obtenido correctamente", user);
+    } catch (error) {
+        handleErrorServer(res, 500, error.message);
+    }
+}

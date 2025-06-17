@@ -30,7 +30,7 @@ export async function loginService(user) {
       return [null, createErrorMessage("password", "La contraseña es incorrecta")];
     }
 
-    //
+    
     const payload = {
       nombreCompleto: userFound.nombreCompleto,
       email: userFound.email,
@@ -40,6 +40,7 @@ export async function loginService(user) {
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
       expiresIn: "0.5h", // 30 minutos
     });
+
 
     return [accessToken, null];
   } catch (error) {

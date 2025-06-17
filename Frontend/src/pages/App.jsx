@@ -10,6 +10,7 @@ import Logout from "./User/logout.jsx";
 import Error404 from "./Error404.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
+import Profile from "./Profile/profile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      }
     ],
   },
   {

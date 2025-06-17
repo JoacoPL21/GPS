@@ -66,13 +66,22 @@ function Navbar({ isOpen, setOpen }) {
                     </Link>
                   </>
                 ) : (
-                  <Link
-                    to="/logout"
-                    className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Cerrar Sesión
-                  </Link>
+                  <>
+                    <Link
+                      to="/logout"
+                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Cerrar Sesión
+                    </Link>
+                    <Link
+                      to="/profile"
+                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Mi perfil
+                    </Link>
+                  </>
                 )}
               </div>
             )}
