@@ -37,12 +37,30 @@ const Direccion = new EntitySchema({
         },
         tipo_de_direccion: {
             type: "enum",
-            enum: ["envio", "facturacion", "otro"],
-            default: "envio",
+            enum: ["predeterminada", "opcional"],
+            default: "predeterminada",
+        },
+        createdAt: {
+            type: "timestamp",
+            default: () => "CURRENT_TIMESTAMP",
+            nullable: false,
+        },
+        updatedAt: {
+            type: "timestamp",
+            default: () => "CURRENT_TIMESTAMP",
+            onUpdate: "CURRENT_TIMESTAMP",
+            nullable: false,
+        },
+
+    },
+    relations: {
+        usuario: {
+            type: "many-to-one",
+            target: "Usuario",
+            inverseSide: "direcciones",
+            onDelete: "CASCADE",
         },
     },
-
-   
 });
 
 export default Direccion;

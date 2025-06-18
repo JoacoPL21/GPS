@@ -9,3 +9,14 @@ export const getAllUsers = async () => {
        
     }
 }
+
+export const registerDireccion = async (direccionData) => {
+    console.log('Datos de dirección en el servicio:', direccionData);
+    console.log("token de axios:", axios.defaults.headers.common['Authorization']);
+    try {
+        const response = await axios.post('/users/direccion', direccionData);
+        return response.data;
+    } catch (error) {
+        console.error('Error registering address:', error.message);
+    }
+}

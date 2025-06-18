@@ -3,7 +3,8 @@ import { Router } from "express";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import {
-  getAllUsers
+  getAllUsers,
+  registerDireccion
 } from "../controller/user.controller.js";
 
 const router = Router();
@@ -14,5 +15,6 @@ router
 
 router
   .get("/", getAllUsers)
+  .post("/direccion", registerDireccion);
 
 export default router;

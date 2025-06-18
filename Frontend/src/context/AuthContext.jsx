@@ -9,6 +9,7 @@ export function useAuth() {
 
 export function AuthProvider(props) {
   const [authUser, setAuthUser] = useState(null);
+  const [direcciones, setDirecciones] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -36,6 +37,10 @@ export function AuthProvider(props) {
         isAuthenticated,
         setIsAuthenticated,
         loading,
+        setLoading,
+        direcciones,
+        setDirecciones,
+
       }}
     >
       {props.children}

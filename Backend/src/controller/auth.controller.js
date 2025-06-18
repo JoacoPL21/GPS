@@ -2,8 +2,7 @@
 import { loginService, registerService } from "../services/auth.service.js";
 import {
   authValidation,
-  registerValidation,
-  direccionValidation
+  registerValidation
 } from "../validations/auth.validation.js";
 import {
   handleErrorClient,
@@ -20,7 +19,7 @@ export async function login(req, res) {
     if (error) {
       return handleErrorClient(res, 400, "Error de validación", error.message);
     }
-    const [accessToken, errorToken,userData] = await loginService(body);
+    const [accessToken, errorToken,payload] = await loginService(body);
 
     if (errorToken) return handleErrorClient(res, 400, "Error iniciando sesión", errorToken);
 
@@ -29,7 +28,7 @@ export async function login(req, res) {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    handleSuccess(res, 200, "Inicio de sesión exitoso", { token: accessToken, user: userData });
+    handleSuccess(res, 200, "Inicio de sesión exitoso", { token: accessToken, user: payload });
   } catch (error) {
     handleErrorServer(res, 500, error.message);
   }
