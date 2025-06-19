@@ -1,6 +1,7 @@
 "use strict";
 import { EntitySchema } from "typeorm";
 
+
 const Direccion = new EntitySchema({
     name: "Direccion",
     tableName: "direcciones",
@@ -57,9 +58,12 @@ const Direccion = new EntitySchema({
         usuario: {
             type: "many-to-one",
             target: "Usuario",
-            inverseSide: "direcciones",
-            onDelete: "CASCADE",
+            inverseSide: "direcciones", // Assuming Usuario entity has a 'direcciones' relation
+            joinColumn: {
+                name: "id_usuario"
+            
         },
+    },
     },
 });
 

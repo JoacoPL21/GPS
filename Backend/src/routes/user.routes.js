@@ -4,7 +4,8 @@ import { isAdmin } from "../middlewares/authorization.middleware.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import {
   getAllUsers,
-  registerDireccion
+  registerDireccion,
+  getDireccionByUserId,
 } from "../controller/user.controller.js";
 
 const router = Router();
@@ -15,6 +16,6 @@ router
 
 router
   .get("/", getAllUsers)
-  .post("/direccion", registerDireccion);
-
+  .post("/direccion", registerDireccion)
+  .get("/direccion/:id", getDireccionByUserId);
 export default router;

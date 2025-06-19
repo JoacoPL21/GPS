@@ -49,14 +49,7 @@ const Usuarios = new EntitySchema({
             nullable: false,
         },
     },
-    relations: {
-        direcciones: {
-            type: "one-to-many",
-            target: "Direccion",
-            inverseSide: "usuario",
-            cascade: true,
-        }
-    },
+   
 
    
 });

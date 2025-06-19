@@ -3,7 +3,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import { registerDireccion } from "../../services/user.service.js";
 import Swal from "sweetalert2";
 const FormDireccionEnvio=()=> {
-  const { authUser,setDirecciones } = useAuth();
+  const { authUser } = useAuth();
   const [success,setSuccess] = useState(false);
   const [form, setForm] = useState({
     id_usuario: authUser?.id_usuario || "",
@@ -22,8 +22,9 @@ const FormDireccionEnvio=()=> {
         icon: "success",
         title: "Dirección registrada exitosamente",
         text: "Tu dirección de envío ha sido guardada.",
-        showConfirmButton: false,
-        timer: 1500,
+        showConfirmButton: true,
+        confirmButtonText: "Aceptar",
+        
       });
       setSuccess(false);
     }
@@ -40,10 +41,8 @@ const FormDireccionEnvio=()=> {
  const handleSubmit = async ( data) => {
     try {
       const response = await registerDireccion(data);
-      console.log("Response from registerDireccion:", response);
       if (response.status === "Success") {
         setSuccess(true);
-        setDirecciones((prev) => [...prev, response.data]);
         setForm({
           id_usuario: authUser?.id_usuario || "",
           calle: "",
