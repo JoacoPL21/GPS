@@ -2,8 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { useCart } from '../../context/CartContext.jsx';
+import { Heart, Trash2, ArrowLeft } from 'lucide-react';
+const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
 initMercadoPago(mpPublicKey, { locale: 'es-CL' });
+
+// Función para formatear precios
+const formatPrice = (price) => {
+  return new Intl.NumberFormat('es-CL').format(price);
+};
 
 const CartItem = ({ 
   title, 
@@ -22,7 +29,7 @@ const CartItem = ({
     <div className="rounded-lg border border-yellow-600 bg-white p-4 shadow-sm md:p-6">
       <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
         <div className="shrink-0 md:order-1">
-          <img className="h-20 w-20" src={image} alt={title} />
+<img className="h-20 w-20" src={`${API_URL}/uploads/${image}`} alt={title} />
         </div>
 
         <div className="flex items-center justify-between md:order-3 md:justify-end">
@@ -32,8 +39,10 @@ const CartItem = ({
               tabIndex={0}
               aria-label="Disminuir cantidad"
               onClick={() => !isMinusDisabled && onDecrease()}
-              className={`flex h-8 w-8 items-center justify-center rounded-full bg-yellow-600 ${
-                isMinusDisabled ? 'text-white cursor-not-allowed' : 'text-white hover:bg-yellow-700 cursor-pointer'
+              className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                isMinusDisabled 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                  : 'bg-yellow-600 text-white hover:bg-yellow-700 cursor-pointer'
               } focus:outline-none text-xl font-bold`}
             >
               -
@@ -50,8 +59,10 @@ const CartItem = ({
               tabIndex={0}
               aria-label="Aumentar cantidad"
               onClick={() => !isPlusDisabled && onIncrease()}
-              className={`flex h-8 w-8 items-center justify-center rounded-full bg-yellow-600 ${
-                isPlusDisabled ? 'text-yellow-200 cursor-not-allowed' : 'text-white hover:bg-yellow-700 cursor-pointer'
+              className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                isPlusDisabled 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                  : 'bg-yellow-600 text-white hover:bg-yellow-700 cursor-pointer'
               } focus:outline-none`}
             >
               +
@@ -89,31 +100,26 @@ const CartItem = ({
 };
 
 const ShoppingCart = () => {
-
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      title: "Estatua tipica chilena Picaro...",
-      price: "6.000",
-      quantity: 1,
-      image: "/images/picaro.jpg"
-    },
-    {
-      id: 2,
-      title: "Jueguete de madera Tralalero",
-      price: "4.000",
-      quantity: 1,
-      image: "/images/tralalero.jpg"
-    }
-  ]);
+  const { 
+    cart: carrito, 
+    removeItem: eliminarDelCarrito,
+    increaseQuantity: aumentarCantidad,
+    decreaseQuantity: disminuirCantidad
+  } = useCart();
+  
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { cart } = useCart();
-  console.log("Carrito:", cart);
-  const handleRemoveItem = (itemId) => {
-    eliminarDelCarrito(itemId);
-  };
+
+  // Calcular totales
+  const subtotal = carrito.reduce(
+    (total, item) => total + (Number(item.precio.toString().replace(/\./g, '')) * (item.cantidad || 1)),
+    0
+  );
+  
+  const discount = 0; // Descuento (puedes implementar lógica real aquí)
+  const shipping = 3000; // Costo de envío fijo
+  const total = subtotal - discount + shipping;
 
   const handleAddToFavorites = (itemId) => {
     console.log('Adding to favorites:', itemId);
@@ -122,11 +128,18 @@ const ShoppingCart = () => {
   const handleCheckout = async () => {
     setLoading(true);
     setError(null);
+    
+    if (carrito.length === 0) {
+      setError('El carrito está vacío');
+      setLoading(false);
+      return;
+    }
+
     try {
       const items = carrito.map(item => ({
         title: item.nombre,
         unit_price: Number(item.precio.toString().replace(/\./g, '')),
-        quantity: item.cantidad,
+        quantity: item.cantidad || 1,
       }));
 
       const response = await fetch('http://localhost:3000/api/payments/create_preference', {
@@ -151,19 +164,20 @@ const ShoppingCart = () => {
   };
 
   return (
-    <section className="min-h-screen bg-white py-8 md:py-16">
+    <section className="min-h-screen min-w-screen bg-white py-8 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4">
-        <div className="flex items-center gap-3 mb-6">
-          <Link
-            to="/"
-            className="flex items-center hover:text-yellow-900 !no-underline !text-yellow-700"
-          >
-            <ArrowLeft className="mr-1 h-5 w-5" /> Volver
-          </Link>
-          <h2 className="text-xl font-semibold text-yellow-900 sm:text-2xl">
-            Carrito de compras
-          </h2>
-        </div>
+<div className="relative mb-6 h-10">
+  <Link
+    to="/"
+    className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 hover:text-yellow-900 !no-underline !text-yellow-700"
+  >
+    <ArrowLeft className="h-4 w-4" />
+    Volver
+  </Link>
+  <h2 className="absolute left-1/3 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-semibold text-yellow-900 sm:text-2xl">
+    Carrito de compras
+  </h2>
+</div>
 
         <div className="lg:flex lg:gap-8">
           <div className="w-full lg:w-2/3 space-y-6">
@@ -171,10 +185,10 @@ const ShoppingCart = () => {
               <CartItem
                 key={item.id}
                 title={item.nombre}
-                price={formatPrice(Number(item.precio))}
+                price={formatPrice(Number(item.precio.toString().replace(/\./g, '')))}
                 quantity={item.cantidad || 1}
                 image={item.imagen}
-                onRemove={() => handleRemoveItem(item.id)}
+                onRemove={() => eliminarDelCarrito(item.id)}
                 onAddToFavorites={() => handleAddToFavorites(item.id)}
                 onIncrease={() => aumentarCantidad(item.id)}
                 onDecrease={() => disminuirCantidad(item.id)}
@@ -229,11 +243,7 @@ const ShoppingCart = () => {
                 />
               ) : (
                 <div
-                  onClick={() => {
-                    if (!loading && carrito.length > 0) {
-                      handleCheckout();
-                    }
-                  }}
+                  onClick={handleCheckout}
                   className={`w-full mt-4 py-2 px-4 text-white rounded-lg text-center ${
                     loading || carrito.length === 0
                       ? "bg-gray-400 cursor-not-allowed"
@@ -247,7 +257,7 @@ const ShoppingCart = () => {
               <div className="flex justify-center gap-2 mt-4">
                 <span className="text-sm text-yellow-700">o</span>
                 <Link
-                  to="/Productos"
+                  to="/catalogo"
                   className="text-sm underline !text-yellow-900"
                 >
                   Volver al catálogo
