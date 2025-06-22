@@ -34,21 +34,29 @@ export const handleWebhook = async (req, res) => {
     // 1. Validar firma del webhook
     const signature = req.headers['x-signature'];
     const secret = process.env.MP_WEBHOOK_SECRET;
-    
-    
+
+
     if (!signature || !secret) {
       console.error('Falta firma o secreto');
       return res.status(401).json({ error: 'Firma inválida' });
     }
-    
+
+    // Guarda el cuerpo original como string
+    const rawBody = JSON.stringify(req.body);
+    console.log("Cuerpo recibido (string):", rawBody);
+
+    console.log("Cuerpo recibido:", JSON.stringify(req.body, null, 2));
+    console.log("Cuerpo usado para HMAC:", JSON.stringify(req.body));
+    console.log("Tipo de dato del body:", typeof JSON.stringify(req.body));
+    console.log("Longitud del string:", JSON.stringify(req.body).length);
     // Generar la firma a partir del cuerpo de la solicitud
     const generatedSignature = crypto
       .createHmac('sha256', secret)
-      .update(JSON.stringify(req.body))
+      .update(rawBody)
       .digest('hex');
-    
+
     const expectedSignature = `sha256=${generatedSignature}`;
-    
+
     if (signature !== expectedSignature) {
       console.error('Firma inválida recibida:', signature, 'esperada:', expectedSignature);
       return res.status(401).json({ error: 'Firma inválida' });
@@ -56,17 +64,16 @@ export const handleWebhook = async (req, res) => {
 
     // 2. Procesar el evento
     const { id, type } = req.body;
-    
+
     if (type === 'payment') {
       let paymentData;
-      
+
       // SOLUCIÓN: Manejar IDs de prueba sin consultar a MercadoPago
-      if (id === "987654321") {
-        // Datos de prueba para desarrollo
+      if (id === "987654320") {  // Asegúrate que sea string
         paymentData = {
-          id: "987654321",
-          status: "Dennied",
-          external_reference: "TEST-123",
+          id: "987654320",       // Mismo ID
+          status: "Denied",
+          external_reference: "TEST-4",
           transaction_amount: 100.00,
           payment_type_id: "credit_card",
           order: { id: "TEST-ORDER-123" },
@@ -77,7 +84,7 @@ export const handleWebhook = async (req, res) => {
         const payment = new Payment(mercadoPagoClient);
         paymentData = await payment.get({ id });
       }
-      
+
       const transactionData = {
         payment_id: paymentData.id,
         status: paymentData.status,
@@ -104,11 +111,11 @@ export const getTransaction = async (req, res) => {
     const paymentId = req.params.paymentId;
     const paymentService = new PaymentService();
     const transaction = await paymentService.getTransactionByPaymentId(paymentId);
-    
+
     if (!transaction) {
       return res.status(404).json({ error: 'Transacción no encontrada' });
     }
-    
+
     res.status(200).json(transaction);
   } catch (error) {
     console.error('Error al obtener transacción:', error);
