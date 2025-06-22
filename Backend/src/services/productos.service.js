@@ -1,8 +1,8 @@
 "use strict";
-import Productos from "../entity/Productos.js";
+import Productos from "../entity/productos.entity.js";
 import { AppDataSource } from "../config/configDB.js";
-import Categorias from "../entity/Categoria.js";
-import { error } from "console";
+import Categorias from "../entity/categoria.entity.js";
+
 
 
 //Funcion para traer productos con estado Disponible Funcional
@@ -33,6 +33,7 @@ export async function getProductosDisponibles() {
     }
 }
 
+//Funcion para traer UN producto por ID
 export async function getProductoById(id) {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
@@ -63,6 +64,7 @@ export async function getProductoById(id) {
     }
 }
 
+//Funcion para crear un producto con validaciones
 export async function createProducto(productoData) {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
@@ -85,3 +87,50 @@ export async function createProducto(productoData) {
         return [null, "Error al crear el producto"];
     }
 }
+
+//Funcion para actualizar un producto de STOCK con validaciones
+export async function updateProductoStock(id, cantidad) {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        const producto = await productoRepository.findOneBy({ id_producto: id });
+
+        if (!producto) {
+            return [null, "Producto no encontrado"];
+        }
+
+        if (producto.stock < cantidad) {
+            return [null, "Stock insuficiente"];
+        }
+
+        producto.stock -= cantidad;
+        console.log(cantidad);
+        await productoRepository.save(producto);
+        return [producto, null];
+    } catch (error) {
+        console.error("Error al actualizar el stock del producto:", error);
+        return [null, "Error al actualizar el stock del producto"];
+    }
+}
+
+//Funcion para editar un producto Para ADMIN
+/*
+export async function updateProducto(id, productoData) {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        const producto = await productoRepository.findOneBy({ id_producto: id });
+
+        if (!producto) {
+            return [null, "Producto no encontrado"];
+        }
+
+        // Actualizar los campos del producto
+        Object.assign(producto, productoData);
+
+        await productoRepository.save(producto);
+        return [producto, null];
+    } catch (error) {
+        console.error("Error al actualizar el producto:", error);
+        return [null, "Error al actualizar el producto"];
+    }
+}
+*/

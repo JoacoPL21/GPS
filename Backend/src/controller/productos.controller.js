@@ -1,5 +1,5 @@
 "use strict";
-import { getProductosDisponibles, getProductoById, createProducto } from "../services/productos.service.js";
+import { getProductosDisponibles, getProductoById, createProducto, updateProductoStock } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
 
@@ -49,3 +49,38 @@ export async function createProductoController(req, res) {
     return handleErrorServer(res, 500, "Error interno del servidor al crear producto");
   }
 }
+
+export async function updateProductoStockController(req, res) {
+  const { id_producto } = req.params;
+  const { cantidad } = req.body;
+
+  if (typeof cantidad !== 'number' || cantidad <= 0) {
+    return handleErrorClient(res, 400, "Cantidad inválida");
+  }
+
+  try {
+    const [productoActualizado, error] = await updateProductoStock(id_producto, cantidad);
+    if (error) {
+      return handleErrorClient(res, 404, error);
+    }
+    return handleSuccess(res, 200, "Stock actualizado exitosamente", productoActualizado);
+  } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al actualizar el stock");
+  }
+}
+/*
+export async function updateProductoController(req, res) {
+  const { id_producto } = req.params;
+  const productoData = req.body;
+
+  try {
+    const [productoActualizado] = await updateProducto(id_producto, productoData);
+    const { error } = productoUpdateValidation.validate(productoData);
+    if (error) {
+      return handleErrorClient(res, 404, error);
+    }
+    return handleSuccess(res, 200, "Producto actualizado exitosamente", productoActualizado);
+  } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al actualizar el producto");
+  }
+}*/
