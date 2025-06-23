@@ -47,6 +47,8 @@ const Login = () => {
         // Actualizar el estado de autenticación
         setIsAuthenticated(true);
         setAuthUser(response.data);
+        
+        
         console.log(authUser);
         navigate("/");
       } else {
