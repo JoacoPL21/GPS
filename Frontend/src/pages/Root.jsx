@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
 import "../styles/App.css";
-
+import Footer from "./Homepage/Footer"; 
 function Root() {
   const [isOpen, setOpen] = useState(false);
   useEffect(() => {
@@ -21,9 +21,7 @@ function Root() {
       <main className="main_content p-4 flex-1">
         <Outlet />
       </main>
-      <footer className="footer bg-gray-100 text-center py-4">
-        © 2025 Artesanías en Madera. Todos los derechos reservados.
-      </footer>
+      <Footer /> {/* Usa el componente Footer aquí */}
     </div>
   );
 }

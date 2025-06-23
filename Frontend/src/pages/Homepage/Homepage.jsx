@@ -29,19 +29,19 @@ function Homepage() {
   // Características de la tienda
   const features = [
     {
-      icon: <FaHandSparkles className="text-3xl mb-2" style={{ color: "#FF6900" }} />,
+      icon: <FaHandSparkles className="text-3xl mb-2" style={{ color: "#FFF" }} />,
       title: "Artesanales"
     },
     {
-      icon: <FaTree className="text-3xl mb-2" style={{ color: "#FF6900" }} />,
+      icon: <FaTree className="text-3xl mb-2" style={{ color: "#FFF" }} />,
       title: "Madera de Calidad"
     },
     {
-      icon: <FaTools className="text-3xl mb-2" style={{ color: "#FF6900" }} />,
+      icon: <FaTools className="text-3xl mb-2" style={{ color: "#FFF" }} />,
       title: "Hechos a Mano"
     },
     {
-      icon: <FaPalette className="text-3xl mb-2" style={{ color: "#FF6900" }} />,
+      icon: <FaPalette className="text-3xl mb-2" style={{ color: "#FFF" }} />,
       title: "Personalizados"
     }
   ];
@@ -145,18 +145,19 @@ function Homepage() {
           </span>
         </div>
       </div>
+      
 
       {/* Sección de características */}
-      <section className="features bg-orange-50 rounded-2xl min-w-full py-8 mb-8">
+      <section className="features rounded-2xl min-w-full py-8 mb-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="text-center p-6  bg-white py-10 rounded-lg shadow-sm hover:shadow-md hover:bg- transition-shadow"
+                className="text-center p-6 bg-[#c9936f] py-10 rounded-lg shadow-sm hover:shadow-md hover:bg- transition-shadow"
               >
                 <div className="flex justify-center">{feature.icon}</div>
-                <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   {feature.title}
                 </h3>
               </div>
@@ -164,6 +165,8 @@ function Homepage() {
           </div>
         </div>
       </section>
+
+      
 
       {/* Hero */}
       <section className="hero mb-8 text-center">
