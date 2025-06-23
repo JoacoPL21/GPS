@@ -12,9 +12,9 @@ export const createPreference = async (req, res) => {
       external_reference,
       auto_return: "approved",
       back_urls: {
-        success: "https://fa2a-181-162-85-50.ngrok-free.app/success",
-        failure: "https://yourdomain.com/failure",
-        pending: "https://yourdomain.com/pending"
+        success: "https://a223-190-211-41-93.ngrok-free.app/success",
+        failure: "https://a223-190-211-41-93.ngrok-free.app/failure",
+        pending: "https://a223-190-211-41-93.ngrok-free.app/pending"
       },
     };
 

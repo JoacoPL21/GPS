@@ -75,9 +75,10 @@ async function setupServer() {
     const uploadPath = path.resolve("src/uploads");
 
     // Servir archivos estáticos desde el directorio 'uploads'
-    app.use("/uploads", express.static(uploadPath));
+    app.use("/api/uploads", express.static(uploadPath));
 
-    // Servidor escuchando en el puerto configurado  
+    // Servidor escuchando en el puerto configurado
+   
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
     });
