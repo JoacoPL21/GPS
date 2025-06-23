@@ -63,13 +63,14 @@ const Profile = () => {
       </div>
       <div  className="mt-4 bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Direccion de envio</h2>
-        <button
-          onClick={() => handleDeleteDireccion(authUser?.id_usuario)}
-          className="bg-red-500 text-white px-4 py-2 rounded mb-4"
-        >
-          Eliminar Dirección
-        </button>
         {direcciones.length > 0 ? (
+          <div className="flex justify-end mb-4">
+            <button 
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              onClick={() => handleDeleteDireccion(direcciones[0].id)}
+            >
+              Eliminar Dirección
+            </button>
           <ul className="pl-4 ">
             {direcciones.map((direccion, index) => (
               <li key={index} className="mb-4 pb-2">
@@ -82,6 +83,7 @@ const Profile = () => {
               </li>
             ))}
           </ul>
+          </div>
         ) : (
           <p>No hay direcciones registradas.</p>
         )}

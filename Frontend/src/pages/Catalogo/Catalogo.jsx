@@ -5,7 +5,6 @@ import CardProducto from "../../components/CardCatalogo.jsx";
 const Catalogo = () => {
   const { productosDisponibles, loading } = useProductosDispo();
   const { addItemToCart } = useCart();
-  console.log("Pruebas de pull request automatico")
 
   const handleAddToCart = (producto) => {
     addItemToCart(producto);

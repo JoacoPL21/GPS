@@ -3,9 +3,7 @@ import chalk from 'chalk';
 import { AppDataSource } from './configDB.js';
 import Productos from '../entity/productos.entity.js';
 import Usuarios from '../entity/usuario.entity.js';
-import Direccion from '../entity/direccion.entity.js';
 import Categoria from '../entity/categoria.entity.js';
-import Categoria from '../entity/Categoria.js';
 import { encryptPassword } from '../helpers/bcrypt.helper.js';
 
 async function createUser() {
