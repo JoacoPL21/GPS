@@ -28,3 +28,12 @@ export const getDireccionesByUserId = async (userId) => {
         console.error('Error fetching user addresses:', error.message);
     }
 }
+
+export const deleteDireccionByUserId = async (userId) => {
+    try {
+        const response = await axios.delete(`/users/direccion/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting user address:', error.message);
+    }
+}

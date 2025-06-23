@@ -14,8 +14,8 @@ export const getAllUsersService = async () => {
         return [userList,null];
 
     } catch (error) {
-        console.error('Error fetching users:', error);
-        throw new Error('Error fetching users');
+        console.error('Error recuperando usuarios', error);
+        throw new Error('Error recuperando usuarios');
     }
 }
 
@@ -38,8 +38,8 @@ export const registerDireccionService = async (direccionData) => {
         const savedDireccion = await direccionRepository.save(newDireccion);
         return savedDireccion;
     } catch (error) {
-        console.error('Error saving address:', error);
-        throw new Error('Error saving address');
+        console.error('Error guardando la direccion:', error);
+        throw new Error('Error guardando la direccion');
     }
 }
 
@@ -51,11 +51,28 @@ export const getDireccionByUserIdService = async (userId) => {
             where:  { usuario: { id_usuario: userId } }, 
         });
         if (!direcciones || direcciones.length === 0) {
-            return [[], 'No addresses found for this user'];
+            return [[], 'No hay direcciones para este usuario'];
         }
         return [direcciones, null];
     } catch (error) {
-        console.error('Error fetching addresses:', error);
-        throw new Error('Error fetching addresses');
+        console.error('error recuperando las direcciones:', error);
+        throw new Error('error recuperando las direcciones');
+    }
+}
+
+export async function deleteDireccionByUserIdService(userId) {
+    try {
+        const direccionRepository = AppDataSource.getRepository(Direccion);
+        const direccionToDelete = await direccionRepository.findOne({
+            where: { usuario: { id_usuario: userId } }
+        });
+        if (!direccionToDelete) {
+            return [null, 'Address not found for this user'];
+        }
+        const deletedDireccion = await direccionRepository.remove(direccionToDelete);
+        return [deletedDireccion, null];
+    } catch (error) {
+        console.error('Error deleting address:', error);
+        throw new Error('error eliminando la dirección');
     }
 }

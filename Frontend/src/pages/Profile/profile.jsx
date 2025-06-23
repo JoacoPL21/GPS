@@ -1,6 +1,7 @@
 import { useAuth } from '../../context/AuthContext.jsx';
 import DirectionForm from '../Profile/directionForm.jsx';
-import { getDireccionesByUserId} from "../../services/user.service.js";
+import { getDireccionesByUserId,deleteDireccionByUserId} from "../../services/user.service.js";
+import swal from 'sweetalert2';
 import { useEffect,useState } from 'react';
 
 const Profile = () => {
@@ -9,9 +10,30 @@ const Profile = () => {
   const [direcciones, setDirecciones] = useState([]);
 
 
+
+
+// Función para eliminar una dirección
+  const handleDeleteDireccion = async (direccionId) => {
+    try {
+      const response = await deleteDireccionByUserId(direccionId);
+      if (response.status === 'Success') {
+        setDirecciones(direcciones.filter(direccion => direccion.id !== direccionId));
+        swal.fire({
+          title: 'Éxito',
+          text: 'Dirección eliminada correctamente.',
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+        });
+      } else {
+        console.error('Error al eliminar la dirección:', response.message);
+      }
+    } catch (error) {
+      console.error('Error al eliminar la dirección:', error);
+    }
+  };
+  
   useEffect(() => {
     const fetchDirecciones = async () => {
-      console.log('ID de usuario:', id_usuario);
       if (id_usuario) {
         try {
           const response = await getDireccionesByUserId(id_usuario);
@@ -27,7 +49,7 @@ const Profile = () => {
     }
 
     fetchDirecciones();
-  },  [id_usuario]);
+  },  [ id_usuario]);
 
 
   return (
@@ -41,10 +63,16 @@ const Profile = () => {
       </div>
       <div  className="mt-4 bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Direccion de envio</h2>
+        <button
+          onClick={() => handleDeleteDireccion(authUser?.id_usuario)}
+          className="bg-red-500 text-white px-4 py-2 rounded mb-4"
+        >
+          Eliminar Dirección
+        </button>
         {direcciones.length > 0 ? (
-          <ul className="list-disc pl-5">
+          <ul className="pl-4 ">
             {direcciones.map((direccion, index) => (
-              <li key={index}>
+              <li key={index} className="mb-4 pb-2">
                 <p><strong>Calle:</strong> {direccion.calle}</p>
                 <p><strong>Número:</strong> {direccion.numero}</p>
                 <p><strong>Ciudad:</strong> {direccion.ciudad}</p>

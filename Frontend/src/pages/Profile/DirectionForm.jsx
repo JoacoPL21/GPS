@@ -129,8 +129,8 @@ const FormDireccionEnvio=()=> {
       <div className="mb-4">
         <label className="block mb-1 font-medium">Tipo de dirección</label>
         <select
-          name="tipo_direccion"
-          value={form.tipo_direccion}
+          name="tipo_de_direccion"
+          value={form.tipo_de_direccion}
           onChange={handleChange}
           className="w-full border rounded px-3 py-1.5"
         >
@@ -140,7 +140,7 @@ const FormDireccionEnvio=()=> {
       </div>
       <button
         type="submit"
-        className="w-full bg-orange-400 text-white py-2 rounded font-semibold hover:bg-orange-500 transition"
+        className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors"
       >
         Guardar dirección
       </button>

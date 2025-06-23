@@ -6,6 +6,7 @@ import {
   getAllUsers,
   registerDireccion,
   getDireccionByUserId,
+  deleteDireccionByUserId
 } from "../controller/user.controller.js";
 
 const router = Router();
@@ -17,5 +18,6 @@ router
 router
   .get("/", getAllUsers)
   .post("/direccion", registerDireccion)
-  .get("/direccion/:id", getDireccionByUserId);
+  .get("/direccion/:id", getDireccionByUserId)
+  .delete("/direccion/:id",deleteDireccionByUserId);
 export default router;

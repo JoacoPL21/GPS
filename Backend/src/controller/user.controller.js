@@ -1,4 +1,4 @@
-import { getAllUsersService,registerDireccionService,getDireccionByUserIdService } from '../services/user.service.js';
+import { getAllUsersService,registerDireccionService,getDireccionByUserIdService,deleteDireccionByUserIdService } from '../services/user.service.js';
 import { handleSuccess, handleErrorServer } from '../handlers/responseHandlers.js';
 import { direccionValidation } from '../validations/auth.validation.js';
 export async function getAllUsers(req, res) {
@@ -62,3 +62,18 @@ export async function getDireccionByUserId(req, res) {
     }
 }
 
+export async function deleteDireccionByUserId(req, res) {
+    const userId = req.params.id;
+    try {
+        const [deletedDireccion, error] = await deleteDireccionByUserIdService(userId);
+        if (error) {
+            return res.status(500).json({ message: 'Error al eliminar la dirección', error });
+        }
+        if (!deletedDireccion) {
+            return res.status(404).json({ message: 'Dirección no encontrada' });
+        }
+        handleSuccess(res, 200, "Dirección eliminada correctamente", deletedDireccion);
+    } catch (error) {
+        handleErrorServer(res, 500, error.message);
+    }
+}
