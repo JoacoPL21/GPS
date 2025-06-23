@@ -25,6 +25,7 @@
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "chalk": "^5.4.1",
+    "connect-pg-simple": "^10.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

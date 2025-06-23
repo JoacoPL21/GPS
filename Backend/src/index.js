@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import indexRoutes from "./routes/routes.js";
 import session from "express-session";
+import pgSession from "connect-pg-simple"; // Nuevo: almacén de sesiones para PostgreSQL
 import passport from "passport";
 import express, { json, urlencoded } from "express";
 import { cookieKey, HOST, PORT } from "./config/configENV.js";
@@ -19,8 +20,19 @@ async function setupServer() {
   try {
     dotenv.config();
     const app = express();
+    
+    // 1. Nuevo: Configura el almacén de sesiones para PostgreSQL
+    const PgStore = pgSession(session);
+    const sessionStore = new PgStore({
+      conObject: {
+        connectionString: `postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+      },
+      createTableIfMissing: true,
+      tableName: 'session',
+    });
 
-    // 1. Middleware para webhooks DEBE SER EL PRIMERO
+    // 2. Middleware para webhooks DEBE SER EL PRIMERO
     app.use(
       '/api/payments/webhook',
       bodyParser.raw({ type: 'application/json' }),
@@ -54,18 +66,18 @@ async function setupServer() {
 
     // Configuración de CORS
     // Configuración de CORS mejorada
-app.use(
-  cors({
-    credentials: true,
-    origin: [
-      'http://localhost:5173',
-      'https://eccomerce-80159rg7k-tyrf1ngs-projects.vercel.app',
-      'https://*.vercel.app' // Permite todos los subdominios de Vercel
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  }),
-);
+    app.use(
+      cors({
+        credentials: true,
+        origin: [
+          'http://localhost:5173',
+          'https://eccomerce-80159rg7k-tyrf1ngs-projects.vercel.app',
+          'https://*.vercel.app' // Permite todos los subdominios de Vercel
+        ],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization']
+      }),
+    );
 
     // Middlewares globales para procesar JSON y URL-encoded
     app.use(
@@ -83,16 +95,18 @@ app.use(
     app.use(cookieParser());
     app.use(morgan("dev"));
 
-    // Configuración de la sesión
+    // 3. Configuración CORREGIDA de la sesión
     app.use(
       session({
-        secret: cookieKey,
+        secret: process.env.SESSION_SECRET || cookieKey, // Usa SESSION_SECRET si está definido
+        store: sessionStore, // Usa el almacén PostgreSQL
         resave: false,
         saveUninitialized: false,
         cookie: {
-          secure: false,
+          secure: process.env.NODE_ENV === 'production', // Debe ser true en producción
           httpOnly: true,
-          sameSite: "strict",
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // none para CORS en producción
+          maxAge: 24 * 60 * 60 * 1000 // 1 día
         },
       }),
     );
@@ -110,6 +124,12 @@ app.use(
 
     // Servir archivos estáticos desde el directorio 'uploads'
     app.use("/uploads", express.static(uploadPath));
+
+    // 4. Nuevo: Manejo de errores global
+    app.use((err, req, res, next) => {
+      console.error('Error global:', err.stack);
+      res.status(500).json({ error: 'Algo salió mal' });
+    });
 
     // Servidor escuchando en el puerto configurado
     app.listen(PORT, () => {
