@@ -5,6 +5,7 @@ import { Sling as Hamburger } from 'hamburger-react';
 import { useState, useEffect } from 'react'; // <-- importamos useEffect
 import Sidebar from '../components/Sidebar';
 import ContactSection from './Contact/contact_us'
+import { API_URL } from '../config.js'; 
 
 
 function App() {
@@ -18,6 +19,14 @@ function App() {
     }
   }, [isOpen]);
 
+// Prueba de conexión al backend
+  useEffect(() => {
+    fetch(`${API_URL}/test`)
+      .then(response => response.json())
+      .then(data => console.log('Conexión exitosa:', data))
+      .catch(error => console.error('Error de conexión:', error));
+  }, []);
+  
   return (
     <div className="full_navbar" >
       {/* Sidebar */}

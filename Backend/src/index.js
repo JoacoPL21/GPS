@@ -13,23 +13,59 @@ import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
-
+import bodyParser from 'body-parser';
 
 async function setupServer() {
   try {
     dotenv.config();
     const app = express();
 
+    // 1. Middleware para webhooks DEBE SER EL PRIMERO
+    app.use(
+      '/api/payments/webhook',
+      bodyParser.raw({ type: 'application/json' }),
+      (req, res, next) => {
+        req.rawBody = req.body.toString('utf8');
+
+        try {
+          req.webhookBody = JSON.parse(req.rawBody);
+        } catch (e) {
+          console.error('Error parsing JSON:', e);
+          console.error('Raw body:', req.rawBody);
+          req.webhookBody = {};
+        }
+
+        // Agregar log de los headers necesarios
+        console.log('-------------------------------------');
+        console.log(`[Webhook] ${new Date().toISOString()}`);
+        console.log('Método:', req.method);
+        console.log('URL:', req.originalUrl);
+        console.log('Headers:', req.headers);
+        console.log('X-Timestamp:', req.headers['x-timestamp']); // Nuevo log
+        console.log('Body:', req.webhookBody);
+        console.log('Raw Body:', req.rawBody);
+        console.log('-------------------------------------');
+        next();
+      }
+    );
+
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
 
     // Configuración de CORS
-    app.use(
-      cors({
-        credentials: true,
-        origin: true, // Permitir todos los orígenes (puedes especificar uno específico aquí)
-      }),
-    );
+    // Configuración de CORS mejorada
+app.use(
+  cors({
+    credentials: true,
+    origin: [
+      'http://localhost:5173',
+      'https://eccomerce-80159rg7k-tyrf1ngs-projects.vercel.app',
+      'https://*.vercel.app' // Permite todos los subdominios de Vercel
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }),
+);
 
     // Middlewares globales para procesar JSON y URL-encoded
     app.use(
@@ -38,7 +74,6 @@ async function setupServer() {
         limit: "1mb",
       }),
     );
-
     app.use(
       json({
         limit: "1mb",
@@ -47,22 +82,6 @@ async function setupServer() {
 
     app.use(cookieParser());
     app.use(morgan("dev"));
-
-    // Middleware para loguear webhooks
-    app.use('/api/payments/webhook', (req, res, next) => {
-      console.log('-------------------------------------');
-      console.log(`[Webhook] ${new Date().toISOString()}`);
-      console.log('Método:', req.method);
-      console.log('URL:', req.originalUrl);
-      console.log('Headers:', req.headers);
-
-      if (req.body && Object.keys(req.body).length > 0) {
-        console.log('Body:', JSON.stringify(req.body, null, 2));
-      }
-
-      console.log('-------------------------------------');
-      next();
-    });
 
     // Configuración de la sesión
     app.use(
@@ -85,7 +104,6 @@ async function setupServer() {
 
     // Otras rutas generales
     app.use("/api", indexRoutes);
-    app.use(express.json());
     app.use('/api/payments', paymentRoutes);
 
     const uploadPath = path.resolve("src/uploads");
@@ -94,7 +112,6 @@ async function setupServer() {
     app.use("/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
-
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
     });
