@@ -1,0 +1,25 @@
+name: Auto Pull Request from Test to Main
+
+on:
+  schedule:
+    - cron: '0 16 * * 1'  # Lunes a las 12:00 CLT (UTC-4 -> UTC+4 = 16:00 UTC)
+  workflow_dispatch:  
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create pull request from test to main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          head: test
+          title: "Auto PR: merge 'test' into 'main'"
+          body: "Este pull request fue creado automáticamente cada lunes a las 12:00 (hora Chile) para integrar cambios de `test` a `main`."
+          branch: auto-pr-test-to-main
+          delete-branch: true
