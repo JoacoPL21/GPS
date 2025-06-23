@@ -31,71 +31,81 @@ export const createPreference = async (req, res) => {
 
 export const handleWebhook = async (req, res) => {
   try {
-    // Validación de firma
-    const signature = req.headers['x-signature'];
-    const secret = process.env.MP_WEBHOOK_SECRET;
-    
-    if (!signature || !secret) {
-      return res.status(401).json({ error: 'Faltan credenciales de seguridad' });
-    }
-    
-    const rawBody = JSON.stringify(req.body);
-    const generatedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(rawBody)
-      .digest('hex');
-    
-    if (signature !== `sha256=${generatedSignature}`) {
-      console.error(`Firma inválida: Recibida ${signature} vs Esperada sha256=${generatedSignature}`);
+    const signatureHeader = req.headers['x-signature'];
+    const secret = process.env.MP_WEBHOOK_SECRET.trim();
+
+    if (!signatureHeader || !secret) {
+      console.error('Faltan cabeceras necesarias o secreto');
       return res.status(401).json({ error: 'Firma inválida' });
     }
 
-    // Procesamiento del evento
-    const { id, type } = req.body;
+    // Extraer ts (timestamp) y v1 (firma) del header
+    const signatureParts = signatureHeader.split(',');
+    const tsPart = signatureParts.find(part => part.startsWith('ts='));
+    const v1Part = signatureParts.find(part => part.startsWith('v1='));
     
-    if (type !== 'payment') {
-      return res.status(400).json({ error: 'Tipo de evento no soportado' });
+    if (!tsPart || !v1Part) {
+      console.error('Formato de firma inválido:', signatureHeader);
+      return res.status(401).json({ error: 'Formato de firma inválido' });
     }
-    
-    let paymentData;
-    const testIds = ["123456789", "987654320", "555555555"];
-    
-    if (testIds.includes(id)) {
-      paymentData = {
-        id,
-        status: id === "987654320" ? "denied" : "approved",
-        external_reference: `TEST-${id.slice(-3)}`,
-        transaction_amount: 100.00,
-        payment_type_id: "credit_card",
-        order: { id: `TEST-ORDER-${id.slice(-3)}` },
-        preference_id: `TEST-PREF-${id.slice(-3)}`
-      };
-    } else {
-      const payment = new Payment(mercadoPagoClient);
-      paymentData = await payment.get({ id });
-    }
-    
-    // Guardar transacción
-    const transactionData = {
-      payment_id: paymentData.id,
-      status: paymentData.status.toLowerCase(), // Normalizar a minúsculas
-      external_reference: paymentData.external_reference,
-      amount: paymentData.transaction_amount,
-      payment_type: paymentData.payment_type_id,
-      merchant_order_id: paymentData.order?.id || 'N/A',
-      preference_id: paymentData.preference_id
-    };
 
-    const paymentService = new PaymentService();
-    await paymentService.saveTransaction(transactionData);
-    
+    const timestamp = tsPart.split('=')[1];
+    const signature = v1Part.split('=')[1];
+    const payload = req.rawBody;
+
+    // FIRMA CORREGIDA SEGÚN DOCUMENTACIÓN MP
+    const signingData = `${payload}:${timestamp}`;
+    const generatedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(signingData)
+      .digest('hex');
+
+    // Debug
+    console.log('Datos para firma:', signingData);
+    console.log('Timestamp:', timestamp);
+    console.log('Firma recibida:', signature);
+    console.log('Firma generada:', generatedSignature);
+
+    if (signature !== generatedSignature) {
+      console.error('Firma inválida recibida:', signature, 'esperada:', generatedSignature);
+      return res.status(401).json({ error: 'Firma inválida' });
+    }
+
+    // 2. Procesar el evento
+    const event = req.webhookBody;
+
+    console.log('Webhook recibido:', JSON.stringify(event, null, 2));
+
+    if (event.type === 'payment') {
+      const paymentId = event.data.id;
+      const payment = new Payment(mercadoPagoClient);
+
+      try {
+        const paymentData = await payment.get({ id: paymentId });
+
+        const transactionData = {
+          payment_id: paymentData.id,
+          status: paymentData.status,
+          external_reference: paymentData.external_reference,
+          amount: paymentData.transaction_amount,
+          payment_type: paymentData.payment_type_id,
+          merchant_order_id: paymentData.order?.id || 'N/A',
+          preference_id: paymentData.preference_id
+        };
+
+        console.log('Guardando transacción:', transactionData);
+        const paymentService = new PaymentService();
+        await paymentService.saveTransaction(transactionData);
+
+      } catch (error) {
+        console.error('Error obteniendo datos de pago:', error);
+      }
+    }
+
     res.status(200).send();
   } catch (error) {
     console.error('Error en webhook:', error);
-    res.status(500).json({ 
-      error: 'Error procesando webhook',
-      details: error.message
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 

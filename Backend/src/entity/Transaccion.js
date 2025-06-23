@@ -49,7 +49,7 @@ export default new EntitySchema({
     },
     created_at: {
       type: "timestamp",
-      default: () => "CURRENT_TIMESTAMP",
+      createDate: true,
     },
   },
 });

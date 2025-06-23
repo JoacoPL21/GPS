@@ -8,7 +8,7 @@ import {
 const router = Router();
 
 router.post('/create_preference', createPreference);
-router.post('/webhook', handleWebhook); 
+router.post('/webhook', handleWebhook); // Eliminar middleware duplicado
 router.get('/transaction/:paymentId', getTransaction);
 
 export default router;
