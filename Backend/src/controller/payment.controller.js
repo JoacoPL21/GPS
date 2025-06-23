@@ -1,5 +1,5 @@
 import { Preference, Payment } from 'mercadopago';
-import mercadoPagoClient from '../config/mercadoPago.js';
+import mercadoPagoClient from '../config/mercadopago.js';
 import { PaymentService } from '../services/payment.service.js';
 import { FRONTEND_URL } from '../config/configENV.js';
 import crypto from 'crypto';
