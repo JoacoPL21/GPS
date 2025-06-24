@@ -38,8 +38,8 @@ const Direccion = new EntitySchema({
         },
         tipo_de_direccion: {
             type: "enum",
-            enum: ["predeterminada", "opcional"],
-            default: "predeterminada",
+            enum: ["predeterminada,opcional"],
+            nullable: false,
         },
         createdAt: {
             type: "timestamp",

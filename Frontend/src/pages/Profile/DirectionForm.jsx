@@ -12,7 +12,7 @@ const FormDireccionEnvio=()=> {
     ciudad: "",
     region: "",
     codigo_postal: "",
-    tipo_de_direccion: "predeterminada",
+    tipo_de_direccion: 0,
   });
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const FormDireccionEnvio=()=> {
           ciudad: "",
           region: "",
           codigo_postal: "",
-          tipo_de_direccion: "predeterminada",
+          tipo_de_direccion: 0,
         });
       } else {
         console.error("Error al registrar la dirección:", response.message);

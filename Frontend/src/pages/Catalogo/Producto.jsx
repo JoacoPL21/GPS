@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useProductosbyId from '../../hooks/productos/useProductosId';
+import {useCart} from'../../context/CartContext.jsx';
 const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 
 const Producto = () => {
@@ -8,6 +9,24 @@ const Producto = () => {
   const { producto, loading } = useProductosbyId(id);
   const [cantidad, setCantidad] = useState(1);
 
+  const {addItemToCart} = useCart();
+
+  const handleClickAddToCart = (producto) => {
+    if (!producto) return;
+    const item = {
+      id: producto.id_producto,
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: cantidad,
+      imagen: producto.imagen,
+      categoria: producto.categoria,
+      stock: producto.stock,
+    };
+    addItemToCart(item);
+    setCantidad(1); // Reset cantidad after adding to cart
+
+  };
+    
   const aumentarCantidad = () => {
     if (producto && cantidad < producto.stock) {
       setCantidad(cantidad + 1);
@@ -69,7 +88,9 @@ const Producto = () => {
           </div>
         </div>
 
-        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+        <button onClick={()=>{
+          handleClickAddToCart(producto);
+        }} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
           Agregar al carrito
         </button>
       </div>
