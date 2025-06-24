@@ -8,12 +8,13 @@ import passport from "passport";
 import express, { json, urlencoded } from "express";
 import { cookieKey, HOST, PORT } from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
-import { createProductos,createUser, createCategoria } from "./config/initialSetup.js";
+import { createProductos, createUser, createCategoria } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
-
+import productosRoutes from "./routes/productos.routes.js";
+import categoriasRoutes from "./routes/categorias.routes.js";
 
 async function setupServer() {
   try {
@@ -30,6 +31,7 @@ async function setupServer() {
         origin: true, // Permitir todos los orígenes (puedes especificar uno específico aquí)
       }),
     );
+
 
     // Middlewares globales para procesar JSON y URL-encoded
     app.use(
@@ -71,6 +73,8 @@ async function setupServer() {
     app.use("/api", indexRoutes);
     app.use(express.json());
     app.use('/api/payments', paymentRoutes);
+    app.use("/api/productos", productosRoutes);
+    app.use("/api/categorias", categoriasRoutes);
 
     const uploadPath = path.resolve("src/uploads");
 
@@ -78,7 +82,7 @@ async function setupServer() {
     app.use("/api/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
-   
+
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
     });
@@ -93,7 +97,7 @@ async function setupAPI() {
     await setupServer(); // Configuración del servidor
     await createUser();
     await createCategoria(); // Creación de usuarios iniciales
-    await createProductos(); 
+    await createProductos();
   } catch (error) {
     console.log("Error en index.js -> setupAPI(), el error es: ", error);
   }
