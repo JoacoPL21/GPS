@@ -10,7 +10,7 @@ import express, { json, urlencoded } from "express";
 import {
   cookieKey,
   WEB_HOST,
-  WEB_PORT,  // Cambiado a WEB_PORT
+  WEB_PORT,
   DB_HOST,
   DB_PORT,
   DB_USERNAME,
@@ -46,7 +46,27 @@ async function setupServer() {
       '/api/payments/webhook',
       bodyParser.raw({ type: 'application/json' }),
       (req, res, next) => {
-        // ... (código existente)
+        req.rawBody = req.body.toString('utf8');
+
+        try {
+          req.webhookBody = JSON.parse(req.rawBody);
+        } catch (e) {
+          console.error('Error parsing JSON:', e);
+          console.error('Raw body:', req.rawBody);
+          req.webhookBody = {};
+        }
+
+        // Agregar log de los headers necesarios
+        console.log('-------------------------------------');
+        console.log(`[Webhook] ${new Date().toISOString()}`);
+        console.log('Método:', req.method);
+        console.log('URL:', req.originalUrl);
+        console.log('Headers:', req.headers);
+        console.log('X-Timestamp:', req.headers['x-timestamp']);
+        console.log('Body:', req.webhookBody);
+        console.log('Raw Body:', req.rawBody);
+        console.log('-------------------------------------');
+        next();
       }
     );
 
@@ -56,35 +76,43 @@ async function setupServer() {
     // Configuración mejorada de CORS
     const allowedOrigins = [
       'http://localhost:5173',
-      'https://eccomerce-tyrf1ngs-projects.vercel.app', // Dominio base
-      /https:\/\/eccomerce-.*-tyrf1ngs-projects\.vercel\.app/, // Patrón para previews
-      /https:\/\/.*\.vercel\.app/ // Patrón general para Vercel
+      'https://eccomerce-tyrf1ngs-projects.vercel.app',
+      /https:\/\/eccomerce-.*-tyrf1ngs-projects\.vercel\.app/,
+      /https:\/\/.*\.vercel\.app/
     ];
 
-    app.use(
-      cors({
-        credentials: true,
-        origin: function (origin, callback) {
-          // Permitir solicitudes sin origen (como apps móviles o curl)
-          if (!origin) return callback(null, true);
+    // Crear instancia de middleware CORS
+    const corsMiddleware = cors({
+      credentials: true,
+      origin: function (origin, callback) {
+        // Permitir solicitudes sin origen
+        if (!origin) return callback(null, true);
+        
+        const isAllowed = allowedOrigins.some(pattern => {
+          if (typeof pattern === 'string') return origin === pattern;
+          if (pattern instanceof RegExp) return pattern.test(origin);
+          return false;
+        });
+        
+        isAllowed ? callback(null, true) : callback(new Error('Not allowed by CORS'));
+      },
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    });
 
-          if (allowedOrigins.some(pattern => {
-            if (typeof pattern === 'string') {
-              return origin === pattern;
-            } else if (pattern instanceof RegExp) {
-              return pattern.test(origin);
-            }
-            return false;
-          })) {
-            return callback(null, true);
-          }
+    // Aplicar CORS a todas las rutas
+    app.use(corsMiddleware);
 
-          callback(new Error('Not allowed by CORS'));
-        },
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization']
-      })
-    );
+    // Manejar explícitamente las solicitudes OPTIONS
+    app.options('*', corsMiddleware);
+
+    // Middleware para saltar otros middlewares en solicitudes OPTIONS
+    app.use((req, res, next) => {
+      if (req.method === 'OPTIONS') {
+        return next(); // Saltar otros middlewares para OPTIONS
+      }
+      next();
+    });
 
     // Middlewares globales para procesar JSON y URL-encoded
     app.use(urlencoded({ extended: true, limit: "1mb" }));
@@ -93,8 +121,10 @@ async function setupServer() {
     app.use(cookieParser());
     app.use(morgan("dev"));
 
-    // 3. Configuración de la sesión
-    app.use(
+    // 3. Configuración de la sesión (solo para rutas no OPTIONS)
+    app.use((req, res, next) => {
+      if (req.method === 'OPTIONS') return next();
+      
       session({
         secret: process.env.SESSION_SECRET || cookieKey,
         store: sessionStore,
@@ -105,9 +135,9 @@ async function setupServer() {
           httpOnly: true,
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
           maxAge: 24 * 60 * 60 * 1000
-        },
-      })
-    );
+        }
+      })(req, res, next);
+    });
 
     // Configuración de Passport para autenticación
     app.use(passport.initialize());
