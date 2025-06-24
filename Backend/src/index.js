@@ -73,37 +73,41 @@ async function setupServer() {
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
 
+// Configuración mejorada y corregida de CORS
 const allowedOrigins = [
   'http://localhost:5173',
   'https://eccomerce-tyrf1ngs-projects.vercel.app',
-  // Usar expresiones regulares válidas:
-  /https:\/\/eccomerce-.*-tyrf1ngs-projects\.vercel\.app/,
-  /https:\/\/.*--tyrf1ngs-projects\.vercel\.app/, // Ejemplo adicional si necesitas
-  /https:\/\/.*\.vercel\.app/
+  'https://eccomerce-frontend.vercel.app' // Agrega tu dominio principal real
 ];
 
-const corsOptions = {
-  credentials: true,
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Permitir server-to-server
-    
-    const allowed = allowedOrigins.some(pattern => 
-      typeof pattern === 'string' 
-        ? origin === pattern 
-        : pattern.test(origin)
-    );
-    
-    allowed ? callback(null, true) : callback(new Error('Bloqueado por CORS'));
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
+// Usa este patrón más seguro para previews
+const vercelPreviewPattern = /^https:\/\/eccomerce-[a-z0-9]+-tyrf1ngs-projects\.vercel\.app$/;
 
-// Aplica CORS globalmente
-app.use(cors(corsOptions));
-
-// Manejo explícito de OPTIONS
-app.options('*', cors(corsOptions));
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      // 1. Permitir solicitudes sin 'origin' (servidor a servidor, móviles, etc)
+      if (!origin) return callback(null, true);
+      
+      // 2. Verificar dominios permitidos exactos
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      // 3. Verificar previews de Vercel con patrón seguro
+      if (vercelPreviewPattern.test(origin)) {
+        return callback(null, true);
+      }
+      
+      // 4. Rechazar otros orígenes (opcional: registrar para depuración)
+      console.warn('Origen bloqueado por CORS:', origin);
+      callback(null, false);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  })
+);
 
     // Aplicar CORS a todas las rutas
     app.use(corsMiddleware);
