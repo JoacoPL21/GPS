@@ -7,9 +7,9 @@ import session from "express-session";
 import pgSession from "connect-pg-simple";
 import passport from "passport";
 import express, { json, urlencoded } from "express";
-import { 
-  cookieKey, 
-  WEB_HOST, 
+import {
+  cookieKey,
+  WEB_HOST,
   WEB_PORT,  // Cambiado a WEB_PORT
   DB_HOST,
   DB_PORT,
@@ -29,7 +29,7 @@ async function setupServer() {
   try {
     dotenv.config();
     const app = express();
-    
+
     // 1. Configura el almacén de sesiones para PostgreSQL
     const PgStore = pgSession(session);
     const sessionStore = new PgStore({
@@ -53,15 +53,34 @@ async function setupServer() {
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
 
-    // Configuración de CORS
+    // Configuración mejorada de CORS
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://eccomerce-tyrf1ngs-projects.vercel.app', // Dominio base
+      /https:\/\/eccomerce-.*-tyrf1ngs-projects\.vercel\.app/, // Patrón para previews
+      /https:\/\/.*\.vercel\.app/ // Patrón general para Vercel
+    ];
+
     app.use(
       cors({
         credentials: true,
-        origin: [
-          'http://localhost:5173',
-          'https://eccomerce-80159rg7k-tyrf1ngs-projects.vercel.app',
-          'https://*.vercel.app'
-        ],
+        origin: function (origin, callback) {
+          // Permitir solicitudes sin origen (como apps móviles o curl)
+          if (!origin) return callback(null, true);
+
+          if (allowedOrigins.some(pattern => {
+            if (typeof pattern === 'string') {
+              return origin === pattern;
+            } else if (pattern instanceof RegExp) {
+              return pattern.test(origin);
+            }
+            return false;
+          })) {
+            return callback(null, true);
+          }
+
+          callback(new Error('Not allowed by CORS'));
+        },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization']
       })
