@@ -1,9 +1,10 @@
 "use client"
 import { Dialog, Transition } from "@headlessui/react"
+import { useCategorias } from "../hooks/productos/useCategorias";
 import { Fragment } from "react"
 
 const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEditing, submitting }) => {
-  const categorias = ["Artesanía", "Juguetes", "Decoración", "Muebles", "Accesorios"]
+  const { categorias } = useCategorias();
 
   const getFieldIcon = (field) => {
     const icons = {
@@ -326,9 +327,9 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             }`}
                           >
                             <option value="">Selecciona una categoría</option>
-                            {categorias.map((categoria) => (
-                              <option key={categoria} value={categoria}>
-                                {categoria}
+                            {categorias.map((categorias, index) => (
+                              <option key={categorias.id_categoria ?? `sin-id-${index}`} value={categorias.id_categoria}>
+                                {categorias.nombre}
                               </option>
                             ))}
                           </select>

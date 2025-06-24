@@ -4,58 +4,29 @@ import { useState, useMemo } from "react"
 import Swal from "sweetalert2"
 import ProductoCard from "../../components/ProductoCard"
 import ProductoModal from "../../components/ProductoModal"
+import { useProductos } from "../../hooks/productos/useProductos"
+import { useCategorias } from "../../hooks/productos/useCategorias"
 
-const initialProducts = [
-  {
-    id: 1,
-    nombre: "Producto 1",
-    descripcion: "Descripción 1",
-    precio: 10000,
-    stock: 10,
-    categoria: "Artesanía",
-    estado: "activo",
-  },
-  {
-    id: 2,
-    nombre: "Producto 2",
-    descripcion: "Descripción 2",
-    precio: 15000,
-    stock: 5,
-    categoria: "Juguetes",
-    estado: "activo",
-  },
-  {
-    id: 3,
-    nombre: "Producto 3",
-    descripcion: "Descripción 3",
-    precio: 8000,
-    stock: 0,
-    categoria: "Decoración",
-    estado: "inactivo",
-  },
-  {
-    id: 4,
-    nombre: "Producto 4",
-    descripcion: "Descripción 4",
-    precio: 25000,
-    stock: 15,
-    categoria: "Artesanía",
-    estado: "activo",
-  },
-]
+function ProductosManagerConnected() {
+  const {
+    productos,
+    loading: productosLoading,
+    error: productosError,
+    addProducto,
+    editProducto,
+    removeProducto,
+  } = useProductos()
 
-const emptyForm = {
-  nombre: "",
-  descripcion: "",
-  precio: "",
-  stock: "",
-  categoria: "",
-  estado: "activo",
-}
+  const { categorias, loading: categoriasLoading, addCategoria, editCategoria, removeCategoria } = useCategorias()
 
-function ProductosManager() {
-  const [products, setProducts] = useState(initialProducts)
-  const [form, setForm] = useState(emptyForm)
+  const [form, setForm] = useState({
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    stock: "",
+    id_categoria: "",
+    estado: "disponible",
+  })
   const [errors, setErrors] = useState({})
   const [editingId, setEditingId] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -74,17 +45,17 @@ function ProductosManager() {
 
   // Estadísticas calculadas
   const stats = useMemo(() => {
-    const total = products.length
-    const active = products.filter((p) => p.estado === "activo").length
-    const lowStock = products.filter((p) => p.stock <= 5).length
-    const totalValue = products.reduce((sum, p) => sum + p.precio * p.stock, 0)
+    const total = productos.length
+    const active = productos.filter((p) => p.estado === "disponible").length
+    const lowStock = productos.filter((p) => p.stock <= 5).length
+    const totalValue = productos.reduce((sum, p) => sum + p.precio * p.stock, 0)
 
     return { total, active, lowStock, totalValue }
-  }, [products])
+  }, [productos])
 
   // Productos filtrados y ordenados
   const filteredAndSortedProducts = useMemo(() => {
-    const filtered = products.filter((producto) => {
+    const filtered = productos.filter((producto) => {
       const matchesSearch =
         producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
@@ -112,10 +83,10 @@ function ProductosManager() {
     })
 
     return filtered
-  }, [products, searchTerm, filterCategory, filterStatus, sortBy, sortOrder])
+  }, [productos, searchTerm, filterCategory, filterStatus, sortBy, sortOrder])
 
   // Categorías únicas para el filtro
-  const categories = [...new Set(products.map((p) => p.categoria))]
+  const categories = [...new Set(productos.map((p) => p.categoria))]
 
   const validate = () => {
     const newErrors = {}
@@ -138,12 +109,18 @@ function ProductosManager() {
 
   const handleAddClick = () => {
     setEditingId(null)
-    setForm(emptyForm)
+    setForm({
+      nombre: "",
+      descripcion: "",
+      precio: "",
+      stock: "",
+      id_categoria: "",
+      estado: "disponible",
+    })
     setModalOpen(true)
   }
 
   const handleEdit = (producto) => {
-    // Solo editar si no estamos en modo selección
     if (selectionMode) return
 
     setForm({
@@ -151,18 +128,17 @@ function ProductosManager() {
       descripcion: producto.descripcion,
       precio: producto.precio,
       stock: producto.stock,
-      categoria: producto.categoria,
+      id_categoria: producto.id_categoria,
       estado: producto.estado,
     })
-    setEditingId(producto.id)
+    setEditingId(producto.id_producto)
     setModalOpen(true)
   }
 
-  const handleDelete = (id) => {
-    // Solo eliminar si no estamos en modo selección
+  const handleDelete = async (id) => {
     if (selectionMode) return
 
-    Swal.fire({
+    const result = await Swal.fire({
       title: "¿Estás seguro?",
       text: "No podrás revertir esto",
       icon: "warning",
@@ -171,19 +147,23 @@ function ProductosManager() {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setProducts((prev) => prev.filter((p) => p.id !== id))
+    })
+
+    if (result.isConfirmed) {
+      const response = await removeProducto(id)
+      if (response.success) {
         setSelectedProducts((prev) => prev.filter((selectedId) => selectedId !== id))
         Swal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success")
+      } else {
+        Swal.fire("Error", response.error || "No se pudo eliminar el producto", "error")
       }
-    })
+    }
   }
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedProducts.length === 0) return
 
-    Swal.fire({
+    const result = await Swal.fire({
       title: `¿Eliminar ${selectedProducts.length} productos?`,
       text: "No podrás revertir esta acción",
       icon: "warning",
@@ -192,17 +172,32 @@ function ProductosManager() {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, eliminar todos",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setProducts((prev) => prev.filter((p) => !selectedProducts.includes(p.id)))
-        setSelectedProducts([])
-        setSelectionMode(false)
-        Swal.fire("¡Eliminados!", `${selectedProducts.length} productos han sido eliminados.`, "success")
-      }
     })
+
+    if (result.isConfirmed) {
+      let successCount = 0
+      let errorCount = 0
+
+      for (const id of selectedProducts) {
+        const response = await removeProducto(id)
+        if (response.success) {
+          successCount++
+        } else {
+          errorCount++
+        }
+      }
+
+      setSelectedProducts([])
+      setSelectionMode(false)
+
+      if (errorCount === 0) {
+        Swal.fire("¡Eliminados!", `${successCount} productos han sido eliminados.`, "success")
+      } else {
+        Swal.fire("Parcialmente completado", `${successCount} productos eliminados, ${errorCount} errores.`, "warning")
+      }
+    }
   }
 
-  // Función principal para manejar el click en las cards
   const handleCardClick = (productoId) => {
     if (!selectionMode) return
 
@@ -211,7 +206,6 @@ function ProductosManager() {
     )
   }
 
-  // Función para verificar si un producto está seleccionado
   const isProductSelected = (productoId) => {
     return selectedProducts.includes(productoId)
   }
@@ -220,28 +214,27 @@ function ProductosManager() {
     if (selectedProducts.length === filteredAndSortedProducts.length) {
       setSelectedProducts([])
     } else {
-      setSelectedProducts(filteredAndSortedProducts.map((p) => p.id))
+      setSelectedProducts(filteredAndSortedProducts.map((p) => p.id_producto))
     }
   }
 
   const toggleSelectionMode = () => {
     setSelectionMode(!selectionMode)
     if (selectionMode) {
-      setSelectedProducts([]) // Limpiar selección al salir del modo
+      setSelectedProducts([])
     }
   }
 
-  // Función para manejar clicks en la tabla
   const handleTableRowClick = (producto) => {
     if (selectionMode) {
-      handleCardClick(producto.id)
+      handleCardClick(producto.id_producto)
     }
   }
 
   const handleExport = () => {
     const csvContent = [
       ["ID", "Nombre", "Descripción", "Precio", "Stock", "Categoría", "Estado"],
-      ...products.map((p) => [p.id, p.nombre, p.descripcion, p.precio, p.stock, p.categoria, p.estado]),
+      ...productos.map((p) => [p.id_producto, p.nombre, p.descripcion, p.precio, p.stock, p.categoria, p.estado]),
     ]
       .map((row) => row.join(","))
       .join("\n")
@@ -255,7 +248,7 @@ function ProductosManager() {
     window.URL.revokeObjectURL(url)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const validationErrors = validate()
     if (Object.keys(validationErrors).length > 0) {
@@ -264,25 +257,77 @@ function ProductosManager() {
     }
 
     setSubmitting(true)
-    if (editingId) {
-      setProducts((prev) =>
-        prev.map((p) =>
-          p.id === editingId ? { ...p, ...form, precio: Number(form.precio), stock: Number(form.stock) } : p,
-        ),
-      )
-      Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
-    } else {
-      setProducts((prev) => [
-        { ...form, id: Date.now(), precio: Number(form.precio), stock: Number(form.stock) },
-        ...prev,
-      ])
-      Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
-    }
 
-    setForm(emptyForm)
-    setEditingId(null)
-    setModalOpen(false)
-    setSubmitting(false)
+    try {
+      let response
+      if (editingId) {
+        response = await editProducto(editingId, form)
+        if (response.success) {
+          Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
+        }
+      } else {
+        response = await addProducto(form)
+        if (response.success) {
+          Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
+        }
+      }
+
+      if (response.success) {
+        setForm({
+          nombre: "",
+          descripcion: "",
+          precio: "",
+          stock: "",
+          id_categoria: "",
+          estado: "disponible",
+        })
+        setEditingId(null)
+        setModalOpen(false)
+      } else {
+        Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
+      }
+    } catch (error) {
+      Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const categoriasManagement = {
+    add: addCategoria,
+    edit: editCategoria,
+    delete: removeCategoria,
+  }
+
+  // Mostrar loading
+  if (productosLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando productos...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar error
+  if (productosError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar productos</h2>
+          <p className="text-gray-600 mb-4">{productosError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -583,8 +628,8 @@ function ProductosManager() {
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                   >
                     <option value="">Todos los estados</option>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
+                    <option value="disponible">Disponible</option>
+                    <option value="agotado">Agotado</option>
                   </select>
                 </div>
                 <div className="flex items-end">
@@ -631,15 +676,15 @@ function ProductosManager() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredAndSortedProducts.map((producto) => (
               <div
-                key={producto.id}
-                onClick={() => handleCardClick(producto.id)}
+                key={producto.id_producto}
+                onClick={() => handleCardClick(producto.id_producto)}
                 className={`${selectionMode ? "cursor-pointer" : ""}`}
               >
                 <ProductoCard
                   producto={producto}
                   onEditar={handleEdit}
                   onEliminar={handleDelete}
-                  isSelected={isProductSelected(producto.id)}
+                  isSelected={isProductSelected(producto.id_producto)}
                   selectionMode={selectionMode}
                 />
               </div>
@@ -689,9 +734,9 @@ function ProductosManager() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredAndSortedProducts.map((producto) => (
                     <tr
-                      key={producto.id}
+                      key={producto.id_producto}
                       className={`hover:bg-gray-50 transition-colors ${selectionMode ? "cursor-pointer" : ""} ${
-                        isProductSelected(producto.id) ? "bg-blue-50 border-l-4 border-blue-500" : ""
+                        isProductSelected(producto.id_producto) ? "bg-blue-50 border-l-4 border-blue-500" : ""
                       }`}
                       onClick={() => handleTableRowClick(producto)}
                     >
@@ -699,8 +744,8 @@ function ProductosManager() {
                         <td className="px-6 py-4">
                           <input
                             type="checkbox"
-                            checked={isProductSelected(producto.id)}
-                            onChange={() => handleCardClick(producto.id)}
+                            checked={isProductSelected(producto.id_producto)}
+                            onChange={() => handleCardClick(producto.id_producto)}
                             className="w-5 h-5 text-orange-600 bg-white border-gray-300 rounded focus:ring-orange-500"
                           />
                         </td>
@@ -725,7 +770,9 @@ function ProductosManager() {
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            producto.estado === "activo" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                            producto.estado === "disponible"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
                           }`}
                         >
                           {producto.estado}
@@ -746,7 +793,7 @@ function ProductosManager() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation()
-                                handleDelete(producto.id)
+                                handleDelete(producto.id_producto)
                               }}
                               className="text-red-600 hover:text-red-900 transition-colors"
                             >
@@ -801,7 +848,14 @@ function ProductosManager() {
         isOpen={modalOpen}
         onClose={() => {
           setModalOpen(false)
-          setForm(emptyForm)
+          setForm({
+            nombre: "",
+            descripcion: "",
+            precio: "",
+            stock: "",
+            categoria: "",
+            estado: "disponible",
+          })
           setEditingId(null)
           setErrors({})
         }}
@@ -811,9 +865,12 @@ function ProductosManager() {
         errors={errors}
         isEditing={!!editingId}
         submitting={submitting}
+        categorias={categorias}
+        categoriasLoading={categoriasLoading}
+        onManageCategorias={categoriasManagement}
       />
     </div>
   )
 }
 
-export default ProductosManager
+export default ProductosManagerConnected
