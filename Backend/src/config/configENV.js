@@ -27,14 +27,14 @@ export const cookieKey = process.env.CookieKey;
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export const FRONTEND_URL = NODE_ENV === 'production'
-  ? 'https://eccomerce-80159rg7k-tyrf1ngs-projects.vercel.app' // Reemplaza con tu URL real
+  ? 'https://eccomerce-80159rg7k-tyrf1ngs-projects.vercel.app' //  URL Frontend en Vercel
   : 'http://localhost:5173';
 
 export const MP_WEBHOOK_URL = NODE_ENV === 'production'
-  ? 'https://gps-u04n.onrender.com/api/payments/webhook' // Reemplaza con tu URL de backend en Render
+  ? 'https://gps-u04n.onrender.com/api/payments/webhook' // URL de backend en Render
   : 'https://535b-190-5-38-87.ngrok-free.app/api/payments/webhook';
 
 export const getBackendUrl = () =>
   NODE_ENV === 'production'
-    ? 'https://gps-u04n.onrender.com' // Reemplaza con tu URL de backend en Render
+    ? 'https://gps-u04n.onrender.com' // URL de backend en Render
     : 'http://localhost:3000';
