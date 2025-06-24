@@ -7,7 +7,6 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "start:prod": "NODE_ENV=production node src/index.js"
-
   },
   "repository": {
     "type": "git",
@@ -32,7 +31,7 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0",
+    "express": "^4.21.2",
     "express-session": "^1.18.1",
     "joi": "^17.13.3",
     "js-cookie": "^3.0.5",
