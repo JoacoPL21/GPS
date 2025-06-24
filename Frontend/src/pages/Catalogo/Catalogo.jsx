@@ -2,14 +2,11 @@
 
 import { useState, useMemo } from "react"
 import { useCart } from "../../context/CartContext.jsx"
-import useProductosDispo from "../../hooks/productos/useProductosDispo"
-import CardProducto from "../../components/CardCatalogo.jsx"
-import { useCart } from '../../context/CartContext.jsx';
-import useProductosDispo from "../../hooks/productos/useProductosDispo";
-import CardProducto from "../../components/CardCatalogo.jsx";
+import { useProductos } from "../../hooks/productos/useProductos"
+import CardCatalogo from "../../components/CardCatalogo.jsx"
 
-const Catalogo = () => {
-  const { productosDisponibles, loading } = useProductosDispo()
+const CatalogoConnected = () => {
+  const { productos, loading, error } = useProductos()
   const { addItemToCart } = useCart()
 
   // Estados para filtros y búsqueda
@@ -23,9 +20,9 @@ const Catalogo = () => {
 
   // Filtrar y ordenar productos
   const filteredAndSortedProducts = useMemo(() => {
-    if (!productosDisponibles) return []
+    if (!productos) return []
 
-    const filtered = productosDisponibles.filter((producto) => {
+    const filtered = productos.filter((producto) => {
       const matchesSearch =
         producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (producto.descripcion && producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -51,10 +48,7 @@ const Catalogo = () => {
     })
 
     return filtered
-  }, [productosDisponibles, searchTerm, sortBy, sortOrder, priceRange])
-  const { productosDisponibles, loading } = useProductosDispo();
-  const { addItemToCart } = useCart();
-  console.log("Pruebas de pull request automatico")
+  }, [productos, searchTerm, sortBy, sortOrder, priceRange])
 
   const handleAddToCart = (producto) => {
     addItemToCart(producto)
@@ -78,10 +72,25 @@ const Catalogo = () => {
       </div>
     </div>
   )
-  const handleAddToCart = (producto) => {
-    addItemToCart(producto);
-    console.log(`Producto ${producto.nombre} agregado al carrito`);
-  };
+
+  // Mostrar error
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar productos</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
@@ -273,7 +282,7 @@ const Catalogo = () => {
             >
               {filteredAndSortedProducts.map((producto) => (
                 <div key={producto.id_producto} className="relative">
-                  <CardProducto producto={producto} onAddToCart={handleAddToCart} viewMode={viewMode} />
+                  <CardCatalogo producto={producto} onAddToCart={handleAddToCart} viewMode={viewMode} />
                   {/* Feedback visual al agregar al carrito */}
                   {addedToCart === producto.id_producto && (
                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium animate-bounce">
@@ -317,12 +326,13 @@ const Catalogo = () => {
             </div>
           )}
         </div>
-        {/* Estadísticas del catálogo 
-        {!loading && productosDisponibles && productosDisponibles.length > 0 && (
+
+        {/* Estadísticas del catálogo */}
+        {!loading && productos && productos.length > 0 && (
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-orange-600">{productosDisponibles.length}</div>
+                <div className="text-2xl font-bold text-orange-600">{productos.length}</div>
                 <div className="text-sm text-gray-600">Total productos</div>
               </div>
               <div>
@@ -331,41 +341,22 @@ const Catalogo = () => {
               </div>
               <div>
                 <div className="text-2xl font-bold text-orange-600">
-                  ${Math.min(...productosDisponibles.map((p) => p.precio)).toLocaleString()}
+                  ${Math.min(...productos.map((p) => p.precio)).toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">Precio mínimo</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-orange-600">
-                  ${Math.max(...productosDisponibles.map((p) => p.precio)).toLocaleString()}
+                  ${Math.max(...productos.map((p) => p.precio)).toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">Precio máximo</div>
               </div>
             </div>
           </div>
-    <div className="p-8 max-w-3xl ">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-        {loading ? (
-          <p className="col-span-full text-center text-gray-500">Cargando productos...</p>
-        ) : productosDisponibles && productosDisponibles.length > 0 ? (
-          productosDisponibles.map((producto) => (
-            <CardProducto
-              key={producto.id_producto}
-              producto={producto}
-              onAddToCart={handleAddToCart}
-            />
-          ))
-        ) : (
-          <p className="col-span-full text-center text-gray-500">No hay productos disponibles.</p>
         )}
-        */}
       </div>
-      </div>  
     </div>
   )
 }
 
-export default Catalogo
-
-
-export default Catalogo;
+export default CatalogoConnected
