@@ -1,5 +1,5 @@
-import Categorias from "../entity/Categoria.js"
-import Productos from "../entity/Productos.js"
+import Categorias from "../entity/categoria.entity.js"
+import Productos from "../entity/productos.entity.js"
 import { AppDataSource } from "../config/configDB.js"
 
 // Obtener todas las categorías
