@@ -19,6 +19,8 @@ export async function login(dataUser) {
             sessionStorage.setItem('usuario', JSON.stringify(userData));
             localStorage.setItem('usuario', JSON.stringify(userData));
             localStorage.setItem('token', data.data.token);
+            // agregar carrito al localStorage
+            localStorage.setItem('cart', JSON.stringify([])); // Inicializar carrito vacío
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.data.token}`;
             cookies.set('jwt-auth', data.data.token, {path:'/'});
@@ -62,6 +64,7 @@ export async function logout() {
         // Eliminar el token del localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('usuario');
+        localStorage.removeItem('cart'); // Limpiar el carrito del localStorage
         // Eliminar el token de las cookies
         cookies.remove('jwt');
         cookies.remove('jwt-auth');

@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useMemo } from "react"
 import { useCart } from "../../context/CartContext.jsx"
 import { useProductos } from "../../hooks/productos/useProductos"
@@ -49,6 +48,11 @@ const CatalogoConnected = () => {
 
     return filtered
   }, [productos, searchTerm, sortBy, sortOrder, priceRange])
+
+const Catalogo = () => {
+  const { productosDisponibles, loading } = useProductosDispo();
+  const { addItemToCart } = useCart();
+
 
   const handleAddToCart = (producto) => {
     addItemToCart(producto)
