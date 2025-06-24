@@ -20,6 +20,7 @@ jobs:
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Create pull request from Test to main
+        id: cpr  # ID para capturar el número del PR
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -28,3 +29,10 @@ jobs:
           body: "Este pull request fue creado automáticamente cada lunes a las 12:00 (hora Chile) para integrar cambios de `Test` a `main`."
           branch: auto-pr-test-to-main-${{ steps.date.outputs.date }}
           delete-branch: true
+
+      - name: Enable auto-merge for pull request
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash 
