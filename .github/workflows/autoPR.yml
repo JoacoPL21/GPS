@@ -12,14 +12,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: Test  
 
-      - name: Create pull request from test to main
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Create pull request from Test to main
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          head: test
-          title: "Auto PR: merge 'test' into 'main'"
-          body: "Este pull request fue creado automáticamente cada lunes a las 12:00 (hora Chile) para integrar cambios de `test` a `main`."
-          branch: auto-pr-test-to-main
+          base: main       
+          title: "Auto PR: merge 'Test' into 'main'"
+          body: "Este pull request fue creado automáticamente cada lunes a las 12:00 (hora Chile) para integrar cambios de `Test` a `main`."
+          branch: auto-pr-test-to-main-${{ steps.date.outputs.date }}
           delete-branch: true
