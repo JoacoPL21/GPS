@@ -73,32 +73,37 @@ async function setupServer() {
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
 
-    // Configuración mejorada de CORS
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'https://eccomerce-tyrf1ngs-projects.vercel.app',
-      /https:\/\/eccomerce-.*-tyrf1ngs-projects\.vercel\.app/,
-      /https:\/\/.*\.vercel\.app/
-    ];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://eccomerce-tyrf1ngs-projects.vercel.app',
+  // Usar expresiones regulares válidas:
+  /https:\/\/eccomerce-.*-tyrf1ngs-projects\.vercel\.app/,
+  /https:\/\/.*--tyrf1ngs-projects\.vercel\.app/, // Ejemplo adicional si necesitas
+  /https:\/\/.*\.vercel\.app/
+];
 
-    // Crear instancia de middleware CORS
-    const corsMiddleware = cors({
-      credentials: true,
-      origin: function (origin, callback) {
-        // Permitir solicitudes sin origen
-        if (!origin) return callback(null, true);
+const corsOptions = {
+  credentials: true,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // Permitir server-to-server
+    
+    const allowed = allowedOrigins.some(pattern => 
+      typeof pattern === 'string' 
+        ? origin === pattern 
+        : pattern.test(origin)
+    );
+    
+    allowed ? callback(null, true) : callback(new Error('Bloqueado por CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 
-        const isAllowed = allowedOrigins.some(pattern => {
-          if (typeof pattern === 'string') return origin === pattern;
-          if (pattern instanceof RegExp) return pattern.test(origin);
-          return false;
-        });
+// Aplica CORS globalmente
+app.use(cors(corsOptions));
 
-        isAllowed ? callback(null, true) : callback(new Error('Not allowed by CORS'));
-      },
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization']
-    });
+// Manejo explícito de OPTIONS
+app.options('*', cors(corsOptions));
 
     // Aplicar CORS a todas las rutas
     app.use(corsMiddleware);
