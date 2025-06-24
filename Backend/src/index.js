@@ -87,13 +87,13 @@ async function setupServer() {
       origin: function (origin, callback) {
         // Permitir solicitudes sin origen
         if (!origin) return callback(null, true);
-        
+
         const isAllowed = allowedOrigins.some(pattern => {
           if (typeof pattern === 'string') return origin === pattern;
           if (pattern instanceof RegExp) return pattern.test(origin);
           return false;
         });
-        
+
         isAllowed ? callback(null, true) : callback(new Error('Not allowed by CORS'));
       },
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -122,21 +122,22 @@ async function setupServer() {
     app.use(morgan("dev"));
 
     // 3. Configuración de la sesión (solo para rutas no OPTIONS)
+    const sessionMiddleware = session({
+      secret: process.env.SESSION_SECRET || cookieKey,
+      store: sessionStore,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000
+      }
+    });
+
     app.use((req, res, next) => {
       if (req.method === 'OPTIONS') return next();
-      
-      session({
-        secret: process.env.SESSION_SECRET || cookieKey,
-        store: sessionStore,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-          secure: process.env.NODE_ENV === 'production',
-          httpOnly: true,
-          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-          maxAge: 24 * 60 * 60 * 1000
-        }
-      })(req, res, next);
+      sessionMiddleware(req, res, next);
     });
 
     // Configuración de Passport para autenticación
