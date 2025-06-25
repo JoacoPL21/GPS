@@ -35,6 +35,7 @@ export async function loginService(user) {
       nombreCompleto: userFound.nombreCompleto,
       email: userFound.email,
       rol: userFound.rol,
+      telefono: userFound.telefono || "",
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {

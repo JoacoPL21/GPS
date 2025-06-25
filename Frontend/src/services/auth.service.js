@@ -12,9 +12,11 @@ export async function login(dataUser) {
         const { status, data } = response;
         
         if (status === 200) {
+            console.log('Datos del usuario service front:', data);
+            const telefono = data.data.user.telefono || '';
             const id_usuario = data.data.user.id;
             const { nombreCompleto, email,rol } = jwtDecode(data.data.token);
-            const userData = { id_usuario,nombreCompleto, email,rol };
+            const userData = { id_usuario,nombreCompleto, email,rol,telefono };
 
             sessionStorage.setItem('usuario', JSON.stringify(userData));
             localStorage.setItem('usuario', JSON.stringify(userData));

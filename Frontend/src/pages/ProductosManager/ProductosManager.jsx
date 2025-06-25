@@ -287,6 +287,7 @@ function ProductosManagerConnected() {
         Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
       }
     } catch (error) {
+      console.log("Error al procesar la solicitud:", error)
       Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
     } finally {
       setSubmitting(false)
