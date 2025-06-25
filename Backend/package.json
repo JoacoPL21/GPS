@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "echo \"Backend tests not yet implemented\" && exit 0"
+    "dev": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",

@@ -38,7 +38,7 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
   const handleDeleteClick = (e) => {
     e.stopPropagation() // Evitar que se active la selección
     if (!selectionMode) {
-      onEliminar(producto.id)
+      onEliminar(producto.id_producto)
     }
   }
 

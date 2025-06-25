@@ -1,8 +1,8 @@
 "use strict";
-import Productos from "../entity/Productos.js";
+import Productos from "../entity/productos.entity.js";
 import { AppDataSource } from "../config/configDB.js";
-import Categorias from "../entity/Categoria.js";
-import { error } from "console";
+import Categorias from "../entity/categoria.entity.js";
+
 
 
 //Funcion para traer productos con estado Disponible Funcional
@@ -34,6 +34,7 @@ export async function getProductosDisponibles() {
     }
 }
 
+//Funcion para traer UN producto por ID
 export async function getProductoById(id) {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
@@ -64,6 +65,7 @@ export async function getProductoById(id) {
     }
 }
 
+//Funcion para crear un producto con validaciones
 export async function createProducto(productoData) {
 
     console.log("Datos del producto a crear:", productoData);

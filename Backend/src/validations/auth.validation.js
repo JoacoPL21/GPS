@@ -64,6 +64,14 @@ export const registerValidation = Joi.object({
 
 
 export const direccionValidation = Joi.object({
+  id_usuario: Joi.number()
+    .positive()
+    .required()
+    .messages({
+      "number.base": "El ID de usuario debe ser un número",
+      "number.positive": "El ID de usuario debe ser un número positivo",
+      "any.required": "El ID de usuario es obligatorio",
+    }),
   calle: Joi.string()
     .min(3)
     .max(100)
@@ -117,6 +125,15 @@ export const direccionValidation = Joi.object({
       "string.empty": "El código postal no puede estar vacío",
       "string.base": "El código postal debe ser una cadena de texto",
 
+    }),
+  tipo_de_direccion: Joi.string()
+    .valid("predeterminada", "opcional")
+    .required()
+    .messages({
+      "any.only": "El tipo de dirección debe ser 'predeterminado' u 'opcional'",
+      "any.required": "El tipo de dirección es obligatorio",
+      "string.empty": "El tipo de dirección no puede estar vacío",
+      "string.base": "El tipo de dirección debe ser una cadena de texto",
     }),
 }).unknown(false).messages({
     "object.unknown": "Los campos adicionales no están permitidos",

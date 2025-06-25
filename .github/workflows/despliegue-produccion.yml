@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  tests:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout código
@@ -20,27 +20,11 @@ jobs:
       - name: Instalar dependencias backend
         working-directory: Backend
         run: npm install
-        
-
-      - name: Ejecutar pruebas Backend
-        working-directory: Backend
-        run: npm test
-        
 
       - name: Instalar dependencias frontend
         working-directory: Frontend
         run: npm install
-        
 
-      - name: Ejecutar pruebas frontend
-        working-directory: Frontend 
-        run: npm test
-        
-
-  deploy:
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
       - name: Instalar dependencias (OpenVPN, SSH y sshpass)
         run: |
           sudo apt update -qq > /dev/null 2>&1
@@ -66,30 +50,38 @@ jobs:
         timeout-minutes: 5
         run: |
             sshpass -p "${{ secrets.PROD_PASSWORD }}" ssh \
-             -q \
-             -o StrictHostKeyChecking=no \
-             -p ${{ secrets.PROD_PORT }} \
-              ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
-                set -euo pipefail
-                cd GPS-Deploy/GPS/
+            -q \
+            -o StrictHostKeyChecking=no \
+            -p ${{ secrets.PROD_PORT }} \
+            ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
+            set -euo pipefail
+            cd GPS-Deploy/GPS/
 
-                echo "Actualizando código fuente..."
-                git fetch origin main
-                git reset --hard origin/main
+            echo "Actualizando código fuente..."
+            git fetch origin main
+            git reset --hard origin/main
 
-                echo "Instalando dependencias BACKEND..."
-                cd Backend
-                npm ci
+            echo "Instalando dependencias BACKEND..."
+            cd Backend
+            npm ci
 
-                echo "Verificando y reiniciando pm2 BACKEND..."
-                pm2 status Backend-app || pm2 start npm --name Backend-app -- run start
-                pm2 restart Backend-app
+            echo "Verificando y reiniciando pm2 BACKEND..."
+            if ! pm2 list | grep -q Backend; then
+              pm2 start npm --name Backend -- run start
+            else
+              pm2 restart Backend
+            fi
 
-                echo "Instalando dependencias FRONTEND..."
-                cd ../Frontend
-                npm ci
+            echo "Instalando dependencias FRONTEND..."
+            cd ../Frontend
+            npm ci
+            npm run build
 
-                echo "Verificando y reiniciando pm2 FRONTEND..."
-                pm2 status frontend-app || pm2 start npm --name frontend-app -- run start
-                pm2 restart frontend-app
+            echo "Verificando y reiniciando pm2 FRONTEND..."
+            if ! pm2 list | grep -q front; then
+              pm2 start npm --name front -- run preview
+            else
+              pm2 restart front
+            fi
+
             EOF

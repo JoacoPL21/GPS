@@ -43,10 +43,13 @@ const Login = () => {
     try {
       const response = await login(data);
       if (response.status === "Success") {
+        
         setSuccess(true);
         // Actualizar el estado de autenticación
         setIsAuthenticated(true);
         setAuthUser(response.data);
+        
+        
         console.log(authUser);
         navigate("/");
       } else {
