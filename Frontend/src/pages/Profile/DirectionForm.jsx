@@ -2,6 +2,8 @@ import { useState,useEffect } from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import { registerDireccion } from "../../services/user.service.js";
 import Swal from "sweetalert2";
+
+
 const FormDireccionEnvio=()=> {
   const { authUser } = useAuth();
   const [success,setSuccess] = useState(false);
@@ -12,7 +14,7 @@ const FormDireccionEnvio=()=> {
     ciudad: "",
     region: "",
     codigo_postal: "",
-    tipo_de_direccion: 0,
+    tipo_de_direccion: "predeterminada",
   });
 
   useEffect(() => {
@@ -50,7 +52,7 @@ const FormDireccionEnvio=()=> {
           ciudad: "",
           region: "",
           codigo_postal: "",
-          tipo_de_direccion: 0,
+          tipo_de_direccion:  "predeterminada",
         });
       } else {
         console.error("Error al registrar la dirección:", response.message);

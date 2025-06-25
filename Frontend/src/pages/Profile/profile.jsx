@@ -1,8 +1,8 @@
 import { useAuth } from '../../context/AuthContext.jsx';
-import DirectionForm from '../Profile/directionForm.jsx';
 import { getDireccionesByUserId,deleteDireccionByUserId} from "../../services/user.service.js";
 import swal from 'sweetalert2';
 import { useEffect,useState } from 'react';
+import FormDireccionEnvio from './DirectionForm.jsx'
 
 const Profile = () => {
   const { authUser } = useAuth();
@@ -67,7 +67,7 @@ const Profile = () => {
           <div className="flex justify-end mb-4">
             <button 
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              onClick={() => handleDeleteDireccion(direcciones[0].id)}
+              onClick={() => handleDeleteDireccion(id_usuario) }
             >
               Eliminar Dirección
             </button>
@@ -88,8 +88,7 @@ const Profile = () => {
           <p>No hay direcciones registradas.</p>
         )}
       </div>
-
-      <DirectionForm />
+        <FormDireccionEnvio />
     </div>
   );
 };

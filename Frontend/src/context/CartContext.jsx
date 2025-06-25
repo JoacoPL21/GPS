@@ -58,6 +58,7 @@ export function CartProvider({ children }) {
       const authUser = localStorage.getItem('user');
       if (authUser) {
         const storedCart = localStorage.getItem('cart');
+      
         return storedCart ? JSON.parse(storedCart) : [];
       }
       const anonCart = localStorage.getItem('anonymous-cart');

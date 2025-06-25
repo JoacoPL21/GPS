@@ -40,9 +40,9 @@ const Direcciones = new EntitySchema({
             nullable: true,
         },
         tipo_de_direccion: {
-            type: "varchar",
-            length: 100,
-            nullable: true,
+            type: "enum",
+            enum: ["predeterminada","opcional"],
+            nullable: false,
         },
         createdAt: {
             type: "timestamp",
