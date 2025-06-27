@@ -8,12 +8,13 @@ import passport from "passport";
 import express, { json, urlencoded } from "express";
 import { cookieKey, HOST, PORT } from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
-import { createProductos, createUser, createCategoria } from "./config/initialSetup.js";
+import { createProductos,  createUser, createCategoria } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
-import bodyParser from 'body-parser';
+import productosRoutes from "./routes/productos.routes.js";
+import categoriasRoutes from "./routes/categorias.routes.js";import bodyParser from 'body-parser';
 
 async function setupServer() {
   try {
@@ -105,11 +106,13 @@ app.use(
     // Otras rutas generales
     app.use("/api", indexRoutes);
     app.use('/api/payments', paymentRoutes);
+    app.use("/api/productos", productosRoutes);
+    app.use("/api/categorias", categoriasRoutes);
 
     const uploadPath = path.resolve("src/uploads");
 
     // Servir archivos estáticos desde el directorio 'uploads'
-    app.use("/uploads", express.static(uploadPath));
+    app.use("/api/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
     app.listen(PORT, () => {
@@ -126,6 +129,7 @@ async function setupAPI() {
     await setupServer(); // Configuración del servidor
     await createUser();
     await createCategoria(); // Creación de usuarios iniciales
+    await createProductos();
     await createProductos();
   } catch (error) {
     console.log("Error en index.js -> setupAPI(), el error es: ", error);

@@ -10,13 +10,25 @@ export async function login(dataUser) {
             password: dataUser.password
         });
         const { status, data } = response;
+        
         if (status === 200) {
+            const id_usuario = data.data.user.id;
             const { nombreCompleto, email,rol } = jwtDecode(data.data.token);
-            const userData = { nombreCompleto, email,rol };
+            const userData = { id_usuario,nombreCompleto, email,rol };
+
             sessionStorage.setItem('usuario', JSON.stringify(userData));
-            axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+            localStorage.setItem('usuario', JSON.stringify(userData));
+            localStorage.setItem('token', data.data.token);
+            // agregar carrito al localStorage
+            localStorage.setItem('cart', JSON.stringify([])); // Inicializar carrito vacío
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data.data.token}`;
             cookies.set('jwt-auth', data.data.token, {path:'/'});
-            return response.data
+            return {
+                status: 'Success',
+                data: userData,
+                message: 'Inicio de sesión exitoso'
+            };
         }
     } catch (error) {
         return error.response.data;
@@ -51,6 +63,8 @@ export async function logout() {
         sessionStorage.removeItem('usuario');
         // Eliminar el token del localStorage
         localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('cart'); // Limpiar el carrito del localStorage
         // Eliminar el token de las cookies
         cookies.remove('jwt');
         cookies.remove('jwt-auth');
