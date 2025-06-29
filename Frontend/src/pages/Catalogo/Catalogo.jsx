@@ -51,7 +51,8 @@ const CatalogoConnected = () => {
   }, [productos, searchTerm, sortBy, sortOrder, priceRange])
 
   const handleAddToCart = (producto) => {
-    addItemToCart(producto)
+    console.log(`Agregando producto ${producto.nombre} al carrito`)
+    addItemToCart(producto) // Asegurar que se agregue correctamente
     setAddedToCart(producto.id_producto)
     console.log(`Producto ${producto.nombre} agregado al carrito`)
 
