@@ -1,7 +1,7 @@
 import './../styles/App.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useState, useEffect } from 'react'; // <-- Tu import de useEffect
-import { API_URL } from '../config.js'; // <-- Tu import de API_URL
+import { useState, useEffect } from 'react'; 
+import { API_URL } from '../config.js'; 
 import Root from "./Root.jsx";
 import Homepage from "./Homepage/Homepage.jsx";
 import Cart from "./Carrito/shopping_cart.jsx";
@@ -31,6 +31,8 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "logout", element: <Logout /> },
+      { path: "success", element: <SuccessPage /> },
+      { path: "failure", element: <FailurePage /> },
       {
         path: "dashboard",
         element: (
@@ -64,7 +66,6 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  // Prueba de conexión al backend (tu lógica)
   useEffect(() => {
     fetch(`${API_URL}/test`)
       .then(response => response.json())

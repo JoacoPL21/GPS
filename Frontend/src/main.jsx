@@ -7,9 +7,9 @@ import { CartProvider } from './context/CartContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <CartProvider>  {/* Provider del carrito (versión upstream) */}
-      <AuthProvider>  {/* Provider de autenticación */}
-        <App />  {/* Las rutas ahora están dentro de App.jsx */}
+    <CartProvider>  
+      <AuthProvider>  
+        <App />  
       </AuthProvider>
     </CartProvider>
   </StrictMode>
