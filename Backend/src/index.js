@@ -158,7 +158,9 @@ async function setupServer() {
     app.use('/api/payments', paymentRoutes);
 
     const uploadPath = path.resolve("src/uploads");
-    app.use("/uploads", express.static(uploadPath));
+
+    // Servir archivos estáticos desde el directorio 'uploads'
+    app.use("/api/uploads", express.static(uploadPath));
 
     // 4. Ruta de prueba básica
     app.get("/", (req, res) => {
