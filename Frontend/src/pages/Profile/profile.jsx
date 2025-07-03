@@ -1,5 +1,5 @@
 import { useAuth } from '../../context/AuthContext.jsx';
-import DirectionForm from '../Profile/directionForm.jsx';
+import DirectionForm from '../Profile/DirectionForm.jsx';
 import { getDireccionesByUserId,deleteDireccionByUserId} from "../../services/user.service.js";
 import swal from 'sweetalert2';
 import { useEffect,useState } from 'react';
