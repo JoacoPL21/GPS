@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { Mail, Phone, MessageCircle, Send, MapPin, Clock } from 'lucide-react';
 
@@ -30,7 +29,6 @@ const ContactSection = () => {
     window.open(`https://wa.me/56945451849?text=${message}`, '_blank');
   };
 
-  useEffect(() => {
   useEffect(() => {
     if (state.succeeded) {
       setFormData({ name: '', email: '', subject: '', message: '' });

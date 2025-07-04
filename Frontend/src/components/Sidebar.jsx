@@ -1,5 +1,6 @@
 import '../styles/Sidebar.css';
 import { useAuth } from '../context/AuthContext'; // Ajusta la ruta si es necesario
+import { Link } from 'react-router-dom';
 
 
 
