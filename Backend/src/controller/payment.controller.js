@@ -35,47 +35,54 @@ export const handleWebhook = async (req, res) => {
     const secret = process.env.MP_WEBHOOK_SECRET.trim();
     console.log('Webhook secret usado:', `"${secret}"`, secret.length);
 
+    // 1. Extraer el evento del body
+    const event = req.webhookBody;
+    const isSandbox = event && event.live_mode === false;
 
-    if (!signatureHeader || !secret) {
-      console.error('Faltan cabeceras necesarias o secreto');
-      return res.status(401).json({ error: 'Firma inválida' });
-    }
+    // Si es producción, validar la firma
+    if (!isSandbox) {
+      if (!signatureHeader || !secret) {
+        console.error('Faltan cabeceras necesarias o secreto');
+        return res.status(401).json({ error: 'Firma inválida' });
+      }
 
-    // Extraer ts (timestamp) y v1 (firma) del header
-    const signatureParts = signatureHeader.split(',');
-    const tsPart = signatureParts.find(part => part.startsWith('ts='));
-    const v1Part = signatureParts.find(part => part.startsWith('v1='));
-    
-    if (!tsPart || !v1Part) {
-      console.error('Formato de firma inválido:', signatureHeader);
-      return res.status(401).json({ error: 'Formato de firma inválido' });
-    }
+      // Extraer ts (timestamp) y v1 (firma) del header
+      const signatureParts = signatureHeader.split(',');
+      const tsPart = signatureParts.find(part => part.startsWith('ts='));
+      const v1Part = signatureParts.find(part => part.startsWith('v1='));
+      
+      if (!tsPart || !v1Part) {
+        console.error('Formato de firma inválido:', signatureHeader);
+        return res.status(401).json({ error: 'Formato de firma inválido' });
+      }
 
-    const timestamp = tsPart.split('=')[1];
-    const signature = v1Part.split('=')[1];
-    const payload = req.rawBody;
+      const timestamp = tsPart.split('=')[1];
+      const signature = v1Part.split('=')[1];
+      const payload = req.rawBody;
 
-    // FIRMA CORREGIDA SEGÚN DOCUMENTACIÓN MP
-    const signingData = `${payload}:${timestamp}`;
-    const generatedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(signingData)
-      .digest('hex');
+      // FIRMA CORREGIDA SEGÚN DOCUMENTACIÓN MP
+      const signingData = `${payload}:${timestamp}`;
+      const generatedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(signingData)
+        .digest('hex');
 
-    // Debug
-    console.log('Datos para firma:', signingData);
-    console.log('Timestamp:', timestamp);
-    console.log('Firma recibida:', signature);
-    console.log('Firma generada:', generatedSignature);
+      // Debug
+      console.log('Datos para firma:', signingData);
+      console.log('Timestamp:', timestamp);
+      console.log('Firma recibida:', signature);
+      console.log('Firma generada:', generatedSignature);
 
-    if (signature !== generatedSignature) {
-      console.error('Firma inválida recibida:', signature, 'esperada:', generatedSignature);
-      return res.status(401).json({ error: 'Firma inválida' });
+      if (signature !== generatedSignature) {
+        console.error('Firma inválida recibida:', signature, 'esperada:', generatedSignature);
+        return res.status(401).json({ error: 'Firma inválida' });
+      }
+    } else {
+      // Si es sandbox, solo loguea y continúa
+      console.warn('[Sandbox] Ignorando validación de firma de webhook');
     }
 
     // 2. Procesar el evento
-    const event = req.webhookBody;
-
     console.log('Webhook recibido:', JSON.stringify(event, null, 2));
 
     if (event.type === 'payment') {
