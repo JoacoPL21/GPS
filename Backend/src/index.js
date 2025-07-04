@@ -24,6 +24,7 @@ import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
 import bodyParser from 'body-parser';
+import { handleWebhook } from './controller/payment.controller.js'; // <-- Importa tu controlador
 
 async function setupServer() {
   try {
@@ -41,84 +42,50 @@ async function setupServer() {
       tableName: 'session',
     });
 
-    // 2. Middleware para webhooks DEBE SER EL PRIMERO
-    app.use(
+    // 2. Webhook de Mercado Pago: SOLO aquí aplica bodyParser.raw
+    app.post(
       '/api/payments/webhook',
       bodyParser.raw({ type: 'application/json' }),
       (req, res, next) => {
         req.rawBody = req.body.toString('utf8');
-
         try {
           req.webhookBody = JSON.parse(req.rawBody);
         } catch (e) {
           console.error('Error parsing JSON:', e);
-          console.error('Raw body:', req.rawBody);
           req.webhookBody = {};
         }
-
-        // Agregar log de los headers necesarios
-        console.log('-------------------------------------');
-        console.log(`[Webhook] ${new Date().toISOString()}`);
-        console.log('Método:', req.method);
-        console.log('URL:', req.originalUrl);
-        console.log('Headers:', req.headers);
-        console.log('X-Timestamp:', req.headers['x-timestamp']);
-        console.log('Body:', req.webhookBody);
-        console.log('Raw Body:', req.rawBody);
-        console.log('-------------------------------------');
+        // logs opcionales...
         next();
-      }
+      },
+      handleWebhook // Usa el controlador directamente aquí
     );
 
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
 
-    // Configuración mejorada y corregida de CORS
+    // Configuración CORS igual que antes
     const allowedOrigins = [
       'http://localhost:5173',
       'https://eccomerce-tyrf1ngs-projects.vercel.app',
       'https://eccomerce-frontend.vercel.app'
     ];
-
-    // Usa este patrón más seguro para previews
     const vercelPreviewPattern = /^https:\/\/eccomerce-[a-z0-9]+-tyrf1ngs-projects\.vercel\.app$/;
-
-    // Define el middleware de CORS primero
     const corsMiddleware = cors({
       credentials: true,
       origin: function (origin, callback) {
-        // 1. Permitir solicitudes sin 'origin' (servidor a servidor, móviles, etc)
         if (!origin) return callback(null, true);
-        
-        // 2. Verificar dominios permitidos exactos
-        if (allowedOrigins.includes(origin)) {
-          return callback(null, true);
-        }
-        
-        // 3. Verificar previews de Vercel con patrón seguro
-        if (vercelPreviewPattern.test(origin)) {
-          return callback(null, true);
-        }
-        
-        // 4. Rechazar otros orígenes (opcional: registrar para depuración)
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        if (vercelPreviewPattern.test(origin)) return callback(null, true);
         console.warn('Origen bloqueado por CORS:', origin);
         callback(null, false);
       },
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization']
     });
-
-    // Aplicar CORS a todas las rutas
     app.use(corsMiddleware);
-
-    // Manejar explícitamente las solicitudes OPTIONS
     app.options('*', corsMiddleware);
-
-    // Middleware para saltar otros middlewares en solicitudes OPTIONS
     app.use((req, res, next) => {
-      if (req.method === 'OPTIONS') {
-        return next(); // Saltar otros middlewares para OPTIONS
-      }
+      if (req.method === 'OPTIONS') return next();
       next();
     });
 
@@ -142,38 +109,32 @@ async function setupServer() {
         maxAge: 24 * 60 * 60 * 1000
       }
     });
-
     app.use((req, res, next) => {
       if (req.method === 'OPTIONS') return next();
       sessionMiddleware(req, res, next);
     });
 
-    // Configuración de Passport para autenticación
+    // Passport
     app.use(passport.initialize());
     app.use(passport.session());
     passportJwtSetup();
 
-    // Otras rutas generales
+    // Otras rutas
     app.use("/api", indexRoutes);
-    app.use('/api/payments', paymentRoutes);
+    app.use('/api/payments', paymentRoutes); // <-- El webhook ya NO está aquí
 
     const uploadPath = path.resolve("src/uploads");
-
-    // Servir archivos estáticos desde el directorio 'uploads'
     app.use("/api/uploads", express.static(uploadPath));
 
-    // 4. Ruta de prueba básica
     app.get("/", (req, res) => {
       res.send("Backend funcionando correctamente");
     });
 
-    // 5. Manejo de errores global
     app.use((err, req, res, next) => {
       console.error('Error global:', err.stack);
       res.status(500).json({ error: 'Algo salió mal' });
     });
 
-    // 6. Servidor escuchando en el puerto correcto para Render
     app.listen(WEB_PORT, WEB_HOST, () => {
       console.log(`=> Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
     });
