@@ -17,6 +17,8 @@ import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
 import Sidebar from '../components/Sidebar'; // <-- Tu componente
 import ContactSection from './Contact/contact_us'; // <-- Tu componente
+import SuccessPage from './Carrito/success.jsx';
+import FailurePage from './Carrito/failure.jsx';
 
 const router = createBrowserRouter([
   {
