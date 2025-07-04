@@ -59,13 +59,14 @@ async function setupServer() {
         console.log('Método:', req.method);
         console.log('URL:', req.originalUrl);
         console.log('Headers:', req.headers);
-        console.log('X-Timestamp:', req.headers['x-timestamp']);
-        console.log('Body:', req.webhookBody);
-        console.log('Raw Body:', req.rawBody);
+        // HEXADECIMAL Y BYTES
+        console.log('Raw Body (utf8):', req.rawBody);
+        console.log('Raw Body (hex):', Buffer.from(req.rawBody).toString('hex'));
+        console.log('Raw Body (bytes):', Buffer.from(req.rawBody));
         console.log('-------------------------------------');
         next();
       },
-      handleWebhook 
+      handleWebhook
     );
 
     // Deshabilita el encabezado "x-powered-by" por seguridad
