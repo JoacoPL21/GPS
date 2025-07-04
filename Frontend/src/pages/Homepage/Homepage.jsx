@@ -1,6 +1,4 @@
 import ContactSection from '../Contact/contact_us';
-import { Link } from 'react-router-dom';
-import { FaHandSparkles, FaTree, FaTools, FaPalette, FaShoppingCart, FaStar, FaHeart } from 'react-icons/fa';
 import ProductFeatures from '../../components/ProductFeatures';
 import ImageCarousel from '../../components/ImageCarousel';
 import FeaturedProducts from '../../components/FeaturedProducts';

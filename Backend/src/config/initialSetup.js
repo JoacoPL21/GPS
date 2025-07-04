@@ -4,7 +4,12 @@ import { AppDataSource } from './configDB.js';
 import Productos from '../entity/productos.entity.js';
 import Usuarios from '../entity/usuario.entity.js';
 import Categoria from '../entity/categoria.entity.js';
+import Compras from '../entity/compra.entity.js';
+import Compra_Producto from '../entity/compra_producto.entity.js';
+import Envios from '../entity/envio.entity.js';
+import Valoraciones from '../entity/valoraciones.entity.js';
 import { encryptPassword } from '../helpers/bcrypt.helper.js';
+import Direccion from '../entity/direccion.entity.js';
 
 async function createUser() {
   try {
@@ -23,6 +28,7 @@ async function createUser() {
         telefono: "966433091",
         password: await encryptPassword("admin123"),
         rol: "admin",
+        id_direccion:1
         
       }))
 
@@ -110,4 +116,197 @@ async function createProductos() {
   }
 }
 
-export { createUser,  createCategoria, createProductos, };
+async function createCompras() {
+  try {
+    const ComprasRepository = AppDataSource.getRepository(Compras);
+
+    const count = await ComprasRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Compras ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 1,
+        facturacion: "1234567890",
+        estado: "pendiente",
+        total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 1,
+        facturacion: "1234567890",
+        estado: "pendiente",
+        total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 1,
+        facturacion: "1234567890",
+        estado: "pendiente",
+          total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Compras creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear compras:", error));
+  }
+}
+
+async function createCompra_Producto() {
+  try {
+    const Compra_ProductoRepository = AppDataSource.getRepository(Compra_Producto);
+
+    const count = await Compra_ProductoRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Compra_Producto ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 1,
+        id_producto: 1,
+        cantidad: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 1,
+        id_producto: 2,
+        cantidad: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 1,
+        id_producto: 3,
+        cantidad: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Compra_Producto creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear Compra_Producto:", error));
+  }
+}
+
+async function createEnvios() {
+  try {
+    const EnviosRepository = AppDataSource.getRepository(Envios);
+
+    const count = await EnviosRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Envios ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 1,
+        estado: "pendiente",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 1,
+        estado: "pendiente",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 1,
+        estado: "pendiente",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Envios creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear Envios:", error));
+  }
+}
+
+async function createValoraciones() {
+  try {
+    const ValoracionesRepository = AppDataSource.getRepository(Valoraciones);
+
+    const count = await ValoracionesRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Valoraciones ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 1,
+        id_producto: 1,
+        puntuacion: 5,
+        descripcion: "Excelente producto",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 1,
+        id_producto: 2,
+        puntuacion: 4,
+        descripcion: "Buen producto",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 1,
+        id_producto: 3,
+        puntuacion: 3,
+        descripcion: "Producto regular",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Valoraciones creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear Valoraciones:", error));
+  }
+}
+
+async function createDireccion() {
+
+  try {
+    const DireccionRepository = AppDataSource.getRepository(Direccion);
+
+    const count = await DireccionRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Direcciones ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      DireccionRepository.save(DireccionRepository.create({
+        calle: "Calle 123",
+        numero: 123,
+        ciudad: "Santiago",
+        region: "Region Metropolitana",
+        codigo_postal: "1234567",
+        tipo_de_direccion: "predeterminada",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Direcciones creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear Direcciones:", error));
+  }
+}
+
+export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones, createDireccion };

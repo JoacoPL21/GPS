@@ -1,8 +1,7 @@
 "use strict";
 import { EntitySchema } from "typeorm";
 
-
-const Direccion = new EntitySchema({
+const Direcciones = new EntitySchema({
     name: "Direccion",
     tableName: "direcciones",
     columns: {
@@ -17,8 +16,7 @@ const Direccion = new EntitySchema({
             nullable: false,
         },
         numero: {
-            type: "varchar",
-            length: 50,
+            type: "int",
             nullable: false,
         },
         ciudad: {
@@ -36,10 +34,15 @@ const Direccion = new EntitySchema({
             length: 7,
             nullable: false,
         },
+        pais: {
+            type: "varchar",
+            length: 100,
+            nullable: true,
+        },
         tipo_de_direccion: {
-            type: "enum",
-            enum: ["predeterminada,opcional"],
-            nullable: false,
+            type: "varchar",
+            length: 100,
+            nullable: true,
         },
         createdAt: {
             type: "timestamp",
@@ -54,17 +57,6 @@ const Direccion = new EntitySchema({
         },
 
     },
-    relations: {
-        usuario: {
-            type: "many-to-one",
-            target: "Usuario",
-            inverseSide: "direcciones", // Assuming Usuario entity has a 'direcciones' relation
-            joinColumn: {
-                name: "id_usuario"
-            
-        },
-    },
-    },
 });
 
-export default Direccion;
+export default Direcciones;
