@@ -33,6 +33,8 @@ export const handleWebhook = async (req, res) => {
   try {
     const signatureHeader = req.headers['x-signature'];
     const secret = process.env.MP_WEBHOOK_SECRET.trim();
+    console.log('Webhook secret usado:', `"${secret}"`, secret.length);
+
 
     if (!signatureHeader || !secret) {
       console.error('Faltan cabeceras necesarias o secreto');

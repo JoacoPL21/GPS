@@ -54,10 +54,18 @@ async function setupServer() {
           console.error('Error parsing JSON:', e);
           req.webhookBody = {};
         }
-        // logs opcionales...
+        console.log('-------------------------------------');
+        console.log(`[Webhook] ${new Date().toISOString()}`);
+        console.log('Método:', req.method);
+        console.log('URL:', req.originalUrl);
+        console.log('Headers:', req.headers);
+        console.log('X-Timestamp:', req.headers['x-timestamp']);
+        console.log('Body:', req.webhookBody);
+        console.log('Raw Body:', req.rawBody);
+        console.log('-------------------------------------');
         next();
       },
-      handleWebhook // Usa el controlador directamente aquí
+      handleWebhook 
     );
 
     // Deshabilita el encabezado "x-powered-by" por seguridad
