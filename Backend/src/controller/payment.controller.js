@@ -50,7 +50,7 @@ export const handleWebhook = async (req, res) => {
       const signatureParts = signatureHeader.split(',');
       const tsPart = signatureParts.find(part => part.startsWith('ts='));
       const v1Part = signatureParts.find(part => part.startsWith('v1='));
-      
+
       if (!tsPart || !v1Part) {
         console.error('Formato de firma inválido:', signatureHeader);
         return res.status(401).json({ error: 'Formato de firma inválido' });
@@ -99,7 +99,7 @@ export const handleWebhook = async (req, res) => {
           amount: paymentData.transaction_amount,
           payment_type: paymentData.payment_type_id,
           merchant_order_id: paymentData.order?.id || 'N/A',
-          preference_id: paymentData.preference_id
+          preference_id: paymentData.preference_id || 'N/A' 
         };
 
         console.log('Guardando transacción:', transactionData);
