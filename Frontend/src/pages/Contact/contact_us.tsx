@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { Mail, Phone, MessageCircle, Send, MapPin, Clock } from 'lucide-react';
 
@@ -12,7 +13,9 @@ const ContactSection = () => {
     message: ''
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -21,10 +24,13 @@ const ContactSection = () => {
   };
 
   const handleWhatsAppClick = () => {
-    const message = encodeURIComponent('Hola! Me interesa conocer más sobre sus artesanías en madera.');
+    const message = encodeURIComponent(
+      'Hola! Me interesa conocer más sobre sus artesanías en madera.'
+    );
     window.open(`https://wa.me/56945451849?text=${message}`, '_blank');
   };
 
+  useEffect(() => {
   useEffect(() => {
     if (state.succeeded) {
       setFormData({ name: '', email: '', subject: '', message: '' });
@@ -32,12 +38,10 @@ const ContactSection = () => {
   }, [state.succeeded]);
 
   return (
-    <section id="contacto" className="py-16 bg-#fff8f0">
+    <section id="contacto" className="py-16 bg-[#fff8f0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-amber-900 mb-4">
-            Contáctanos
-          </h2>
+          <h2 className="text-4xl font-bold text-amber-900 mb-4">Contáctanos</h2>
           <p className="text-lg text-amber-700 max-w-2xl mx-auto">
             ¿No encontraste lo que buscabas? Si necesitas un pedido
             personalizado, estamos aquí para ayudarte. También puedes
@@ -89,6 +93,7 @@ const ContactSection = () => {
                   </div>
                 </div>
 
+                {/* Horario de Atención */}
                 <div className="flex items-center space-x-4">
                   <div className="bg-amber-100 p-3 rounded-full flex-shrink-0">
                     <Clock className="w-6 h-6 text-amber-700" />
@@ -101,6 +106,28 @@ const ContactSection = () => {
                       Lunes a Viernes: 9:00 - 18:00
                     </p>
                     <p className="text-amber-700">Sábados: 9:00 - 14:00</p>
+                  </div>
+                </div>
+
+                {/* Teléfono */}
+                <div className="flex items-center space-x-4">
+                  <div className="bg-amber-100 p-3 rounded-full flex-shrink-0">
+                    <Phone className="w-6 h-6 text-amber-700" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-amber-900">Teléfono</p>
+                    <p className="text-amber-700">+56 9 1234 5678</p>
+                  </div>
+                </div>
+
+                {/* Correo Electrónico */}
+                <div className="flex items-center space-x-4">
+                  <div className="bg-amber-100 p-3 rounded-full flex-shrink-0">
+                    <Mail className="w-6 h-6 text-amber-700" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-amber-900">Email</p>
+                    <p className="text-amber-700">contacto@artesaniamadera.cl</p>
                   </div>
                 </div>
               </div>
@@ -120,10 +147,7 @@ const ContactSection = () => {
           {/* Formulario */}
           <div className="h-full">
             <div className="bg-white rounded-2xl shadow-lg p-8 border border-amber-100 h-full flex flex-col">
-              <h3 className="text-2xl font-bold text-amber-900 mb-6">
-                Envíanos un Mensaje
-              </h3>
-
+              <h3 className="text-2xl font-bold text-amber-900 mb-6">Envíanos un Mensaje</h3>
               <div className="flex-grow flex flex-col">
                 <form
                   onSubmit={handleSubmit}
@@ -253,17 +277,8 @@ const ContactSection = () => {
                       }
                       className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2 disabled:cursor-not-allowed disabled:transform-none"
                     >
-                      {state.submitting ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                          <span>Enviando...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-5 h-5" />
-                          <span>Enviar Mensaje</span>
-                        </>
-                      )}
+                      <Send className="inline-block mr-2" />
+                      Enviar Mensaje
                     </button>
                   </div>
                 </form>

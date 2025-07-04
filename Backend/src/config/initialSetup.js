@@ -1,16 +1,14 @@
 'use strict';
 import chalk from 'chalk';
 import { AppDataSource } from './configDB.js';
-import Productos from '../entity/Productos.js';
+import Productos from '../entity/productos.entity.js';
 import Usuarios from '../entity/usuario.entity.js';
-import Direccion from '../entity/direccion.entity.js';
-import Categoria from '../entity/Categoria.js';
+import Categoria from '../entity/categoria.entity.js';
 import { encryptPassword } from '../helpers/bcrypt.helper.js';
 
 async function createUser() {
   try {
     const UserRepository = AppDataSource.getRepository(Usuarios);
-    const DireccionRepository = AppDataSource.getRepository(Direccion);
 
     const count = await UserRepository.count();
     if (count > 0) {
@@ -25,17 +23,9 @@ async function createUser() {
         telefono: "966433091",
         password: await encryptPassword("admin123"),
         rol: "admin",
-        id_direccion: 1
         
-      })),
-      DireccionRepository.save(DireccionRepository.create({
-        calle: "Avnda Los carreras",
-        numero: "505",
-        ciudad: "Concepcion",
-        region: "Biobio",
-        codigo_postal: "1234567",
-        tipo_de_direccion: "envio"
       }))
+
     ]);
 
     console.log(chalk.green("✅ Usuarios creados exitosamente."));

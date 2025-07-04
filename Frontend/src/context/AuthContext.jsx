@@ -36,6 +36,8 @@ export function AuthProvider(props) {
         isAuthenticated,
         setIsAuthenticated,
         loading,
+        setLoading,
+
       }}
     >
       {props.children}

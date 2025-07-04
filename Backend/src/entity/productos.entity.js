@@ -20,7 +20,7 @@ const Productos = new EntitySchema({
         nullable: true,
         },
         precio: {
-        type: "decimal",
+        type: "int",
         },
         stock: {
         type: "int",

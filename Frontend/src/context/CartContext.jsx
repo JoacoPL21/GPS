@@ -1,5 +1,4 @@
-import { createContext, useContext,  } from "react";
-import { useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 
 const CartContext = createContext();
 
@@ -7,46 +6,89 @@ export function useCart() {
   return useContext(CartContext);
 }
 
-export function CartProvider({ children }) {
-
-
-  // establece el estado inicial del carrito y el total
-  const initialState = {
-    cart: [],
-    total: 0,
-  };
-
-  // Reducer para manejar las acciones del carrito que recibe el estado del carrito y una acción a realizar
-  const cartReducer = (state, action) => {
-    switch (action.type) {
-      case 'ADD_ITEM':
-        return {
-          ...state,
-          cart: [...state.cart, action.payload],
-          total: state.total + action.payload.price,
-        };
-      case 'REMOVE_ITEM':{
-        const updatedCart = state.cart.filter(item => item.id !== action.payload.id);
-        const itemToRemove = state.cart.find(item => item.id === action.payload.id);
+// Reducer para manejar las acciones del carrito - MOVIDO AQUÍ
+const cartReducer = (state, action) => {
+  switch (action.type) {
+    case 'ADD_ITEM': {
+      const existingItemIndex = state.cart.findIndex(item => item.id === action.payload.id);
+      
+      if (existingItemIndex >= 0) {
+        // Si el item ya existe, actualizar la cantidad
+        const updatedCart = [...state.cart];
+        updatedCart[existingItemIndex].cantidad += action.payload.cantidad;
+        
         return {
           ...state,
           cart: updatedCart,
-          total: state.total - (itemToRemove ? itemToRemove.price : 0),
+          total: state.total + (action.payload.precio * action.payload.cantidad),
         };
-      }
-      case 'CLEAR_CART':
+      } else {
+        // Si es un nuevo item, agregarlo
         return {
           ...state,
-          cart: [],
-          total: 0,
+          cart: [...state.cart, action.payload],
+          total: state.total + (action.payload.precio * action.payload.cantidad),
         };
-      default:
-        return state;
+      }
+    }
+    case 'REMOVE_ITEM': {
+      const updatedCart = state.cart.filter(item => item.id !== action.payload.id);
+      const itemToRemove = state.cart.find(item => item.id === action.payload.id);
+      
+      return {
+        ...state,
+        cart: updatedCart,
+        total: state.total - (itemToRemove ? itemToRemove.precio * itemToRemove.cantidad : 0),
+      };
+    }
+    case 'CLEAR_CART':
+      return {
+        ...state,
+        cart: [],
+        total: 0,
+      };
+    default:
+      return state;
+  }
+};
+
+export function CartProvider({ children }) {
+  const getInitialCart = () => {
+    try {
+      const authUser = localStorage.getItem('user');
+      if (authUser) {
+        const storedCart = localStorage.getItem('cart');
+        return storedCart ? JSON.parse(storedCart) : [];
+      }
+      const anonCart = localStorage.getItem('anonymous-cart');
+      return anonCart ? JSON.parse(anonCart) : [];
+    } catch (error) {
+      console.error('Error loading cart:', error);
+      return [];
     }
   };
 
-  // Usamos useReducer para manejar el estado del carrito
+  const initialState = {
+    cart: getInitialCart(),
+    total: getInitialCart().reduce((acc, item) => acc + (item.precio*item.cantidad), 0),
+  };
+
+  // Ahora useReducer puede usar cartReducer porque ya está definido
   const [state, dispatch] = useReducer(cartReducer, initialState);
+
+  // Actualizar localStorage cuando cambie el estado del carrito
+  useEffect(() => {
+    try {
+      const authUser = localStorage.getItem('user');
+      if (authUser) {
+        localStorage.setItem('cart', JSON.stringify(state.cart));
+      } else {
+        localStorage.setItem('anonymous-cart', JSON.stringify(state.cart));
+      }
+    } catch (error) {
+      console.error('Error saving cart:', error);
+    }
+  }, [state.cart]); // Dependencia cambiada a state.cart
 
   // Funciones para interactuar con el carrito
   const addItemToCart = (item) => {
@@ -55,16 +97,12 @@ export function CartProvider({ children }) {
 
   const removeItemFromCart = (item) => {
     dispatch({ type: 'REMOVE_ITEM', payload: item });
-  }
+  };
+
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
   };
 
-  // Con esto proporcionamos el estado del carrito y las funciones para interactuar con él a través del contexto
-
-
-
- 
   return (
     <CartContext.Provider value={{
       cart: state.cart,
@@ -72,8 +110,7 @@ export function CartProvider({ children }) {
       addItemToCart,
       removeItemFromCart,
       clearCart,
-      dispatch, // Proporcionamos el dispatch para que se pueda usar en componentes hijos si es necesario
-      
+      dispatch,
     }}>
       {children}
     </CartContext.Provider>
