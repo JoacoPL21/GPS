@@ -15,6 +15,32 @@ export async function getProductosDisponibles() {
   }
 }
 
+export async function getProductosDestacados() {
+  try {
+    const response = await axios.get("/productos/destacados")
+    return { data: response.data, error: null }
+  } catch (error) {
+    console.error("Error al obtener productos destacados:", error)
+    return {
+      data: null,
+      error: error.response ? error.response.data : "Error al obtener productos destacados",
+    }
+  }
+}
+
+export async function toggleProductoDestacado(id_producto) {
+  try {
+    const response = await axios.put(`/productos/${id_producto}/destacado`)
+    return { data: response.data, error: null }
+  } catch (error) {
+    console.error("Error al cambiar estado destacado:", error)
+    return {
+      data: null,
+      error: error.response ? error.response.data : "Error al cambiar estado destacado",
+    }
+  }
+}
+
 export async function getProductoById(id_producto) {
   try {
     const response = await axios.get(`/productos/${id_producto}`)
@@ -148,5 +174,18 @@ export const formatProductoData = (formData, categorias = []) => {
     id_categoria: Number.parseInt(id_categoria),
     estado: formData.estado || "disponible",
     image_url: formData.image_url || null,
+  }
+}
+
+export async function getConteoProductosDestacados() {
+  try {
+    const response = await axios.get("/productos/destacados/conteo")
+    return { data: response.data, error: null }
+  } catch (error) {
+    console.error("Error al obtener conteo de productos destacados:", error)
+    return {
+      data: null,
+      error: error.response ? error.response.data : "Error al obtener conteo de productos destacados",
+    }
   }
 }

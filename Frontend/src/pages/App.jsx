@@ -12,6 +12,7 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
+import GestionDestacados from "../components/GestionDestacados.jsx";
 
 
 const router = createBrowserRouter([
@@ -32,6 +33,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
             <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "gestiondestac",
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <GestionDestacados />
           </ProtectedRoute>
         ),
       },

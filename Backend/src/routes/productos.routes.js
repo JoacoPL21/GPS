@@ -1,13 +1,15 @@
 import { Router } from "express";
-import { getProductosDisponiblesController,getProductoByIdController, createProductoController, updateProductoController, deleteProductoController } from "../controller/productos.controller.js";
-import { isAdmin } from "../middlewares/authorization.middleware.js";
-import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import { getProductosDisponiblesController,getProductoByIdController, createProductoController, updateProductoController, deleteProductoController, getProductosDestacadosController, toggleDestacadoController, getConteoDestacadosController } from "../controller/productos.controller.js";
+
 const router = Router();
 
 router
   .get("/", getProductosDisponiblesController)
+  .get("/destacados", getProductosDestacadosController)
+  .get("/destacados/conteo", getConteoDestacadosController)
   .get("/:id_producto", getProductoByIdController)
-  .post("/crear",authenticateJwt,isAdmin, createProductoController)
+  .post("/crear", createProductoController)
   .put('/:id_producto', updateProductoController)
+  .put('/:id_producto/destacado', toggleDestacadoController)
   .delete('/:id_producto', deleteProductoController);
 export default router;

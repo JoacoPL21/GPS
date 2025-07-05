@@ -82,31 +82,53 @@ async function createProductos() {
 
     await Promise.all([
       ProductosRepository.save(ProductosRepository.create({
-        nombre: "Picaro",
-        precio: 12000,
+        nombre: "Jardinera",
+        precio: 79990,
+        prom_valoraciones: 3,
         stock: 10,
-        descripcion: "Artesania Tipica",
+        descripcion: "Esta es una descripcion de prueba.",
         estado: "disponible",
-        image_url: "picaro.jpg",
-        id_categoria:1
+        image_url: "jardinera.jpg",
+        id_categoria:3
       })),
       ProductosRepository.save(ProductosRepository.create({
-        nombre: "Tung",
-        precio: 8500,
-        stock: 20,
-        descripcion: "Juguete de Madera",
+        nombre: "Macetero",
+        precio: 9990,
+        prom_valoraciones: 3,
+        stock: 10,
+        descripcion: "Esta es una descripcion de prueba.",
         estado: "disponible",
-        image_url:"tung.png",
+        image_url: "macetero.webp",
+        id_categoria:3
+      })),
+      ProductosRepository.save(ProductosRepository.create({
+        nombre: "Medallero",
+        precio: 29990,
+        prom_valoraciones: 3,
+        stock: 10,
+        descripcion: "Esta es una descripcion de prueba.",
+        estado: "disponible",
+        image_url: "medallero.webp",
         id_categoria:2
       })),
       ProductosRepository.save(ProductosRepository.create({
-        nombre: "Tralalero",
-        precio: 18000,
-        stock: 5,
-        descripcion: "Tralalero Decorativo",
+        nombre: "Escaño",
+        precio: 119990,
+        prom_valoraciones: 5,
+        stock: 20,
+        descripcion: "Esta es una descripcion de prueba.",
         estado: "disponible",
-        image_url:"tralalero.jpg",
-        id_categoria:3
+        image_url:"escaño.webp",
+        id_categoria:2
+      })),
+      ProductosRepository.save(ProductosRepository.create({
+        nombre: "Mesa de centro",
+        precio: 69990,
+        stock: 5,
+        descripcion: "Esta es una descripcion de prueba.",
+        estado: "disponible",
+        image_url:"mesacentro.webp",
+        id_categoria:2
       })),
     ]);
 
