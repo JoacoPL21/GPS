@@ -16,6 +16,7 @@ import paymentRoutes from './routes/payment.routes.js';
 import productosRoutes from "./routes/productos.routes.js";
 import categoriasRoutes from "./routes/categorias.routes.js";
 import valoracionesRoutes from './routes/valoraciones.routes.js';
+import { minioClient } from './config/configMinio.js';
 
 async function setupServer() {
   try {
@@ -77,6 +78,16 @@ async function setupServer() {
     app.use("/api/productos", productosRoutes);
     app.use("/api/categorias", categoriasRoutes);
     app.use("/api/valoraciones", valoracionesRoutes);
+
+    // Ruta de prueba para verificar la conexión a MinIO
+    app.get('/api/minio/test', (req, res) => {
+      minioClient.listBuckets((err, buckets) => {
+        if (err) {
+          return res.status(500).json({ message: 'No se pudo conectar a MinIO', error: err.message });
+          }
+      return res.status(200).json({ message: 'Conexión exitosa a MinIO', buckets });
+      });
+    });
 
     const uploadPath = path.resolve("src/uploads");
 
