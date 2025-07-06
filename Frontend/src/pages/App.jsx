@@ -15,10 +15,11 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
-import Sidebar from '../components/Sidebar'; // <-- Tu componente
-import ContactSection from './Contact/contact_us'; // <-- Tu componente
+import Sidebar from '../components/Sidebar'; 
+import ContactSection from './Contact/contact_us';   
 import SuccessPage from './Carrito/success.jsx';
 import FailurePage from './Carrito/failure.jsx';
+import MultiStepCart from './Carrito/multi-step-cart.jsx';
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
     errorElement: <Error404 />,
     children: [
       { path: "", element: <Homepage /> },
-      { path: "cart", element: <Cart /> },
+      { path: "cart", element: <MultiStepCart /> },
       { path: "catalogo", element: <Catalogo /> },
       { path: "producto/:id_producto", element: <Producto /> }, 
       { path: "login", element: <Login /> },
