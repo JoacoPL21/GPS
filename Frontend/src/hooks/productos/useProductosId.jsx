@@ -14,7 +14,11 @@ const useProductoById = (id) => {
       const { data, error } = await getProductoById(id);
 
       if (data) {
-        setProducto(data.data);
+        const prod = data.data;
+        setProducto({
+          ...prod,
+          id_producto: prod.id_producto || prod.id
+        });
       } else {
         console.error("Error al obtener el producto:", error);
       }

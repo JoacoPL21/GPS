@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useProductosbyId from '../../hooks/productos/useProductosId';
 import {useCart} from'../../context/CartContext.jsx';
+import ValoracionesProducto from '../../components/ValoracionesProducto';
 const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 
 const Producto = () => {
@@ -40,12 +41,14 @@ const Producto = () => {
   };
 
   if (loading) return <p className="text-center mt-10">Cargando producto...</p>;
+  console.log(producto.id_producto);
 
   if (!producto) {
     return <p className="text-center mt-10">Producto no encontrado.</p>;
   }
 
   return (
+  <>  
     <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-10">
       
       <div>
@@ -96,6 +99,10 @@ const Producto = () => {
       </div>
       </section>
     </div>
+    {producto?.id_producto && (
+        <ValoracionesProducto id_producto={producto.id_producto} />
+      )}
+  </>
   );
 };
 
