@@ -1,33 +1,27 @@
-'use client';
+"use client";
 
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Transition
-} from '@headlessui/react';
-import { Fragment } from 'react';
-import { X } from 'lucide-react';
-import { useCart } from '../../context/CartContext';
-import { Link } from 'react-router-dom';
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
+  Transition,
+} from "@headlessui/react";
+import { Fragment } from "react";
+import { X } from "lucide-react";
+import { useCart } from "../../context/CartContext";
+import { Link } from "react-router-dom";
+const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/api";
 
 const MenuCarrito = ({ open, setOpen }) => {
-  const {
-    cart,
-    total,
-    removeItemFromCart,
-    dispatch,
-  } = useCart();
-
+  const { cart, total, removeItemFromCart, dispatch } = useCart();
 
   const aumentarCantidad = (id) => {
-    dispatch({ type: 'INCREMENT_QUANTITY', payload: { id } });
+    dispatch({ type: "INCREMENT_QUANTITY", payload: { id } });
   };
 
   const disminuirCantidad = (id) => {
-    dispatch({ type: 'DECREMENT_QUANTITY', payload: { id } });
+    dispatch({ type: "DECREMENT_QUANTITY", payload: { id } });
   };
 
   return (
@@ -194,19 +188,24 @@ const MenuCarrito = ({ open, setOpen }) => {
                           </Link>
                         </div>
                         <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
-                          <p>
-                            o{" "}
-                            <div
-  role="button"
-  tabIndex={0}
-  onClick={() => setOpen(false)}
-  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setOpen(false)}
-  className="font-medium text-yellow-800 cursor-pointer inline"
->
-  Continuar comprando
-  <span aria-hidden="true"> &rarr;</span>
-</div>
-                          </p>
+                          <div>
+                            {" "}
+                            {/* Cambiar <p> por <div> */}o{" "}
+                            <span // Cambiar <div> por <span>
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => setOpen(false)}
+                              onKeyDown={(e) =>
+                                (e.key === "Enter" || e.key === " ") &&
+                                setOpen(false)
+                              }
+                              className="font-medium text-yellow-800 cursor-pointer inline"
+                            >
+                              Continuar comprando
+                              <span aria-hidden="true"> &rarr;</span>
+                            </span>
+                          </div>{" "}
+                          {/* Cerrar </div> */}
                         </div>
                       </div>
                     )}

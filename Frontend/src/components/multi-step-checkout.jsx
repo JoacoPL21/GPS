@@ -298,7 +298,7 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
 
       <div className="space-y-3 mb-4">
         {cart.map((item) => (
-          <div key={item.id} className="flex justify-between items-center">
+          <div key={item.id_producto} className="flex justify-between items-center"> {/* Cambiar item.id por item.id_producto */}
             <div className="flex items-center gap-2">
               <span className="w-6 h-6 bg-amber-500 text-white text-xs rounded-full flex items-center justify-center">
                 {item.cantidad}
@@ -306,7 +306,7 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
               <span className="text-sm text-gray-700">{item.nombre}</span>
             </div>
             <span className="font-medium">
-                $
+                $
               {formatPrice(
                 Number(item.precio.toString().replace(/\./g, "")) *
                   item.cantidad
