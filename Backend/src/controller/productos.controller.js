@@ -1,5 +1,5 @@
 "use strict";
-import { getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados } from "../services/productos.service.js";
+import { getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados,updateProductoStock } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
 
@@ -188,5 +188,24 @@ export async function getConteoDestacadosController(req, res) {
     return handleSuccess(res, 200, "Conteo de productos destacados obtenido exitosamente", { conteo });
   } catch (error) {
     return handleErrorServer(res, 500, "Error interno del servidor al obtener conteo de productos destacados");
+  }
+}
+
+export async function updateProductoStockController(req, res) {
+  const { id_producto } = req.params;
+  const { cantidad } = req.body;
+
+  if (typeof cantidad !== 'number' || cantidad <= 0) {
+    return handleErrorClient(res, 400, "Cantidad inválida");
+  }
+
+  try {
+    const [productoActualizado, error] = await updateProductoStock(id_producto, cantidad);
+    if (error) {
+      return handleErrorClient(res, 404, error);
+    }
+    return handleSuccess(res, 200, "Stock actualizado exitosamente", productoActualizado);
+  } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al actualizar el stock");
   }
 }

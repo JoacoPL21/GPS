@@ -6,7 +6,8 @@ import useProductosbyId from "../../hooks/productos/useProductosId"
 import { useCart } from "../../context/CartContext.jsx"
 import CardInfoProducto from "../../components/CardInfoProductos.jsx"
 
-const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/api"
+const MINIO_URL = import.meta.env.VITE_MINIO_URL
+console.log("MINIO_URL", MINIO_URL)
 
 const Producto = () => {
   const { id_producto: id } = useParams()
@@ -148,7 +149,7 @@ const Producto = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="relative">
               <img
-                src={`${API_URL}/uploads/${producto.imagen}`}
+                src={`${MINIO_URL}/minio/generar-pre-firma-url/${producto.imagen}`}
                 alt={producto.nombre}
                 className="w-full h-96 lg:h-[600px] object-cover"
               />

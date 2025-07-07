@@ -15,6 +15,7 @@ import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
 import productosRoutes from "./routes/productos.routes.js";
 import categoriasRoutes from "./routes/categorias.routes.js";
+import  minioRutes from "./routes/minio.routes.js";
 import { minioClient } from './config/configMinio.js';
 
 async function setupServer() {
@@ -77,6 +78,8 @@ async function setupServer() {
     app.use("/api/productos", productosRoutes);
     app.use("/api/categorias", categoriasRoutes);
 
+    app.use("/api/minio", minioRutes);
+
     // Ruta de prueba para verificar la conexión a MinIO
     app.get('/api/minio/test', (req, res) => {
       minioClient.listBuckets((err, buckets) => {
@@ -86,11 +89,6 @@ async function setupServer() {
       return res.status(200).json({ message: 'Conexión exitosa a MinIO', buckets });
       });
     });
-
-    const uploadPath = path.resolve("src/uploads");
-
-    // Servir archivos estáticos desde el directorio 'uploads'
-    app.use("/api/uploads", express.static(uploadPath));
 
     // Servidor escuchando en el puerto configurado
 
