@@ -15,6 +15,38 @@ export async function getProductosDisponibles() {
   }
 }
 
+export async function getProductos() {
+  try {
+    const response = await axios.get("/productos/all");
+    return {
+      success: true,
+      data: response.data.data, // Suponiendo que usas handleSuccess que envuelve en `.data`
+    };
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    return {
+      success: false,
+      error: error.response?.data || "Error desconocido al obtener productos",
+    };
+  }
+}
+
+const fetchProductos = async () => {
+  setLoading(true);
+  const response = await getProductos();
+
+  if (response?.data?.data && Array.isArray(response.data.data)) {
+    console.log("productosAll cargado:", response.data.data);
+    setProductosAll(response.data.data);
+  } else {
+    console.error("La respuesta no tiene un array válido");
+    setProductosAll([]);
+  }
+
+  setLoading(false);
+};
+
+
 export async function getProductosDestacados() {
   try {
     const response = await axios.get("/productos/destacados")
@@ -100,7 +132,7 @@ export async function deleteProducto(id_producto) {
 export async function getCategorias() {
   try {
     const response = await axios.get("/categorias/")
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al obtener categorías:", error)
     return {
@@ -113,7 +145,7 @@ export async function getCategorias() {
 export async function createCategoria(categoriaData) {
   try {
     const response = await axios.post("/categorias/crear", categoriaData)
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al crear categoría:", error)
     return {
@@ -126,7 +158,7 @@ export async function createCategoria(categoriaData) {
 export async function updateCategoria(id, categoriaData) {
   try {
     const response = await axios.put(`/categorias/${id}`, categoriaData)
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al actualizar categoría:", error)
     return {
@@ -139,7 +171,7 @@ export async function updateCategoria(id, categoriaData) {
 export async function deleteCategoria(id) {
   try {
     const response = await axios.delete(`/categorias/${id}`)
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al eliminar categoría:", error)
     return {
@@ -172,7 +204,7 @@ export const formatProductoData = (formData, categorias = []) => {
     precio: Number.parseFloat(formData.precio),
     stock: Number.parseInt(formData.stock),
     id_categoria: Number.parseInt(id_categoria),
-    estado: formData.estado || "disponible",
+    estado: formData.estado || "activo",
     image_url: formData.image_url || null,
   }
 }

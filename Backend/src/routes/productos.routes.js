@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { getProductosDisponiblesController,getProductoByIdController, createProductoController, updateProductoController, deleteProductoController, getProductosDestacadosController, toggleDestacadoController, getConteoDestacadosController } from "../controller/productos.controller.js";
+import { getProductosController,getProductosDisponiblesController,getProductoByIdController, createProductoController, updateProductoController, deleteProductoController, getProductosDestacadosController, toggleDestacadoController, getConteoDestacadosController } from "../controller/productos.controller.js";
 
 const router = Router();
 
 router
   .get("/", getProductosDisponiblesController)
+  .get("/all", getProductosController) 
   .get("/destacados", getProductosDestacadosController)
   .get("/destacados/conteo", getConteoDestacadosController)
   .get("/:id_producto", getProductoByIdController)
