@@ -45,6 +45,23 @@ export function AuthProvider(props) {
     return true;
   };
 
+  // Función para actualizar los datos del usuario
+  const updateUser = (updatedUserData) => {
+    setAuthUser(prevUser => ({
+      ...prevUser,
+      ...updatedUserData
+    }));
+    
+    // También actualizar el localStorage
+    try {
+      const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
+      const newUserData = { ...currentUserData, ...updatedUserData };
+      localStorage.setItem('user', JSON.stringify(newUserData));
+    } catch (error) {
+      console.error('Error updating user in localStorage:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -55,6 +72,7 @@ export function AuthProvider(props) {
         loading,
         setLoading,
         checkTokenValidity,
+        updateUser,
       }}
     >
       {props.children}

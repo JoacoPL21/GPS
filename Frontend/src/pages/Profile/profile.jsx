@@ -1,18 +1,20 @@
 "use client"
 
 import { useAuth } from "../../context/AuthContext.jsx"
-import { getUserDirecciones, deleteDireccion } from "../../services/user.service.js"
+import { getUserDirecciones, deleteDireccion, updateUserProfile } from "../../services/user.service.js"
 import swal from "sweetalert2"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import FormDireccionEnvio from "./DirectionForm.jsx"
+import EditProfileModal from "../../components/EditProfileModal.jsx"
 
 const Profile = () => {
-  const { authUser } = useAuth()
+  const { authUser, updateUser } = useAuth()
   const [direcciones, setDirecciones] = useState([])
   const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Función para cargar direcciones
-  const fetchDirecciones = async () => {
+  const fetchDirecciones = useCallback(async () => {
     if (!authUser?.id) return
 
     setIsLoadingDirecciones(true)
@@ -30,7 +32,7 @@ const Profile = () => {
     } finally {
       setIsLoadingDirecciones(false)
     }
-  }
+  }, [authUser?.id])
 
   // Función para eliminar una dirección
   const handleDeleteDireccion = async (direccionId) => {
@@ -81,6 +83,40 @@ const Profile = () => {
 
 
 
+  // Función para actualizar perfil
+  const handleProfileUpdate = async (updateData) => {
+    try {
+      const response = await updateUserProfile(updateData)
+      if (response.status === "Success") {
+        // Actualizar el contexto de autenticación con los nuevos datos
+        const updatedUserData = { ...authUser, ...updateData }
+        updateUser(updatedUserData)
+        
+        swal.fire({
+          title: "¡Perfil actualizado!",
+          text: "Tu información ha sido actualizada correctamente.",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+        })
+      } else {
+        swal.fire({
+          title: "Error",
+          text: response.message || "No se pudo actualizar el perfil",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        })
+      }
+    } catch (error) {
+      console.error("Error al actualizar perfil:", error)
+      swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al actualizar el perfil",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      })
+    }
+  }
+
   // Función para agregar nueva dirección (callback para el formulario)
   const handleDireccionAdded = (nuevaDireccion) => {
     setDirecciones((prev) => [...prev, nuevaDireccion])
@@ -88,7 +124,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchDirecciones()
-  }, [authUser?.id])
+  }, [authUser?.id, fetchDirecciones])
 
   const getInitials = (name) => {
     return name
@@ -186,6 +222,24 @@ const Profile = () => {
                       <p className="text-amber-900 capitalize">{authUser?.rol || "No disponible"}</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Botón para editar perfil */}
+                <div className="mt-6">
+                  <button
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white px-4 py-3 rounded-xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <span>Editar Perfil</span>
+                  </button>
                 </div>
 
                
@@ -331,6 +385,14 @@ const Profile = () => {
         <div className="mt-8">
           <FormDireccionEnvio onDireccionAdded={handleDireccionAdded} />
         </div>
+
+        {/* Modal para editar perfil */}
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          userProfile={authUser}
+          onProfileUpdated={handleProfileUpdate}
+        />
       </div>
     </div>
   )
