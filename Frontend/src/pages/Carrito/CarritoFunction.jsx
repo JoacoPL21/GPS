@@ -18,17 +18,12 @@ const MenuCarrito = ({ open, setOpen }) => {
     cart,
     total,
     removeItemFromCart,
-    dispatch,
+    incrementItemQuantity,
+    decrementItemQuantity
+    
   } = useCart();
 
 
-  const aumentarCantidad = (id) => {
-    dispatch({ type: 'INCREMENT_QUANTITY', payload: { id } });
-  };
-
-  const disminuirCantidad = (id) => {
-    dispatch({ type: 'DECREMENT_QUANTITY', payload: { id } });
-  };
 
   return (
     <Transition show={open} as={Fragment}>
@@ -91,7 +86,7 @@ const MenuCarrito = ({ open, setOpen }) => {
                               className="-my-6 divide-y divide-gray-200"
                             >
                               {cart.map((item) => (
-                                <li key={item.id} className="flex py-6">
+                                <li key={item.id_producto} className="flex py-6">
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img
                                       src={`${API_URL}/uploads/${item.imagen}`}
@@ -123,12 +118,7 @@ const MenuCarrito = ({ open, setOpen }) => {
                                           role="button"
                                           tabIndex={0}
                                           onClick={() =>
-                                            disminuirCantidad(item.id)
-                                          }
-                                          onKeyDown={(e) =>
-                                            (e.key === "Enter" ||
-                                              e.key === " ") &&
-                                            disminuirCantidad(item.id)
+                                            decrementItemQuantity(item.id_producto)
                                           }
                                           className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
                                         >
@@ -139,13 +129,9 @@ const MenuCarrito = ({ open, setOpen }) => {
                                           role="button"
                                           tabIndex={0}
                                           onClick={() =>
-                                            aumentarCantidad(item.id)
+                                            incrementItemQuantity(item.id_producto)
                                           }
-                                          onKeyDown={(e) =>
-                                            (e.key === "Enter" ||
-                                              e.key === " ") &&
-                                            aumentarCantidad(item.id)
-                                          }
+                                         
                                           className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
                                         >
                                           +
@@ -156,11 +142,7 @@ const MenuCarrito = ({ open, setOpen }) => {
                                         role="button"
                                         tabIndex={0}
                                         onClick={() => removeItemFromCart(item)}
-                                        onKeyDown={(e) =>
-                                          (e.key === "Enter" ||
-                                            e.key === " ") &&
-                                          removeItemFromCart(item)
-                                        }
+                                       
                                         className="font-medium border-yellow-600 p-2 border-2 rounded-3xl text-yellow-700 hover:border-red-600 hover:text-red-600 cursor-pointer"
                                       >
                                         Eliminar

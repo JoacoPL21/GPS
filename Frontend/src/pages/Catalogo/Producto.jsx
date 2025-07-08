@@ -1,9 +1,9 @@
-"use client"
-
-import { useState } from "react"
-import { useParams } from "react-router-dom"
-import useProductosbyId from "../../hooks/productos/useProductosId"
-import { useCart } from "../../context/CartContext.jsx"
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import useProductosbyId from '../../hooks/productos/useProductosId';
+import {useCart} from'../../context/CartContext.jsx';
+import ValoracionesProducto from '../../components/ValoracionesProducto';
+const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 import CardInfoProducto from "../../components/CardInfoProductos.jsx"
 
 const MINIO_URL = import.meta.env.VITE_MINIO_URL
@@ -51,7 +51,8 @@ const Producto = () => {
 
 if (loading) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f5eee7] to-[#f0e6dd]">
+  <>  
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <nav className="text-sm text-gray-500 mb-4">
@@ -80,6 +81,10 @@ if (loading) {
         </div>
       </div>
     </div>
+    {producto?.id_producto && (
+        <ValoracionesProducto id_producto={producto.id_producto} />
+      )}
+  </>
   )
 }
 

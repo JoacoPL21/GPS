@@ -359,4 +359,7 @@ const CatalogoConnected = () => {
   )
 }
 
+
+
 export default CatalogoConnected
+

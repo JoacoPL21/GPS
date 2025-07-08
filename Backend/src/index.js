@@ -16,6 +16,7 @@ import paymentRoutes from './routes/payment.routes.js';
 import productosRoutes from "./routes/productos.routes.js";
 import categoriasRoutes from "./routes/categorias.routes.js";
 import  minioRutes from "./routes/minio.routes.js";
+import valoracionesRoutes from './routes/valoraciones.routes.js';
 import { minioClient } from './config/configMinio.js';
 
 async function setupServer() {
@@ -77,6 +78,7 @@ async function setupServer() {
     app.use('/api/payments', paymentRoutes);
     app.use("/api/productos", productosRoutes);
     app.use("/api/categorias", categoriasRoutes);
+    app.use("/api/valoraciones", valoracionesRoutes);
 
     app.use("/api/minio", minioRutes);
 
