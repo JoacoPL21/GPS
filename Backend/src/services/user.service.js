@@ -57,7 +57,7 @@ export async function deleteDireccionByUserIdService(direccionId, userId) {
         // Buscar la dirección que pertenezca al usuario
         const direccion = await direccionRepository.findOne({
             where: { 
-                id: direccionId,
+                id_direccion: direccionId,
                 id_usuario: userId 
             }
         });

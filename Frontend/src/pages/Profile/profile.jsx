@@ -53,7 +53,7 @@ const Profile = () => {
       const response = await deleteDireccion(direccionId)
       if (response.status === "Success") {
         // Actualizar estado local
-        setDirecciones(direcciones.filter((direccion) => direccion.id !== direccionId))
+        setDirecciones(direcciones.filter((direccion) => direccion.id_direccion !== direccionId))
 
         swal.fire({
           title: "¡Eliminada!",
@@ -305,7 +305,7 @@ const Profile = () => {
 
                             {/* Botón eliminar individual */}
                             <button
-                              onClick={() => handleDeleteDireccion(direccion.id)}
+                              onClick={() => handleDeleteDireccion(direccion.id_direccion)}
                               className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg"
                               title="Eliminar dirección"
                             >
