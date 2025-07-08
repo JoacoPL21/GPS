@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { isTokenValid, getCurrentUser, initializeAuth, getUserProfile } from "../services/auth.service.js";
 
 // crea un contexto que usaremos para manejar la autenticación
 const AuthContext = createContext();
@@ -12,21 +13,49 @@ export function AuthProvider(props) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Recuperar usuario y token al montar
+  // Recuperar usuario y token al montar, verificando validez del token
   useEffect(() => {
-    const storedUser = localStorage.getItem("usuario");
-    const token = localStorage.getItem("token");
-    if (storedUser && token) {
-      try {
-        setAuthUser(JSON.parse(storedUser));
+    // Intentar inicializar la autenticación
+    const isValidAuth = initializeAuth();
+    
+    if (isValidAuth) {
+      const user = getCurrentUser();
+      if (user) {
+        setAuthUser(user);
         setIsAuthenticated(true);
-      } catch {
-        setAuthUser(null);
-        setIsAuthenticated(false);
       }
+    } else {
+      // Token inválido o expirado
+      setAuthUser(null);
+      setIsAuthenticated(false);
     }
-    setLoading(false); // <-- Importante: termina la carga
+    
+    setLoading(false);
   }, []);
+
+  // Función para actualizar el perfil del usuario
+  const refreshUserProfile = async () => {
+    try {
+      const result = await getUserProfile();
+      if (result.status === 'Success') {
+        setAuthUser(result.data);
+        return result.data;
+      }
+    } catch (error) {
+      console.error('Error al actualizar perfil:', error);
+    }
+    return null;
+  };
+
+  // Función para verificar si el token sigue siendo válido
+  const checkTokenValidity = () => {
+    if (!isTokenValid()) {
+      setAuthUser(null);
+      setIsAuthenticated(false);
+      return false;
+    }
+    return true;
+  };
 
   return (
     <AuthContext.Provider
@@ -37,7 +66,8 @@ export function AuthProvider(props) {
         setIsAuthenticated,
         loading,
         setLoading,
-
+        refreshUserProfile,
+        checkTokenValidity,
       }}
     >
       {props.children}
