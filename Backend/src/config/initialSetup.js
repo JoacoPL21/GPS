@@ -318,7 +318,7 @@ async function createDireccion() {
         numero: 123,
         ciudad: "Santiago",
         region: "Region Metropolitana",
-        codigo_postal: "1234567",
+        codigo_postal: "4100000",
         tipo_de_direccion: "predeterminada",
         createdAt: new Date(),
         updatedAt: new Date()

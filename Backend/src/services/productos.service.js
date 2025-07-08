@@ -342,3 +342,26 @@ export async function getConteoProductosDestacados() {
         return 0;
     }
 }
+
+export async function updateProductoStock(id, cantidad) {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        const producto = await productoRepository.findOneBy({ id_producto: id });
+
+        if (!producto) {
+            return [null, "Producto no encontrado"];
+        }
+
+        if (producto.stock < cantidad) {
+            return [null, "Stock insuficiente"];
+        }
+
+        producto.stock -= cantidad;
+        console.log(cantidad);
+        await productoRepository.save(producto);
+        return [producto, null];
+    } catch (error) {
+        console.error("Error al actualizar el stock del producto:", error);
+        return [null, "Error al actualizar el stock del producto"];
+    }
+}

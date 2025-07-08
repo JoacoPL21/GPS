@@ -30,19 +30,28 @@ export async function loginService(user) {
     }
 
     
+    // Payload mínimo para el JWT - solo información esencial
     const payload = {
       id: userFound.id_usuario,
-      nombreCompleto: userFound.nombreCompleto,
       email: userFound.email,
       rol: userFound.rol,
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-      expiresIn: "0.5h", // 30 minutos
+      expiresIn: "1h", // Aumentado a 1 hora para mejor UX
     });
 
+    // Información completa del usuario para el frontend (sin contraseña)
+    const userInfo = {
+      id: userFound.id_usuario,
+      nombreCompleto: userFound.nombreCompleto,
+      email: userFound.email,
+      rol: userFound.rol,
+      telefono: userFound.telefono || "",
+      
+    };
 
-    return [accessToken, null, payload];
+    return [accessToken, null, userInfo];
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     return [null, "Error interno del servidor"];

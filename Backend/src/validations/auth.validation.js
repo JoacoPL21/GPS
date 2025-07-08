@@ -64,14 +64,6 @@ export const registerValidation = Joi.object({
 
 
 export const direccionValidation = Joi.object({
-  id_usuario: Joi.number()
-    .positive()
-    .required()
-    .messages({
-      "number.base": "El ID de usuario debe ser un número",
-      "number.positive": "El ID de usuario debe ser un número positivo",
-      "any.required": "El ID de usuario es obligatorio",
-    }),
   calle: Joi.string()
     .min(3)
     .max(100)

@@ -19,60 +19,79 @@ export const getAllUsersService = async () => {
     }
 }
 
-export const registerDireccionService = async (direccionData) => {
+export async function registerDireccionService(direccionData) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
-        const {id_usuario,calle, numero, ciudad, region, codigo_postal, tipo_de_direccion} = direccionData;
-        console.log(id_usuario)
-        const newDireccion = direccionRepository.create({
-            calle,
-            numero,
-            ciudad,
-            region,
-            codigo_postal,
-            tipo_de_direccion,
-            usuario: {
-                id_usuario: id_usuario // Assuming id_usuario is the primary key in Usuario entity
-            }
-        });
+        
+        console.log('Guardando dirección:', direccionData);
+        
+        const newDireccion = direccionRepository.create(direccionData);
         const savedDireccion = await direccionRepository.save(newDireccion);
-        return savedDireccion;
+        
+        return [savedDireccion, null];
     } catch (error) {
-        console.error('Error guardando la direccion:', error);
-        throw new Error('Error guardando la direccion');
+        console.error("Error al registrar dirección:", error);
+        return [null, "Error interno del servidor"];
     }
 }
 
-export const getDireccionByUserIdService = async (userId) => {
+export async function getDireccionByUserIdService(userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
+        
         const direcciones = await direccionRepository.find({
-            //DONDE SU usuario.id_usuario = userId
-            where:  { usuario: { id_usuario: userId } }, 
+            where: { id_usuario: userId }
         });
-        if (!direcciones || direcciones.length === 0) {
-            return [[], 'No hay direcciones para este usuario'];
-        }
+        
         return [direcciones, null];
     } catch (error) {
-        console.error('error recuperando las direcciones:', error);
-        throw new Error('error recuperando las direcciones');
+        console.error("Error al obtener direcciones:", error);
+        return [null, "Error interno del servidor"];
     }
 }
 
-export async function deleteDireccionByUserIdService(userId) {
+export async function deleteDireccionByUserIdService(direccionId, userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
-        const direccionToDelete = await direccionRepository.findOne({
-            where: { usuario: { id_usuario: userId } }
+        
+        // Buscar la dirección que pertenezca al usuario
+        const direccion = await direccionRepository.findOne({
+            where: { 
+                id_direccion: direccionId,
+                id_usuario: userId 
+            }
         });
-        if (!direccionToDelete) {
-            return [null, 'Address not found for this user'];
+        
+        if (!direccion) {
+            return [null, "Dirección no encontrada o no pertenece al usuario"];
         }
-        const deletedDireccion = await direccionRepository.remove(direccionToDelete);
-        return [deletedDireccion, null];
+        
+        await direccionRepository.remove(direccion);
+        return [direccion, null];
     } catch (error) {
-        console.error('Error deleting address:', error);
-        throw new Error('error eliminando la dirección');
+        console.error("Error al eliminar dirección:", error);
+        return [null, "Error interno del servidor"];
     }
 }
+
+export const getUserProfileService = async (userId) => {
+    try {
+        const userRepository = AppDataSource.getRepository(Usuarios);
+        
+        const user = await userRepository.findOne({
+            where: { id_usuario: userId }
+        });
+        
+        if (!user) {
+            return [null, { message: 'Usuario no encontrado' }];
+        }
+        
+        // Excluir la contraseña de la respuesta
+        const { password, ...userProfile } = user;
+        
+        return [userProfile, null];
+    } catch (error) {
+        console.error('Error al obtener perfil del usuario:', error);
+        return [null, { message: 'Error interno del servidor' }];
+    }
+};
