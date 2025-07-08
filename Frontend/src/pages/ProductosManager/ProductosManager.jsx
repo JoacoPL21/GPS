@@ -341,11 +341,13 @@ console.log("produtosAll antes del render:", productosAll)
         response = await editProducto(editingId, form)
         if (response.success) {
           Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
+          await fetchProductos() 
         }
       } else {
         response = await addProducto(form)
         if (response.success) {
           Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
+          await fetchProductos() 
         }
       }
 
@@ -415,16 +417,33 @@ console.log("produtosAll antes del render:", productosAll)
   }
 
   // Mostrar loading
-  if (productosLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando productos...</p>
-        </div>
+if (productosLoading) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#fff8f0]">
+      {/* Spinner con animación y sombra */}
+      <div className="relative flex items-center justify-center">
+        <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-orange-500 shadow-lg"></div>
+        {/* Ícono dentro del spinner (puedes cambiar el SVG por uno que te guste) */}
+        <svg
+          className="absolute h-12 w-12 text-orange-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
       </div>
-    )
-  }
+      {/* Texto con animación de opacidad pulsante */}
+      <p className="mt-6 text-xl font-semibold text-orange-600 animate-pulse">
+        Cargando productos...
+      </p>
+    </div>
+  )
+}
+
+
 
   // Mostrar error
   if (productosError) {
@@ -457,7 +476,7 @@ console.log("categoriasSet antes del render:", categoriasSet)
         title="Administración de productos"
         subtitle="Gestiona tu inventario de productos"
       />
-      <div className="mt-4 lg:mt-0 flex items-center space-x-4">
+      <div className="mt-4 lg:mt-0 flex items-center space-x-4 bg-[#fff8f0]">
         <button
           onClick={handleExport}
           className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
@@ -498,7 +517,7 @@ currentColor" viewBox="0 0 24 24">
         </button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 bg-[#fff8f0]">
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6">
