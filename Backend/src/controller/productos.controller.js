@@ -1,5 +1,5 @@
 "use strict";
-import { getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService } from "../services/productos.service.js";
+import { getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
 
@@ -131,3 +131,62 @@ export const deleteProductoController = async (req, res) => {
     });
   }
 };
+
+// Obtener productos destacados o últimos productos por defecto
+export async function getProductosDestacadosController(req, res) {
+  try {
+    // Primero intentar obtener productos destacados
+    const [productosDestacados, errorDestacados] = await getProductosDestacados();
+    
+    if (errorDestacados) {
+      return handleErrorClient(res, 400, errorDestacados);
+    }
+
+    // Si hay productos destacados, devolverlos
+    if (productosDestacados && productosDestacados.length > 0) {
+      return handleSuccess(res, 200, "Productos destacados obtenidos exitosamente", productosDestacados);
+    }
+
+    // Si no hay productos destacados, devolver los últimos 4 productos
+    const [ultimosProductos, errorUltimos] = await getUltimosProductos(4);
+    
+    if (errorUltimos) {
+      return handleErrorClient(res, 400, errorUltimos);
+    }
+
+    return handleSuccess(res, 200, "Últimos productos obtenidos exitosamente", ultimosProductos);
+  } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al obtener productos destacados");
+  }
+}
+
+// Marcar/desmarcar producto como destacado
+export async function toggleDestacadoController(req, res) {
+  try {
+    const { id_producto } = req.params;
+    
+    if (!id_producto || isNaN(id_producto)) {
+      return handleErrorClient(res, 400, "ID de producto inválido");
+    }
+
+    const resultado = await toggleProductoDestacado(id_producto);
+
+    if (resultado.success) {
+      return handleSuccess(res, 200, resultado.message, { destacado: resultado.destacado });
+    } else {
+      return handleErrorClient(res, 404, resultado.message);
+    }
+  } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al cambiar estado destacado");
+  }
+}
+
+// Obtener conteo de productos destacados
+export async function getConteoDestacadosController(req, res) {
+  try {
+    const conteo = await getConteoProductosDestacados();
+    return handleSuccess(res, 200, "Conteo de productos destacados obtenido exitosamente", { conteo });
+  } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al obtener conteo de productos destacados");
+  }
+}

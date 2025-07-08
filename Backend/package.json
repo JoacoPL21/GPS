@@ -32,6 +32,7 @@
     "joi": "^17.13.3",
     "js-cookie": "^3.0.5",
     "mercadopago": "^2.7.0",
+    "minio": "^8.0.5",
     "morgan": "^1.10.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

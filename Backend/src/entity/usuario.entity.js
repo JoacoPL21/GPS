@@ -37,6 +37,10 @@ const Usuarios = new EntitySchema({
             default: "cliente",
             nullable: false,
         },
+        id_direccion: {
+            type: "int",
+            nullable: false,
+        },
         createdAt: {
             type: "timestamp",
             default: () => "CURRENT_TIMESTAMP",
@@ -49,9 +53,15 @@ const Usuarios = new EntitySchema({
             nullable: false,
         },
     },
-   
-
-   
+    relations: {
+        Direcciones: {
+            type: "many-to-one",
+            target: "Direccion",
+            joinColumn: {
+                name: "id_direccion",
+            },
+        },
+    },
 });
 
 export default Usuarios;

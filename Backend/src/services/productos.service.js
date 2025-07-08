@@ -19,11 +19,13 @@ export async function getProductosDisponibles() {
 
         const productosData = productos.map(producto => ({
             id_producto: producto.id_producto,
+            prom_valoraciones: producto.prom_valoraciones,
             nombre: producto.nombre,
             precio: producto.precio,
             stock: producto.stock,
             descripcion: producto.descripcion,
             estado: producto.estado,
+            destacado: producto.destacado,
             imagen: producto.image_url,
             categoria: producto.categoria?.nombre
         }));
@@ -49,11 +51,13 @@ export async function getProductoById(id) {
 
         const productoData = {
             id: producto.id_producto,
+            prom_valoraciones: producto.prom_valoraciones,
             nombre: producto.nombre,
             precio: producto.precio,
             stock: producto.stock,
             descripcion: producto.descripcion,
             estado: producto.estado,
+            destacado: producto.destacado,
             imagen: producto.image_url,
             categoria: producto.categoria?.nombre
         };
@@ -184,3 +188,129 @@ export const deleteProductoService = async (id_producto) => {
         };
     }
 };
+
+//Funcion para traer productos destacados
+export async function getProductosDestacados() {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        const productos = await productoRepository.find({
+            where: {
+                estado: "disponible",
+                destacado: true,
+            },
+            relations: ["categoria"],
+            order: {
+                created_at: "DESC"
+            }
+        });
+
+        const productosData = productos.map(producto => ({
+            id_producto: producto.id_producto,
+            prom_valoraciones: producto.prom_valoraciones,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            stock: producto.stock,
+            descripcion: producto.descripcion,
+            estado: producto.estado,
+            destacado: producto.destacado,
+            imagen: producto.image_url,
+            categoria: producto.categoria?.nombre
+        }));
+        return [productosData, null];
+    } catch (error) {
+        console.error("Error al obtener productos destacados:", error);
+        return [null, "Error al obtener productos destacados"];
+    }
+}
+
+//Funcion para traer los últimos productos agregados (por defecto)
+export async function getUltimosProductos(limit = 4) {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        const productos = await productoRepository.find({
+            where: {
+                estado: "disponible",
+            },
+            relations: ["categoria"],
+            order: {
+                created_at: "DESC"
+            },
+            take: limit
+        });
+
+        const productosData = productos.map(producto => ({
+            id_producto: producto.id_producto,
+            prom_valoraciones: producto.prom_valoraciones,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            stock: producto.stock,
+            descripcion: producto.descripcion,
+            estado: producto.estado,
+            destacado: producto.destacado,
+            imagen: producto.image_url,
+            categoria: producto.categoria?.nombre
+        }));
+        return [productosData, null];
+    } catch (error) {
+        console.error("Error al obtener últimos productos:", error);
+        return [null, "Error al obtener últimos productos"];
+    }
+}
+
+//Funcion para marcar/desmarcar producto como destacado
+export async function toggleProductoDestacado(id_producto) {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        
+        // Verificar si el producto existe
+        const producto = await productoRepository.findOne({
+            where: { id_producto: parseInt(id_producto) }
+        });
+
+        if (!producto) {
+            return { success: false, message: "Producto no encontrado" };
+        }
+
+        // Si vamos a marcar como destacado, verificar el límite
+        if (!producto.destacado) {
+            // Contar productos destacados actuales
+            const productosDestacados = await productoRepository.count({
+                where: { destacado: true }
+            });
+
+            if (productosDestacados >= 8) {
+                return { 
+                    success: false, 
+                    message: "No se puede marcar más productos como destacados. Máximo 8 productos permitidos." 
+                };
+            }
+        }
+
+        // Cambiar el estado de destacado
+        producto.destacado = !producto.destacado;
+        await productoRepository.save(producto);
+
+        return { 
+            success: true, 
+            message: producto.destacado ? "Producto marcado como destacado" : "Producto desmarcado como destacado",
+            destacado: producto.destacado
+        };
+    } catch (error) {
+        console.error("Error al cambiar estado destacado:", error);
+        return { success: false, message: "Error al cambiar estado destacado" };
+    }
+}
+
+//Funcion para obtener el conteo de productos destacados
+export async function getConteoProductosDestacados() {
+    try {
+        const productoRepository = AppDataSource.getRepository(Productos);
+        const conteo = await productoRepository.count({
+            where: { destacado: true }
+        });
+        return conteo;
+    } catch (error) {
+        console.error("Error al obtener conteo de productos destacados:", error);
+        return 0;
+    }
+}
