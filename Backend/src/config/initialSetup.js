@@ -302,4 +302,4 @@ async function createValoraciones() {
 
 
 
-export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones, createDireccion };
+export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones};

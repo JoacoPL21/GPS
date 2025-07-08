@@ -7,9 +7,8 @@ import { useEffect, useState } from "react"
 import FormDireccionEnvio from "./DirectionForm.jsx"
 
 const Profile = () => {
-  const { authUser, refreshUserProfile } = useAuth()
+  const { authUser } = useAuth()
   const [direcciones, setDirecciones] = useState([])
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true)
 
   // Función para cargar direcciones
@@ -80,31 +79,7 @@ const Profile = () => {
     }
   }
 
-  // Función para actualizar el perfil del usuario
-  const handleRefreshProfile = async () => {
-    setIsRefreshing(true)
-    try {
-      const updatedUser = await refreshUserProfile()
-      if (updatedUser) {
-        swal.fire({
-          title: "Éxito",
-          text: "Perfil actualizado correctamente.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-        })
-      }
-    } catch (error) {
-      console.error("Error al actualizar perfil:", error)
-      swal.fire({
-        title: "Error",
-        text: "No se pudo actualizar el perfil.",
-        icon: "error",
-        confirmButtonText: "Aceptar",
-      })
-    } finally {
-      setIsRefreshing(false)
-    }
-  }
+
 
   // Función para agregar nueva dirección (callback para el formulario)
   const handleDireccionAdded = (nuevaDireccion) => {
@@ -213,26 +188,7 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* Botón actualizar perfil */}
-                <div className="mt-6">
-                  <button
-                    onClick={handleRefreshProfile}
-                    disabled={isRefreshing}
-                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  >
-                    {isRefreshing ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span>Actualizando...</span>
-                      </div>
-                    ) : (
-                      "Actualizar Perfil"
-                    )}
-                  </button>
-                </div>
+               
               </div>
             </div>
           </div>

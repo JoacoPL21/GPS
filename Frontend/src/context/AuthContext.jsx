@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { isTokenValid, getCurrentUser, initializeAuth, getUserProfile } from "../services/auth.service.js";
+import { isTokenValid, getCurrentUser, initializeAuth } from "../services/auth.service.js";
 
 // crea un contexto que usaremos para manejar la autenticación
 const AuthContext = createContext();
@@ -33,19 +33,7 @@ export function AuthProvider(props) {
     setLoading(false);
   }, []);
 
-  // Función para actualizar el perfil del usuario
-  const refreshUserProfile = async () => {
-    try {
-      const result = await getUserProfile();
-      if (result.status === 'Success') {
-        setAuthUser(result.data);
-        return result.data;
-      }
-    } catch (error) {
-      console.error('Error al actualizar perfil:', error);
-    }
-    return null;
-  };
+
 
   // Función para verificar si el token sigue siendo válido
   const checkTokenValidity = () => {
@@ -66,7 +54,6 @@ export function AuthProvider(props) {
         setIsAuthenticated,
         loading,
         setLoading,
-        refreshUserProfile,
         checkTokenValidity,
       }}
     >
