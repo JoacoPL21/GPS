@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { getProductosDisponiblesController,getProductoByIdController, createProductoController, updateProductoController, deleteProductoController, getProductosDestacadosController, toggleDestacadoController, getConteoDestacadosController } from "../controller/productos.controller.js";
-
+import { getProductosDisponiblesController,getProductoByIdController, createProductoController, updateProductoController, deleteProductoController, getProductosDestacadosController, toggleDestacadoController, getConteoDestacadosController,updateProductoStockController} from "../controller/productos.controller.js";
+import { isAdmin } from "../middlewares/authorization.middleware.js";
+import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 const router = Router();
 
 router
@@ -8,8 +9,10 @@ router
   .get("/destacados", getProductosDestacadosController)
   .get("/destacados/conteo", getConteoDestacadosController)
   .get("/:id_producto", getProductoByIdController)
-  .post("/crear", createProductoController)
-  .put('/:id_producto', updateProductoController)
   .put('/:id_producto/destacado', toggleDestacadoController)
-  .delete('/:id_producto', deleteProductoController);
+  .delete('/:id_producto', deleteProductoController)
+  .patch("/:id_producto/stock", updateProductoStockController)
+  // Rutas para crear y actualizar productos solo admin
+  .post("/crear", isAdmin,authenticateJwt, createProductoController)
+  .put('/:id_producto',isAdmin,authenticateJwt, updateProductoController);
 export default router;

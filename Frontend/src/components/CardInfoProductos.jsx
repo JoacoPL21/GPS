@@ -50,8 +50,8 @@ const CardInfoProducto = ({ producto }) => {
 };
 
 const Caracteristica = ({ iconPath, titulo, valor }) => (
-  <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-xl text-center">
-    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+  <div className="bg-[#f5eee7] p-6 rounded-xl text-center">
+    <div className="w-12 h-12 bg-[#a47148] rounded-full flex items-center justify-center mx-auto mb-4">
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
@@ -62,8 +62,8 @@ const Caracteristica = ({ iconPath, titulo, valor }) => (
       </svg>
     </div>
     <h3 className="font-semibold text-gray-800 mb-2">{titulo}</h3>
-    <p className="text-orange-600 font-medium">{valor}</p>
+    <p className="text-[#a47148] font-medium">{valor}</p>
   </div>
-);
+)
 
 export default CardInfoProducto;
