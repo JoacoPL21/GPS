@@ -1,16 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAuth } from "../../context/AuthContext.jsx"
 import { registerDireccion } from "../../services/user.service.js"
 import Swal from "sweetalert2"
 
-const FormDireccionEnvio = () => {
-  const { authUser } = useAuth()
+// En el componente FormDireccionEnvio, agregar el prop onDireccionAdded
+const FormDireccionEnvio = ({ onDireccionAdded }) => {
   const [success, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [form, setForm] = useState({
-    id_usuario: authUser?.id_usuario || "",
     calle: "",
     numero: "",
     ciudad: "",
@@ -41,14 +39,34 @@ const FormDireccionEnvio = () => {
     }))
   }
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    // Validar que todos los campos requeridos estén completos
+    if (!form.calle || !form.numero || !form.ciudad || !form.region || !form.codigo_postal) {
+      Swal.fire({
+        title: "Campos incompletos",
+        text: "Por favor completa todos los campos requeridos.",
+        icon: "warning",
+        confirmButtonText: "Aceptar",
+      })
+      return
+    }
+
     setIsLoading(true)
     try {
-      const response = await registerDireccion(data)
+      console.log('Enviando datos de dirección:', form)
+      const response = await registerDireccion(form)
+      console.log('Respuesta del servidor:', response)
+      
       if (response.status === "Success") {
-        setSuccess(true)
+        // Notificar al componente padre que se agregó una nueva dirección
+        if (onDireccionAdded) {
+          onDireccionAdded(response.data)
+        }
+
+        // Limpiar formulario y mostrar éxito
         setForm({
-          id_usuario: authUser?.id_usuario || "",
           calle: "",
           numero: "",
           ciudad: "",
@@ -56,11 +74,25 @@ const FormDireccionEnvio = () => {
           codigo_postal: "",
           tipo_de_direccion: "predeterminada",
         })
+        
+        setSuccess(true)
       } else {
         console.error("Error al registrar la dirección:", response.message)
+        Swal.fire({
+          title: "Error",
+          text: response.message || "No se pudo registrar la dirección",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        })
       }
     } catch (error) {
       console.error("Error al enviar el formulario:", error)
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al registrar la dirección. Por favor intenta nuevamente.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -83,10 +115,7 @@ const FormDireccionEnvio = () => {
 
       {/* Formulario */}
       <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          handleSubmit(form)
-        }}
+        onSubmit={handleSubmit}
         className="p-6"
       >
         <div className="grid md:grid-cols-2 gap-6">
