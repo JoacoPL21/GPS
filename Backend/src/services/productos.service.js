@@ -184,6 +184,7 @@ export const updateProductoService = async (id_producto, productoData) => {
 export const deleteProductoService = async (id_producto) => {
     try {
         const productosRepository = AppDataSource.getRepository(Productos);
+        const valoracionesRepository = AppDataSource.getRepository("Valoraciones");
 
         // Verificar si el producto existe
         const productoExistente = await productosRepository.findOne({
@@ -197,6 +198,9 @@ export const deleteProductoService = async (id_producto) => {
                 data: null
             };
         }
+
+        // Eliminar valoraciones asociadas
+        await valoracionesRepository.delete({ id_producto: parseInt(id_producto) });
 
         // Eliminar el producto
         await productosRepository.remove(productoExistente);
@@ -216,6 +220,8 @@ export const deleteProductoService = async (id_producto) => {
         };
     }
 };
+
+
 
 //Funcion para traer productos destacados
 export async function getProductosDestacados() {

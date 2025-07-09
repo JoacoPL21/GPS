@@ -44,12 +44,12 @@ function ProductosManagerConnected() {
   }, []);
 
   useEffect(() => {
-  console.log("productosAll actualizado:", productosAll)
-}, [productosAll])
+    console.log("productosAll actualizado:", productosAll)
+  }, [productosAll])
 
 
-  
-console.log("produtosAll antes del render:", productosAll)
+
+  console.log("produtosAll antes del render:", productosAll)
 
   const { categorias, loading: categoriasLoading, addCategoria, editCategoria, removeCategoria } = useCategorias()
 
@@ -71,7 +71,7 @@ console.log("produtosAll antes del render:", productosAll)
   const [submitting, setSubmitting] = useState(false)
   const [categoriasSet, setCategorias] = useState([])
   const [loadingCategorias, setLoadingCategorias] = useState(false)
-  
+
   useEffect(() => {
     fetchCategorias()
   }, [])
@@ -122,13 +122,13 @@ console.log("produtosAll antes del render:", productosAll)
 
   // Estadísticas calculadas
   const stats = useMemo(() => {
-  const total = productosAll.length;
-  const active = productosAll.filter((p) => p.estado === "activo").length;
-  const lowStock = productosAll.filter((p) => p.stock <= 5).length;
-  const totalValue = productosAll.reduce((sum, p) => sum + p.precio * p.stock, 0);
+    const total = productosAll.length;
+    const active = productosAll.filter((p) => p.estado === "activo").length;
+    const lowStock = productosAll.filter((p) => p.stock <= 5).length;
+    const totalValue = productosAll.reduce((sum, p) => sum + p.precio * p.stock, 0);
 
-  return { total, active, lowStock, totalValue };
-}, [productosAll]);
+    return { total, active, lowStock, totalValue };
+  }, [productosAll]);
 
 
   // Productos filtrados y ordenados
@@ -341,11 +341,13 @@ console.log("produtosAll antes del render:", productosAll)
         response = await editProducto(editingId, form)
         if (response.success) {
           Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
+          await fetchProductos()
         }
       } else {
         response = await addProducto(form)
         if (response.success) {
           Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
+          await fetchProductos()
         }
       }
 
@@ -364,6 +366,7 @@ console.log("produtosAll antes del render:", productosAll)
         Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
       }
     } catch (error) {
+      console.log("Error al procesar la solicitud:", error)
       Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
     } finally {
       setSubmitting(false)
@@ -417,14 +420,31 @@ console.log("produtosAll antes del render:", productosAll)
   // Mostrar loading
   if (productosLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando productos...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#fff8f0]">
+        {/* Spinner con animación y sombra */}
+        <div className="relative flex items-center justify-center">
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-orange-500 shadow-lg"></div>
+          {/* Ícono dentro del spinner (puedes cambiar el SVG por uno que te guste) */}
+          <svg
+            className="absolute h-12 w-12 text-orange-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
         </div>
+        {/* Texto con animación de opacidad pulsante */}
+        <p className="mt-6 text-xl font-semibold text-orange-600 animate-pulse">
+          Cargando productos...
+        </p>
       </div>
     )
   }
+
+
 
   // Mostrar error
   if (productosError) {
@@ -444,7 +464,7 @@ console.log("produtosAll antes del render:", productosAll)
       </div>
     )
   }
-console.log("categoriasSet antes del render:", categoriasSet)
+  console.log("categoriasSet antes del render:", categoriasSet)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -457,48 +477,52 @@ console.log("categoriasSet antes del render:", categoriasSet)
         title="Administración de productos"
         subtitle="Gestiona tu inventario de productos"
       />
-      <div className="mt-4 lg:mt-0 flex items-center space-x-4">
-        <button
-          onClick={handleExport}
-          className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <span>Exportar</span>
-        </button>
-        <button
-          onClick={handleAddClick}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <span>Agregar Producto</span>
-        </button>
-        <button
-          onClick={() => setModalCategoriaOpen(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="
-currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 0v4m0-4h4m-4 0H8"
-            />
-          </svg>
-          <span>Agregar Categoría</span>
-        </button>
+      <div className="mt-4 lg:mt-0 flex items-center space-x-4 bg-[#fff8f0]">
+
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 bg-[#fff8f0]">
+        {/* Botones de acción */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <button
+            onClick={handleAddClick}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span>Agregar Producto</span>
+          </button>
+          <button
+            onClick={() => setModalCategoriaOpen(true)}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="
+currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 0v4m0-4h4m-4 0H8"
+              />
+            </svg>
+            <span>Agregar Categoría</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-lime-500 to-green-500 text-white rounded-xl hover:from-lime-600 hover:to-green-600 transition-all shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span>Exportar</span>
+          </button>
+        </div>
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -611,8 +635,8 @@ currentColor" viewBox="0 0 24 24">
                 <button
                   onClick={toggleSelectionMode}
                   className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-colors ${selectionMode
-                      ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                    ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                     }`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -894,8 +918,8 @@ currentColor" viewBox="0 0 24 24">
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${productosAll.estado === "activo"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
                             }`}
                         >
                           {productosAll.estado}
