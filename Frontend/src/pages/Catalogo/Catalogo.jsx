@@ -4,7 +4,6 @@ import { useState, useMemo } from "react"
 import { useCart } from "../../context/CartContext.jsx"
 import { useProductos } from "../../hooks/productos/useProductos"
 import CardCatalogo from "../../components/CardCatalogo.jsx"
-import PageHeader from "../../components/PageHeader"
 
 const CatalogoConnected = () => {
   const { productos, loading, error } = useProductos()
@@ -14,7 +13,7 @@ const CatalogoConnected = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("nombre")
   const [sortOrder, setSortOrder] = useState("asc")
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 })
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 50000 })
   const [viewMode, setViewMode] = useState("grid")
   const [showFilters, setShowFilters] = useState(false)
   const [addedToCart, setAddedToCart] = useState(null)
@@ -97,14 +96,29 @@ const CatalogoConnected = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header del Catálogo */}
-      <PageHeader
-        breadcrumbs={[
-          { label: "Inicio", to: "/" },
-          { label: "Catálogo" }
-        ]}
-        title="Nuestro Catálogo"
-        subtitle="Descubre todas nuestras artesanías únicas en madera"
-      />
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {/* Breadcrumbs */}
+          <nav className="text-sm text-gray-500 mb-4">
+            <span>Inicio</span> <span className="mx-2">/</span>{" "}
+            <span className="text-orange-600 font-medium">Catálogo</span>
+          </nav>
+
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">Nuestro Catálogo</h1>
+              <p className="text-gray-600">Descubre todas nuestras artesanías únicas en madera</p>
+            </div>
+            <div className="mt-4 md:mt-0 flex items-center space-x-4">
+              <div className="bg-gradient-to-r from-amber-100 to-orange-100 px-4 py-2 rounded-full">
+                <span className="text-sm font-medium text-gray-700">
+                  {loading ? "..." : `${filteredAndSortedProducts.length} productos`}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Barra de herramientas */}
@@ -132,14 +146,6 @@ const CatalogoConnected = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
               />
-            </div>
-
-            <div className="mt-4 md:mt-0 flex items-center space-x-4">
-              <div className="bg-gradient-to-r from-amber-100 to-orange-100 px-4 py-2 rounded-full">
-                <span className="text-sm font-medium text-gray-700">
-                  {loading ? "..." : `${filteredAndSortedProducts.length} productos`}
-                </span>
-              </div>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -233,7 +239,7 @@ const CatalogoConnected = () => {
                       placeholder="Máx"
                       value={priceRange.max}
                       onChange={(e) =>
-                        setPriceRange((prev) => ({ ...prev, max: Number.parseInt(e.target.value) || 1000000 }))
+                        setPriceRange((prev) => ({ ...prev, max: Number.parseInt(e.target.value) || 50000 }))
                       }
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     />
@@ -243,7 +249,7 @@ const CatalogoConnected = () => {
                   <button
                     onClick={() => {
                       setSearchTerm("")
-                      setPriceRange({ min: 0, max: 1000000 })
+                      setPriceRange({ min: 0, max: 50000 })
                       setSortBy("nombre")
                       setSortOrder("asc")
                     }}
@@ -357,3 +363,4 @@ const CatalogoConnected = () => {
 
 
 export default CatalogoConnected
+

@@ -1,24 +1,36 @@
 "use client"
 
 import { useAuth } from "../../context/AuthContext.jsx"
-import { getUserDirecciones, deleteDireccion } from "../../services/user.service.js"
+import { getUserDirecciones, deleteDireccion, updateUserProfile } from "../../services/user.service.js"
 import swal from "sweetalert2"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import FormDireccionEnvio from "./DirectionForm.jsx"
+import EditProfileModal from "../../components/EditProfileModal.jsx"
 
 const Profile = () => {
-  const { authUser, refreshUserProfile } = useAuth()
+  const { authUser, updateUser } = useAuth()
   const [direcciones, setDirecciones] = useState([])
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  
+  console.log("authUser", authUser);
+  
+  // Función helper para obtener el ID del usuario (compatible con ambos formatos)
+  const getUserId = (user) => user?.id || user?.id_usuario;
 
   // Función para cargar direcciones
-  const fetchDirecciones = async () => {
-    if (!authUser?.id) return
+  const fetchDirecciones = useCallback(async () => {
+    const userId = getUserId(authUser);
+    if (!userId) {
+      console.log("No hay ID de usuario disponible");
+      return;
+    }
 
     setIsLoadingDirecciones(true)
     try {
       const response = await getUserDirecciones()
+      console.log("Respuesta de direcciones:", response);
+      
       if (response.status === "Success") {
         setDirecciones(response.data || [])
       } else {
@@ -31,7 +43,7 @@ const Profile = () => {
     } finally {
       setIsLoadingDirecciones(false)
     }
-  }
+  }, [authUser])
 
   // Función para eliminar una dirección
   const handleDeleteDireccion = async (direccionId) => {
@@ -80,16 +92,28 @@ const Profile = () => {
     }
   }
 
-  // Función para actualizar el perfil del usuario
-  const handleRefreshProfile = async () => {
-    setIsRefreshing(true)
+
+
+  // Función para actualizar perfil
+  const handleProfileUpdate = async (updateData) => {
     try {
-      const updatedUser = await refreshUserProfile()
-      if (updatedUser) {
+      const response = await updateUserProfile(updateData)
+      if (response.status === "Success") {
+        // Actualizar el contexto de autenticación con los nuevos datos
+        const updatedUserData = { ...authUser, ...updateData }
+        updateUser(updatedUserData)
+        
         swal.fire({
-          title: "Éxito",
-          text: "Perfil actualizado correctamente.",
+          title: "¡Perfil actualizado!",
+          text: "Tu información ha sido actualizada correctamente.",
           icon: "success",
+          confirmButtonText: "Aceptar",
+        })
+      } else {
+        swal.fire({
+          title: "Error",
+          text: response.message || "No se pudo actualizar el perfil",
+          icon: "error",
           confirmButtonText: "Aceptar",
         })
       }
@@ -97,12 +121,10 @@ const Profile = () => {
       console.error("Error al actualizar perfil:", error)
       swal.fire({
         title: "Error",
-        text: "No se pudo actualizar el perfil.",
+        text: "Ocurrió un error al actualizar el perfil",
         icon: "error",
         confirmButtonText: "Aceptar",
       })
-    } finally {
-      setIsRefreshing(false)
     }
   }
 
@@ -113,7 +135,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchDirecciones()
-  }, [authUser?.id])
+  }, [fetchDirecciones])
 
   const getInitials = (name) => {
     return name
@@ -213,26 +235,25 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* Botón actualizar perfil */}
+                {/* Botón para editar perfil */}
                 <div className="mt-6">
                   <button
-                    onClick={handleRefreshProfile}
-                    disabled={isRefreshing}
-                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white px-4 py-3 rounded-xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                   >
-                    {isRefreshing ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span>Actualizando...</span>
-                      </div>
-                    ) : (
-                      "Actualizar Perfil"
-                    )}
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <span>Editar Perfil</span>
                   </button>
                 </div>
+
+               
               </div>
             </div>
           </div>
@@ -375,6 +396,14 @@ const Profile = () => {
         <div className="mt-8">
           <FormDireccionEnvio onDireccionAdded={handleDireccionAdded} />
         </div>
+
+        {/* Modal para editar perfil */}
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          userProfile={authUser}
+          onProfileUpdated={handleProfileUpdate}
+        />
       </div>
     </div>
   )

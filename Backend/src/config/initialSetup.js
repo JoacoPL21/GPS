@@ -9,7 +9,7 @@ import Compra_Producto from '../entity/compra_producto.entity.js';
 import Envios from '../entity/envio.entity.js';
 import Valoraciones from '../entity/valoraciones.entity.js';
 import { encryptPassword } from '../helpers/bcrypt.helper.js';
-import Direccion from '../entity/direccion.entity.js';
+
 
 async function createUser() {
   try {
@@ -28,7 +28,6 @@ async function createUser() {
         telefono: "966433091",
         password: await encryptPassword("admin123"),
         rol: "admin",
-        id_direccion:1
         
       }))
 
@@ -87,7 +86,7 @@ async function createProductos() {
         prom_valoraciones: 3,
         stock: 10,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "activo",
+        estado: "disponible",
         image_url: "jardinera.jpg",
         id_categoria:3
       })),
@@ -97,7 +96,7 @@ async function createProductos() {
         prom_valoraciones: 3,
         stock: 10,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "activo",
+        estado: "disponible",
         image_url: "macetero.webp",
         id_categoria:3
       })),
@@ -107,7 +106,7 @@ async function createProductos() {
         prom_valoraciones: 3,
         stock: 10,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "activo",
+        estado: "disponible",
         image_url: "medallero.webp",
         id_categoria:2
       })),
@@ -117,7 +116,7 @@ async function createProductos() {
         prom_valoraciones: 5,
         stock: 20,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "activo",
+        estado: "disponible",
         image_url:"escaño.webp",
         id_categoria:2
       })),
@@ -126,7 +125,7 @@ async function createProductos() {
         precio: 69990,
         stock: 5,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "activo",
+        estado: "disponible",
         image_url:"mesacentro.webp",
         id_categoria:2
       })),
@@ -301,34 +300,6 @@ async function createValoraciones() {
   }
 }
 
-async function createDireccion() {
 
-  try {
-    const DireccionRepository = AppDataSource.getRepository(Direccion);
 
-    const count = await DireccionRepository.count();
-    if (count > 0) {
-      console.log(chalk.yellow("ℹ️  Direcciones ya existen. Se omite creación."));
-      return;
-    }
-
-    await Promise.all([
-      DireccionRepository.save(DireccionRepository.create({
-        calle: "Calle 123",
-        numero: 123,
-        ciudad: "Santiago",
-        region: "Region Metropolitana",
-        codigo_postal: "4100000",
-        tipo_de_direccion: "predeterminada",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-    ]);
-
-    console.log(chalk.green("✅ Direcciones creadas exitosamente."));
-  } catch (error) {
-    console.error(chalk.red("❌ Error al crear Direcciones:", error));
-  }
-}
-
-export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones, createDireccion };
+export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones};
