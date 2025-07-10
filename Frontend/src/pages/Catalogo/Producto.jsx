@@ -107,6 +107,7 @@ if (!producto) {
 }
 
 return (
+<>
 <div className="min-h-screen bg-gradient-to-br from-[#f5eee7] to-[#f0e6dd]">
   <div className="bg-white shadow-sm border-b">
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -236,6 +237,9 @@ return (
     <CardInfoProducto producto={producto} />
   </div>
 </div>
+{producto?.id_producto && (
+      <ValoracionesProducto id_producto={producto.id_producto} />
+    )}</>
   )
 }
 

@@ -11,7 +11,7 @@ export async function getProductosDisponibles() {
         const productoRepository = AppDataSource.getRepository(Productos);
         const productos = await productoRepository.find({
             where: {
-                estado: "disponible",
+                estado: "activo",
             },
             relations: ["categoria"]
         });
@@ -36,12 +36,40 @@ export async function getProductosDisponibles() {
     }
 }
 
+export async function getProductos() {
+  try {
+    const productos = await AppDataSource.getRepository(Productos).find({
+      relations: ["categoria"],
+    });
+
+    const productosData = productos.map(producto => ({
+      id_producto: producto.id_producto,
+      prom_valoraciones: producto.prom_valoraciones,
+      nombre: producto.nombre,
+      precio: producto.precio,
+      stock: producto.stock,
+      descripcion: producto.descripcion,
+      estado: producto.estado,
+      destacado: producto.destacado,
+      imagen: producto.image_url,
+      categoria: producto.categoria?.nombre
+    }));
+
+    return productosData;
+  } catch (error) {
+    console.error("Error al obtener productos all Bknd:", error);
+    throw new Error("Error al obtener productos");
+  }
+}
+
+
+
 //Funcion para traer UN producto por ID
 export async function getProductoById(id) {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
         const producto = await productoRepository.findOne({
-            where: { id_producto: id, estado: "disponible" },
+            where: { id_producto: id, estado: "activo" },
             relations: ["categoria"]
         });
 
@@ -195,7 +223,7 @@ export async function getProductosDestacados() {
         const productoRepository = AppDataSource.getRepository(Productos);
         const productos = await productoRepository.find({
             where: {
-                estado: "disponible",
+                estado: "activo",
                 destacado: true,
             },
             relations: ["categoria"],
@@ -229,7 +257,7 @@ export async function getUltimosProductos(limit = 4) {
         const productoRepository = AppDataSource.getRepository(Productos);
         const productos = await productoRepository.find({
             where: {
-                estado: "disponible",
+                estado: "activo",
             },
             relations: ["categoria"],
             order: {
