@@ -1,12 +1,12 @@
-import { useState,useEffect } from "react";
-import {useAuth} from "../../context/AuthContext.jsx";
-import { registerDireccion } from "../../services/user.service.js";
-import Swal from "sweetalert2";
+"use client"
 
+import { useState, useEffect } from "react"
+import { registerDireccion } from "../../services/user.service.js"
+import Swal from "sweetalert2"
 
-const FormDireccionEnvio=()=> {
-  const { authUser } = useAuth();
-  const [success,setSuccess] = useState(false);
+// En el componente FormDireccionEnvio, agregar el prop onDireccionAdded
+const FormDireccionEnvio = ({ onDireccionAdded }) => {
+  const [success, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [form, setForm] = useState({
     calle: "",
@@ -15,7 +15,7 @@ const FormDireccionEnvio=()=> {
     region: "",
     codigo_postal: "",
     tipo_de_direccion: "predeterminada",
-  });
+  })
 
   useEffect(() => {
     if (success) {
@@ -72,8 +72,10 @@ const FormDireccionEnvio=()=> {
           ciudad: "",
           region: "",
           codigo_postal: "",
-          tipo_de_direccion:  "predeterminada",
-        });
+          tipo_de_direccion: "predeterminada",
+        })
+        
+        setSuccess(true)
       } else {
         console.error("Error al registrar la dirección:", response.message)
         Swal.fire({

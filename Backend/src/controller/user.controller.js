@@ -1,4 +1,4 @@
-import { getAllUsersService,registerDireccionService,getDireccionByUserIdService,deleteDireccionByUserIdService } from '../services/user.service.js';
+import { getAllUsersService,registerDireccionService,getDireccionByUserIdService,deleteDireccionByUserIdService, getUserProfileService, updateUserProfileService } from '../services/user.service.js';
 import { handleSuccess, handleErrorServer } from '../handlers/responseHandlers.js';
 import { direccionValidation } from '../validations/auth.validation.js';
 export async function getAllUsers(req, res) {
@@ -103,5 +103,55 @@ export async function deleteDireccionByUserId(req, res) {
         handleErrorServer(res, 500, error.message);
     }
 }
+
+export const getUserProfileDetailed = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        const [userProfile, error] = await getUserProfileService(userId);
+        if (error) {
+            return res.status(404).json({ message: error.message });
+        }
+        
+        handleSuccess(res, 200, "Perfil de usuario obtenido correctamente", userProfile);
+    } catch (error) {
+        console.error('Error al obtener perfil del usuario:', error);
+        handleErrorServer(res, 500, error.message);
+    }
+};
+
+export const updateUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const updateData = req.body;
+        
+        // Validar que no se intente actualizar campos sensibles
+        const prohibitedFields = ['password', 'id_usuario', 'rol'];
+        const hasProhibitedFields = prohibitedFields.some(field => field in updateData);
+        
+        if (hasProhibitedFields) {
+            return res.status(400).json({ 
+                message: 'No se pueden actualizar campos sensibles como contraseña, ID o rol' 
+            });
+        }
+        
+        // Validar que al menos haya un campo para actualizar
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ 
+                message: 'Debe proporcionar al menos un campo para actualizar' 
+            });
+        }
+        
+        const [updatedProfile, error] = await updateUserProfileService(userId, updateData);
+        if (error) {
+            return res.status(404).json({ message: error.message });
+        }
+        
+        handleSuccess(res, 200, "Perfil actualizado correctamente", updatedProfile);
+    } catch (error) {
+        console.error('Error al actualizar perfil del usuario:', error);
+        handleErrorServer(res, 500, error.message);
+    }
+};
 
 

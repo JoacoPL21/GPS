@@ -43,6 +43,7 @@ const Direcciones = new EntitySchema({
             type: "enum",
             enum: ["predeterminada","opcional"],
             nullable: false,
+
         },
         createdAt: {
             type: "timestamp",

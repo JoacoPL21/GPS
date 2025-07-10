@@ -1,6 +1,6 @@
 "use client"
 import { Dialog, Transition } from "@headlessui/react"
-import { Fragment, useState, useEffect } from "react"
+import { Fragment, useState } from "react"
 import Swal from "sweetalert2"
 
 const CategoriasModal = ({
@@ -12,9 +12,7 @@ const CategoriasModal = ({
   onDeleteCategoria,
   loading,
 }) => {
-  
-console.log("Prop categorias en modal:", categorias)
-  const [form, setForm] = useState({ nombre: ""})
+  const [form, setForm] = useState({ nombre: "", descripcion: "" })
   const [editingId, setEditingId] = useState(null)
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -52,7 +50,7 @@ console.log("Prop categorias en modal:", categorias)
       }
 
       if (response.success) {
-        setForm({ nombre: ""})
+        setForm({ nombre: "", descripcion: "" })
         setEditingId(null)
         setErrors({})
         Swal.fire(
@@ -73,6 +71,7 @@ console.log("Prop categorias en modal:", categorias)
   const handleEdit = (categoria) => {
     setForm({
       nombre: categoria.nombre,
+      descripcion: categoria.descripcion || "",
     })
     setEditingId(categoria.id_categoria)
   }
@@ -100,20 +99,10 @@ console.log("Prop categorias en modal:", categorias)
   }
 
   const resetForm = () => {
-    setForm({ nombre: ""})
+    setForm({ nombre: "", descripcion: "" })
     setEditingId(null)
     setErrors({})
   }
-
-  useEffect(() => {
-  if (editingId) {
-    const cat = categorias.find((c) => c.id_categoria === editingId)
-    if (cat) {
-      setForm({ nombre: cat.nombre }) // actualizar el form si el nombre cambió
-    }
-  }
-}, [categorias, editingId])
-
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -242,6 +231,9 @@ console.log("Prop categorias en modal:", categorias)
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
                                   <h4 className="font-semibold text-gray-800">{categoria.nombre}</h4>
+                                  {categoria.descripcion && (
+                                    <p className="text-sm text-gray-600 mt-1">{categoria.descripcion}</p>
+                                  )}
                                   <p className="text-xs text-gray-500 mt-1">
                                     {categoria.total_productos || 0} productos
                                   </p>
