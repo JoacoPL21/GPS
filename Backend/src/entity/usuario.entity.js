@@ -39,7 +39,7 @@ const Usuarios = new EntitySchema({
         },
         id_direccion: {
             type: "int",
-            nullable: true,
+            nullable: false,
         },
         createdAt: {
             type: "timestamp",

@@ -15,6 +15,38 @@ export async function getProductosDisponibles() {
   }
 }
 
+export async function getProductos() {
+  try {
+    const response = await axios.get("/productos/all");
+    return {
+      success: true,
+      data: response.data.data, // Suponiendo que usas handleSuccess que envuelve en `.data`
+    };
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    return {
+      success: false,
+      error: error.response?.data || "Error desconocido al obtener productos",
+    };
+  }
+}
+
+const fetchProductos = async () => {
+  setLoading(true);
+  const response = await getProductos();
+
+  if (response?.data?.data && Array.isArray(response.data.data)) {
+    console.log("productosAll cargado:", response.data.data);
+    setProductosAll(response.data.data);
+  } else {
+    console.error("La respuesta no tiene un array válido");
+    setProductosAll([]);
+  }
+
+  setLoading(false);
+};
+
+
 export async function getProductosDestacados() {
   try {
     const response = await axios.get("/productos/destacados")
@@ -71,29 +103,14 @@ export async function createProducto(productoData) {
 
 export async function updateProducto(id_producto, productoData) {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
-
-    // Formatear datos si es necesario
-    const formattedData = typeof productoData === 'object' ? 
-      formatProductoData(productoData) : productoData;
-
-    const response = await axios.put(`/productos/${id_producto}`, formattedData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    return { data: response.data, error: null };
+    const response = await axios.put(`/productos/${id_producto}`, productoData)
+    return { data: response.data, error: null }
   } catch (error) {
-    console.error("Error al actualizar producto:", error);
+    console.error("Error al actualizar producto:", error)
     return {
       data: null,
-      error: error.response?.data?.message || error.message || "Error al actualizar producto",
-    };
+      error: error.response ? error.response.data : "Error al actualizar producto",
+    }
   }
 }
 
@@ -115,7 +132,7 @@ export async function deleteProducto(id_producto) {
 export async function getCategorias() {
   try {
     const response = await axios.get("/categorias/")
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al obtener categorías:", error)
     return {
@@ -128,7 +145,7 @@ export async function getCategorias() {
 export async function createCategoria(categoriaData) {
   try {
     const response = await axios.post("/categorias/crear", categoriaData)
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al crear categoría:", error)
     return {
@@ -141,7 +158,7 @@ export async function createCategoria(categoriaData) {
 export async function updateCategoria(id, categoriaData) {
   try {
     const response = await axios.put(`/categorias/${id}`, categoriaData)
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al actualizar categoría:", error)
     return {
@@ -154,7 +171,7 @@ export async function updateCategoria(id, categoriaData) {
 export async function deleteCategoria(id) {
   try {
     const response = await axios.delete(`/categorias/${id}`)
-    return { data: response.data, error: null }
+    return { success:true, data: response.data }
   } catch (error) {
     console.error("Error al eliminar categoría:", error)
     return {
@@ -172,19 +189,13 @@ export const handleApiError = (error, defaultMessage = "Ha ocurrido un error") =
 }
 
 export const formatProductoData = (formData, categorias = []) => {
-  // Buscar tanto "categoria" como "id_categoria"
-  let id_categoria = formData.id_categoria || formData.categoria;
+  // Si se envía un nombre de categoría, buscar su ID
+  let id_categoria = formData.categoria
 
   if (isNaN(id_categoria)) {
     // Es un nombre, buscar el ID
-    const categoria = categorias.find((cat) => cat.nombre === id_categoria);
-    id_categoria = categoria ? categoria.id_categoria : null;
-  }
-
-  // Verificar que id_categoria sea válido antes de parseInt
-  if (!id_categoria || id_categoria === null) {
-    console.error('Error: id_categoria no válido:', id_categoria);
-    return null; // O lanzar un error
+    const categoria = categorias.find((cat) => cat.nombre === formData.categoria)
+    id_categoria = categoria ? categoria.id_categoria : null
   }
 
   return {
@@ -193,9 +204,9 @@ export const formatProductoData = (formData, categorias = []) => {
     precio: Number.parseFloat(formData.precio),
     stock: Number.parseInt(formData.stock),
     id_categoria: Number.parseInt(id_categoria),
-    estado: formData.estado || "disponible",
+    estado: formData.estado || "activo",
     image_url: formData.image_url || null,
-  };
+  }
 }
 
 export async function getConteoProductosDestacados() {
