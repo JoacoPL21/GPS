@@ -71,14 +71,29 @@ export async function createProducto(productoData) {
 
 export async function updateProducto(id_producto, productoData) {
   try {
-    const response = await axios.put(`/productos/${id_producto}`, productoData)
-    return { data: response.data, error: null }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    // Formatear datos si es necesario
+    const formattedData = typeof productoData === 'object' ? 
+      formatProductoData(productoData) : productoData;
+
+    const response = await axios.put(`/productos/${id_producto}`, formattedData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return { data: response.data, error: null };
   } catch (error) {
-    console.error("Error al actualizar producto:", error)
+    console.error("Error al actualizar producto:", error);
     return {
       data: null,
-      error: error.response ? error.response.data : "Error al actualizar producto",
-    }
+      error: error.response?.data?.message || error.message || "Error al actualizar producto",
+    };
   }
 }
 
@@ -157,13 +172,19 @@ export const handleApiError = (error, defaultMessage = "Ha ocurrido un error") =
 }
 
 export const formatProductoData = (formData, categorias = []) => {
-  // Si se envía un nombre de categoría, buscar su ID
-  let id_categoria = formData.categoria
+  // Buscar tanto "categoria" como "id_categoria"
+  let id_categoria = formData.id_categoria || formData.categoria;
 
   if (isNaN(id_categoria)) {
     // Es un nombre, buscar el ID
-    const categoria = categorias.find((cat) => cat.nombre === formData.categoria)
-    id_categoria = categoria ? categoria.id_categoria : null
+    const categoria = categorias.find((cat) => cat.nombre === id_categoria);
+    id_categoria = categoria ? categoria.id_categoria : null;
+  }
+
+  // Verificar que id_categoria sea válido antes de parseInt
+  if (!id_categoria || id_categoria === null) {
+    console.error('Error: id_categoria no válido:', id_categoria);
+    return null; // O lanzar un error
   }
 
   return {
@@ -174,7 +195,7 @@ export const formatProductoData = (formData, categorias = []) => {
     id_categoria: Number.parseInt(id_categoria),
     estado: formData.estado || "disponible",
     image_url: formData.image_url || null,
-  }
+  };
 }
 
 export async function getConteoProductosDestacados() {

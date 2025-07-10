@@ -12,7 +12,7 @@ router
   .put('/:id_producto/destacado', toggleDestacadoController)
   .delete('/:id_producto', deleteProductoController)
   .patch("/:id_producto/stock", updateProductoStockController)
-  // Rutas para crear y actualizar productos solo admin
-  .post("/crear", isAdmin,authenticateJwt, createProductoController)
-  .put('/:id_producto',isAdmin,authenticateJwt, updateProductoController);
+  // Rutas para crear y actualizar productos solo admin (ORDEN CORREGIDO)
+  .post("/crear", authenticateJwt, isAdmin, createProductoController)
+  .put('/:id_producto', authenticateJwt, isAdmin, updateProductoController);
 export default router;

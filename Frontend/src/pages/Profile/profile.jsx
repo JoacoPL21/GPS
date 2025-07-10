@@ -12,10 +12,10 @@ const Profile = () => {
   const [direcciones, setDirecciones] = useState([])
   const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-
+  console.log("authUser", authUser);
   // Función para cargar direcciones
   const fetchDirecciones = useCallback(async () => {
-    if (!authUser?.id) return
+    if (!authUser?.id_usuario) return
 
     setIsLoadingDirecciones(true)
     try {
@@ -32,7 +32,7 @@ const Profile = () => {
     } finally {
       setIsLoadingDirecciones(false)
     }
-  }, [authUser?.id])
+  }, [authUser?.id_usuario])
 
   // Función para eliminar una dirección
   const handleDeleteDireccion = async (direccionId) => {
@@ -124,7 +124,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchDirecciones()
-  }, [authUser?.id, fetchDirecciones])
+  }, [authUser?.id_usuario, fetchDirecciones])
 
   const getInitials = (name) => {
     return name

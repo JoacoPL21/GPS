@@ -1,5 +1,5 @@
 "use strict";
-import { getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados,updateProductoStock } from "../services/productos.service.js";
+import { getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados, updateProductoStock } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
 
@@ -137,7 +137,7 @@ export async function getProductosDestacadosController(req, res) {
   try {
     // Primero intentar obtener productos destacados
     const [productosDestacados, errorDestacados] = await getProductosDestacados();
-    
+
     if (errorDestacados) {
       return handleErrorClient(res, 400, errorDestacados);
     }
@@ -149,7 +149,7 @@ export async function getProductosDestacadosController(req, res) {
 
     // Si no hay productos destacados, devolver los últimos 4 productos
     const [ultimosProductos, errorUltimos] = await getUltimosProductos(4);
-    
+
     if (errorUltimos) {
       return handleErrorClient(res, 400, errorUltimos);
     }
@@ -164,7 +164,7 @@ export async function getProductosDestacadosController(req, res) {
 export async function toggleDestacadoController(req, res) {
   try {
     const { id_producto } = req.params;
-    
+
     if (!id_producto || isNaN(id_producto)) {
       return handleErrorClient(res, 400, "ID de producto inválido");
     }
