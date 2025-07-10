@@ -95,32 +95,3 @@ export const getUserProfileService = async (userId) => {
         return [null, { message: 'Error interno del servidor' }];
     }
 };
-
-export const updateUserProfileService = async (userId, updateData) => {
-    try {
-        const userRepository = AppDataSource.getRepository(Usuarios);
-        
-        // Buscar el usuario por ID
-        const user = await userRepository.findOne({
-            where: { id_usuario: userId }
-        });
-        
-        if (!user) {
-            return [null, { message: 'Usuario no encontrado' }];
-        }
-        
-        // Actualizar los campos del usuario
-        Object.assign(user, updateData);
-        
-        // Guardar los cambios
-        const updatedUser = await userRepository.save(user);
-        
-        // Excluir la contraseña de la respuesta
-        const { password, ...userProfile } = updatedUser;
-        
-        return [userProfile, null];
-    } catch (error) {
-        console.error('Error al actualizar perfil del usuario:', error);
-        return [null, { message: 'Error interno del servidor' }];
-    }
-};
