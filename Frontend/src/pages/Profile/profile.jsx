@@ -12,14 +12,25 @@ const Profile = () => {
   const [direcciones, setDirecciones] = useState([])
   const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  
   console.log("authUser", authUser);
+  
+  // Función helper para obtener el ID del usuario (compatible con ambos formatos)
+  const getUserId = (user) => user?.id || user?.id_usuario;
+
   // Función para cargar direcciones
   const fetchDirecciones = useCallback(async () => {
-    if (!authUser?.id_usuario) return
+    const userId = getUserId(authUser);
+    if (!userId) {
+      console.log("No hay ID de usuario disponible");
+      return;
+    }
 
     setIsLoadingDirecciones(true)
     try {
       const response = await getUserDirecciones()
+      console.log("Respuesta de direcciones:", response);
+      
       if (response.status === "Success") {
         setDirecciones(response.data || [])
       } else {
@@ -32,7 +43,7 @@ const Profile = () => {
     } finally {
       setIsLoadingDirecciones(false)
     }
-  }, [authUser?.id_usuario])
+  }, [authUser])
 
   // Función para eliminar una dirección
   const handleDeleteDireccion = async (direccionId) => {
@@ -124,7 +135,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchDirecciones()
-  }, [authUser?.id_usuario, fetchDirecciones])
+  }, [fetchDirecciones])
 
   const getInitials = (name) => {
     return name
