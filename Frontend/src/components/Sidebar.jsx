@@ -17,23 +17,20 @@ export default function Sidebar({ isOpen, toggle }) {
           }`}
       >
         <ul className="p-6 space-y-4">
+          {authUser?.rol === "admin" && (
+            <h2 className="text-center text-lg font-bold text-gray-500">Cliente</h2>
+          )}
           <li><Link to="/" onClick={toggle} className="sidebar_text hover:underline">Inicio</Link></li>
           <li><Link to="/catalogo" onClick={toggle} className="sidebar_text hover:underline">Catálogo</Link></li>
           <li><Link to="/#nosotros" onClick={toggle} className="sidebar_text hover:underline">Nosotros</Link></li>
           <li><Link to="/#contacto" onClick={toggle} className="sidebar_text hover:underline">Contacto</Link></li>
-          {!isAuthenticated && (
-            <li>
-              <Link to="/login" onClick={toggle} className="sidebar_text hover:underline">
-                Iniciar Sesión
-              </Link>
-            </li>
+          {authUser?.rol === "admin" && (
+            <h2 className="text-center text-lg font-bold mt-10 text-gray-500">Administración</h2>
           )}
 
           {authUser?.rol === "admin" && (
             <li>
-              <a href="/productos" onClick={toggle} className="sidebar_text hover:underline">
-                Productos
-              </a>
+              <Link to="/productos" onClick={toggle} className="sidebar_text hover:underline">Productos</Link>
             </li>
           )}
         </ul>
