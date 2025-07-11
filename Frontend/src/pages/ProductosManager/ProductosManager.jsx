@@ -43,13 +43,7 @@ function ProductosManagerConnected() {
     fetchProductos();
   }, []);
 
-  useEffect(() => {
-  console.log("productosAll actualizado:", productosAll)
-}, [productosAll])
-
-
-  
-console.log("produtosAll antes del render:", productosAll)
+  console.log("produtosAll antes del render:", productosAll)
 
   const { categorias, loading: categoriasLoading, addCategoria, editCategoria, removeCategoria } = useCategorias()
 
@@ -71,7 +65,7 @@ console.log("produtosAll antes del render:", productosAll)
   const [submitting, setSubmitting] = useState(false)
   const [categoriasSet, setCategorias] = useState([])
   const [loadingCategorias, setLoadingCategorias] = useState(false)
-  
+
   useEffect(() => {
     fetchCategorias()
   }, [])
@@ -122,20 +116,20 @@ console.log("produtosAll antes del render:", productosAll)
 
   // Estadísticas calculadas
   const stats = useMemo(() => {
-  const total = productosAll.length;
-  const active = productosAll.filter((p) => p.estado === "activo").length;
-  const lowStock = productosAll.filter((p) => p.stock <= 5).length;
-  const totalValue = productosAll.reduce((sum, p) => sum + p.precio * p.stock, 0);
+    const total = productosAll.length;
+    const active = productosAll.filter((p) => p.estado === "activo").length;
+    const lowStock = productosAll.filter((p) => p.stock <= 5).length;
+    const totalValue = productosAll.reduce((sum, p) => sum + p.precio * p.stock, 0);
 
-  return { total, active, lowStock, totalValue };
-}, [productosAll]);
-
+    return { total, active, lowStock, totalValue };
+  }, [productosAll]);
 
   // Productos filtrados y ordenados
   const filteredAndSortedProducts = useMemo(() => {
     const filtered = productosAll.filter((producto) => {
       const matchesSearch =
-        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesCategory = !filterCategory || producto.categoria === filterCategory
       const matchesStatus = !filterStatus || producto.estado === filterStatus
 
@@ -341,11 +335,13 @@ console.log("produtosAll antes del render:", productosAll)
         response = await editProducto(editingId, form)
         if (response.success) {
           Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
+          await fetchProductos()
         }
       } else {
         response = await addProducto(form)
         if (response.success) {
           Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
+          await fetchProductos()
         }
       }
 
@@ -364,49 +360,12 @@ console.log("produtosAll antes del render:", productosAll)
         Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
       }
     } catch (error) {
+      console.log("Error al procesar la solicitud:", error)
       Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
     } finally {
       setSubmitting(false)
     }
   }
-
-  const handleCategoriaSubmit = async (e) => {
-    e.preventDefault()
-    const validationErrors = validate()
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
-    }
-    setSubmitting(true)
-    try {
-      let response
-      if (editingId) {
-        response = await editCategoria(editingId, form)
-        if (response.success) {
-          Swal.fire("¡Actualizado!", "La categoría ha sido actualizada.", "success")
-        }
-      } else {
-        response = await addCategoria(form)
-        if (response.success) {
-          Swal.fire("¡Agregada!", "La categoría ha sido agregada.", "success")
-        }
-      }
-      if (response.success) {
-        setForm({
-          nombre: ""
-        })
-        setEditingId(null)
-        setModalOpen(false)
-      } else {
-        Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
-      }
-    } catch (error) {
-      Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
 
   const categoriasManagement = {
     add: addCategoria,
@@ -417,11 +376,26 @@ console.log("produtosAll antes del render:", productosAll)
   // Mostrar loading
   if (productosLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando productos...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#fff8f0]">
+        {/* Spinner con animación y sombra */}
+        <div className="relative flex items-center justify-center">
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-orange-500 shadow-lg"></div>
+          {/* Ícono dentro del spinner (puedes cambiar el SVG por uno que te guste) */}
+          <svg
+            className="absolute h-12 w-12 text-orange-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
         </div>
+        {/* Texto con animación de opacidad pulsante */}
+        <p className="mt-6 text-xl font-semibold text-orange-600 animate-pulse">
+          Cargando productos...
+        </p>
       </div>
     )
   }
@@ -444,7 +418,7 @@ console.log("produtosAll antes del render:", productosAll)
       </div>
     )
   }
-console.log("categoriasSet antes del render:", categoriasSet)
+  console.log("categoriasSet antes del render:", categoriasSet)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -457,48 +431,52 @@ console.log("categoriasSet antes del render:", categoriasSet)
         title="Administración de productos"
         subtitle="Gestiona tu inventario de productos"
       />
-      <div className="mt-4 lg:mt-0 flex items-center space-x-4">
-        <button
-          onClick={handleExport}
-          className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <span>Exportar</span>
-        </button>
-        <button
-          onClick={handleAddClick}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <span>Agregar Producto</span>
-        </button>
-        <button
-          onClick={() => setModalCategoriaOpen(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="
-currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 0v4m0-4h4m-4 0H8"
-            />
-          </svg>
-          <span>Agregar Categoría</span>
-        </button>
+      <div className="mt-4 lg:mt-0 flex items-center space-x-4 bg-[#fff8f0]">
+
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 bg-[#fff8f0]">
+        {/* Botones de acción */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <button
+            onClick={handleAddClick}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span>Agregar Producto</span>
+          </button>
+          <button
+            onClick={() => setModalCategoriaOpen(true)}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 0v4m0-4h4m-4 0H8"
+              />
+            </svg>
+            <span>Agregar Categoría</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-lime-500 to-green-500 text-white rounded-xl hover:from-lime-600 hover:to-green-600 transition-all shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span>Exportar</span>
+          </button>
+        </div>
+        
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -610,10 +588,11 @@ currentColor" viewBox="0 0 24 24">
               <div className="flex items-center space-x-2">
                 <button
                   onClick={toggleSelectionMode}
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-colors ${selectionMode
+                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-colors ${
+                    selectionMode
                       ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    }`}
+                  }`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -697,8 +676,9 @@ currentColor" viewBox="0 0 24 24">
               <div className="flex bg-gray-100 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-colors ${viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
-                    }`}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
+                  }`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -711,8 +691,9 @@ currentColor" viewBox="0 0 24 24">
                 </button>
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`p-2 rounded-lg transition-colors ${viewMode === "table" ? "bg-white shadow-sm" : "hover:bg-gray-200"
-                    }`}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === "table" ? "bg-white shadow-sm" : "hover:bg-gray-200"
+                  }`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -800,17 +781,17 @@ currentColor" viewBox="0 0 24 24">
         {/* Lista de productos */}
         {viewMode === "grid" ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredAndSortedProducts.map((productosAll) => (
+            {filteredAndSortedProducts.map((producto) => (
               <div
-                key={productosAll.id_producto}
-                onClick={() => handleCardClick(productosAll.id_producto)}
+                key={producto.id_producto}
+                onClick={() => handleCardClick(producto.id_producto)}
                 className={`${selectionMode ? "cursor-pointer" : ""}`}
               >
                 <ProductoCard
-                  producto={productosAll}
+                  producto={producto}
                   onEditar={handleEdit}
                   onEliminar={handleDelete}
-                  isSelected={isProductSelected(productosAll.id_producto)}
+                  isSelected={isProductSelected(producto.id_producto)}
                   selectionMode={selectionMode}
                 />
               </div>
@@ -858,47 +839,50 @@ currentColor" viewBox="0 0 24 24">
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredAndSortedProducts.map((productosAll) => (
+                  {filteredAndSortedProducts.map((producto) => (
                     <tr
-                      key={productosAll.id_producto}
-                      className={`hover:bg-gray-50 transition-colors ${selectionMode ? "cursor-pointer" : ""} ${isProductSelected(productosAll.id_producto) ? "bg-blue-50 border-l-4 border-blue-500" : ""
-                        }`}
-                      onClick={() => handleTableRowClick(productosAll)}
+                      key={producto.id_producto}
+                      className={`hover:bg-gray-50 transition-colors ${selectionMode ? "cursor-pointer" : ""} ${
+                        isProductSelected(producto.id_producto) ? "bg-blue-50 border-l-4 border-blue-500" : ""
+                      }`}
+                      onClick={() => handleTableRowClick(producto)}
                     >
                       {selectionMode && (
                         <td className="px-6 py-4">
                           <input
                             type="checkbox"
-                            checked={isProductSelected(productosAll.id_producto)}
-                            onChange={() => handleCardClick(productosAll.id_producto)}
+                            checked={isProductSelected(producto.id_producto)}
+                            onChange={() => handleCardClick(producto.id_producto)}
                             className="w-5 h-5 text-orange-600 bg-white border-gray-300 rounded focus:ring-orange-500"
                           />
                         </td>
                       )}
                       <td className="px-6 py-4">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{productosAll.nombre}</div>
-                          <div className="text-sm text-gray-500">{productosAll.descripcion}</div>
+                          <div className="text-sm font-medium text-gray-900">{producto.nombre}</div>
+                          <div className="text-sm text-gray-500">{producto.descripcion}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{productosAll.categoria}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">${productosAll.precio.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{producto.categoria}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">${producto.precio.toLocaleString()}</td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${productosAll.stock <= 5 ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
-                            }`}
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            producto.stock <= 5 ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                          }`}
                         >
-                          {productosAll.stock}
+                          {producto.stock}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${productosAll.estado === "activo"
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            producto.estado === "activo"
                               ? "bg-green-100 text-green-800"
                               : "bg-gray-100 text-gray-800"
-                            }`}
+                          }`}
                         >
-                          {productosAll.estado}
+                          {producto.estado}
                         </span>
                       </td>
                       {!selectionMode && (
@@ -916,7 +900,7 @@ currentColor" viewBox="0 0 24 24">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation()
-                                handleDelete(productosAll.id_producto)
+                                handleDelete(producto.id_producto)
                               }}
                               className="text-red-600 hover:text-red-900 transition-colors"
                             >
@@ -976,7 +960,7 @@ currentColor" viewBox="0 0 24 24">
             descripcion: "",
             precio: "",
             stock: "",
-            categoria: "",
+            id_categoria: "",
             estado: "",
           })
           setEditingId(null)
@@ -993,14 +977,14 @@ currentColor" viewBox="0 0 24 24">
         onManageCategorias={categoriasManagement}
       />
 
-      {/* Modal de categoría */}
+      {/* Modal de categorías */}
       <CategoriasModal
         isOpen={modalCategoriaOpen}
         onClose={() => setModalCategoriaOpen(false)}
         categorias={categoriasSet}
-        onAddCategoria={handleAddCategoria}
-        onEditCategoria={handleEditCategoria}
-        onDeleteCategoria={handleDeleteCategoria}
+        onAdd={handleAddCategoria}
+        onEdit={handleEditCategoria}
+        onDelete={handleDeleteCategoria}
         loading={loadingCategorias}
       />
     </div>
