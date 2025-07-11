@@ -5,13 +5,13 @@ import Categorias from "../entity/categoria.entity.js";
 
 
 
-//Funcion para traer productos con estado Disponible Funcional
+//Funcion para traer productos con estado Activo
 export async function getProductosDisponibles() {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
         const productos = await productoRepository.find({
             where: {
-                estado: "disponible",
+                estado: "activo",
             },
             relations: ["categoria"]
         });
@@ -36,12 +36,39 @@ export async function getProductosDisponibles() {
     }
 }
 
+//Funcion para traer todos los productos
+export async function getProductos() {
+  try {
+    const productos = await AppDataSource.getRepository(Productos).find({
+      relations: ["categoria"],
+    });
+
+    const productosData = productos.map(producto => ({
+      id_producto: producto.id_producto,
+      prom_valoraciones: producto.prom_valoraciones,
+      nombre: producto.nombre,
+      precio: producto.precio,
+      stock: producto.stock,
+      descripcion: producto.descripcion,
+      estado: producto.estado,
+      destacado: producto.destacado,
+      imagen: producto.image_url,
+      categoria: producto.categoria?.nombre
+    }));
+
+    return productosData;
+  } catch (error) {
+    console.error("Error al obtener productos all Bknd:", error);
+    throw new Error("Error al obtener productos");
+  }
+}
+
 //Funcion para traer UN producto por ID
 export async function getProductoById(id) {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
         const producto = await productoRepository.findOne({
-            where: { id_producto: id, estado: "disponible" },
+            where: { id_producto: id, estado: "activo" },
             relations: ["categoria"]
         });
 
@@ -156,7 +183,6 @@ export const updateProductoService = async (id_producto, productoData) => {
 export const deleteProductoService = async (id_producto) => {
     try {
         const productosRepository = AppDataSource.getRepository(Productos);
-        const valoracionesRepository = AppDataSource.getRepository("Valoraciones");
 
         // Verificar si el producto existe
         const productoExistente = await productosRepository.findOne({
@@ -170,9 +196,6 @@ export const deleteProductoService = async (id_producto) => {
                 data: null
             };
         }
-
-        // Eliminar valoraciones asociadas
-        await valoracionesRepository.delete({ id_producto: parseInt(id_producto) });
 
         // Eliminar el producto
         await productosRepository.remove(productoExistente);
@@ -193,15 +216,13 @@ export const deleteProductoService = async (id_producto) => {
     }
 };
 
-
-
 //Funcion para traer productos destacados
 export async function getProductosDestacados() {
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
         const productos = await productoRepository.find({
             where: {
-                estado: "disponible",
+                estado: "activo",
                 destacado: true,
             },
             relations: ["categoria"],
@@ -235,7 +256,7 @@ export async function getUltimosProductos(limit = 4) {
         const productoRepository = AppDataSource.getRepository(Productos);
         const productos = await productoRepository.find({
             where: {
-                estado: "disponible",
+                estado: "activo",
             },
             relations: ["categoria"],
             order: {

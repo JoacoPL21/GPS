@@ -86,7 +86,7 @@ async function createProductos() {
         prom_valoraciones: 3,
         stock: 10,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "disponible",
+        estado: "activo",
         image_url: "jardinera.jpg",
         id_categoria:3
       })),
@@ -96,7 +96,7 @@ async function createProductos() {
         prom_valoraciones: 3,
         stock: 10,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "disponible",
+        estado: "activo",
         image_url: "macetero.webp",
         id_categoria:3
       })),
@@ -106,7 +106,7 @@ async function createProductos() {
         prom_valoraciones: 3,
         stock: 10,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "disponible",
+        estado: "activo",
         image_url: "medallero.webp",
         id_categoria:2
       })),
@@ -116,7 +116,7 @@ async function createProductos() {
         prom_valoraciones: 5,
         stock: 20,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "disponible",
+        estado: "activo",
         image_url:"escaño.webp",
         id_categoria:2
       })),
@@ -125,7 +125,7 @@ async function createProductos() {
         precio: 69990,
         stock: 5,
         descripcion: "Esta es una descripcion de prueba.",
-        estado: "disponible",
+        estado: "activo",
         image_url:"mesacentro.webp",
         id_categoria:2
       })),

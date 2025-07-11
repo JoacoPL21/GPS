@@ -13,7 +13,6 @@ const CategoriasModal = ({
   loading,
 }) => {
   
-console.log("Prop categorias en modal:", categorias)
   const [form, setForm] = useState({ nombre: ""})
   const [editingId, setEditingId] = useState(null)
   const [errors, setErrors] = useState({})

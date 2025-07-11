@@ -1,5 +1,5 @@
 "use strict";
-import { getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados, updateProductoStock } from "../services/productos.service.js";
+import { getProductos, getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados, updateProductoStock } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
 
@@ -11,6 +11,16 @@ export async function getProductosDisponiblesController(req, res) {
     }
     return handleSuccess(res, 200, "Productos disponibles obtenidos exitosamente", productos);
   } catch (error) {
+    return handleErrorServer(res, 500, "Error interno del servidor al obtener productos");
+  }
+}
+
+export async function getProductosController(req, res) {
+  try {
+    const productos = await getProductos();
+    return handleSuccess(res, 200, "Productos all obtenidos exitosamente", productos); 
+  }
+  catch (error) {
     return handleErrorServer(res, 500, "Error interno del servidor al obtener productos");
   }
 }
