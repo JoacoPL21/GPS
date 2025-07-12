@@ -24,6 +24,13 @@ const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/api";
 const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
 initMercadoPago(mpPublicKey, { locale: "es-CL" });
 
+// Mapeo de códigos de región romanos a números
+const regionRomanToNumber = {
+  'I': '1', 'II': '2', 'III': '3', 'IV': '4', 'V': '5', 'VI': '6', 'VII': '7',
+  'VIII': '8', 'IX': '9', 'X': '10', 'XI': '11', 'XII': '12', 'XIII': '13',
+  'XIV': '14', 'XV': '15', 'XVI': '16'
+};
+
 // Función para formatear precios
 const formatPrice = (price) => {
   return new Intl.NumberFormat("es-CL").format(price);
@@ -390,10 +397,11 @@ function MultiStepCheckout() {
 
   // Consultar cobertura cada vez que cambian región o comuna (y ambos existen)
   useEffect(() => {
-    if (shippingData.regionCode && shippingData.comunaCode) {
-      checkCobertura(shippingData.regionCode, shippingData.comunaCode);
-    }
-  }, [shippingData.regionCode, shippingData.comunaCode]);
+  if (shippingData.regionCode && shippingData.comunaCode) {
+    const regionNumber = regionRomanToNumber[shippingData.regionCode] || shippingData.regionCode;
+    checkCobertura(regionNumber, shippingData.comunaCode);
+  }
+}, [shippingData.regionCode, shippingData.comunaCode]);
 
   const steps = [
     { label: "Carrito", icon: <Package className="w-5 h-5" /> },
