@@ -33,7 +33,11 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
         <div className="flex">
           {/* Imagen del producto */}
           <div className="relative w-48 h-48 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center flex-shrink-0">
-            <div className="text-6xl opacity-30">🪵</div>
+            <img
+              src={producto.imagen }
+              alt={producto.nombre}
+              className="object-contain max-h-40"
+            />
 
             {/* Badge de categoría */}
             <div className="absolute top-3 left-3">
@@ -107,7 +111,11 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group hover:scale-105">
       {/* Imagen del producto */}
       <div className="relative h-64 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-        <div className="text-6xl opacity-30">🪵</div>
+        <img
+          src={producto.imagen }
+          alt={producto.nombre}
+          className="object-contain max-h-44"
+        />
 
         {/* Badge de categoría */}
         <div className="absolute top-3 left-3">
@@ -143,15 +151,12 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
 
       {/* Contenido de la tarjeta */}
       <div className="p-6">
-        {/* Título */}
         <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors">
           {producto.nombre}
         </h3>
 
-        {/* Descripción */}
         <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-2">{producto.descripcion}</p>
 
-        {/* Información del stock */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,7 +170,6 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
             <span className="text-sm text-gray-600">{producto.stock} disponibles</span>
           </div>
 
-          {/* Rating placeholder */}
           <div className="flex items-center space-x-1">
             {[...Array(5)].map((_, i) => (
               <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -176,7 +180,6 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
           </div>
         </div>
 
-        {/* Precio y botón */}
         <div className="flex items-center justify-between">
           <div className="text-2xl font-bold text-orange-600">
             ${producto.precio.toLocaleString()}
@@ -204,7 +207,6 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
           </button>
         </div>
 
-        {/* Información adicional */}
         <div className="mt-4 pt-4 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span>Envío gratis desde $50.000</span>

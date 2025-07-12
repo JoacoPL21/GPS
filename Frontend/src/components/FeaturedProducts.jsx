@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { FaShoppingCart, FaStar, FaHeart } from "react-icons/fa";
 import { useProductosDestacados } from "../hooks/productos/useProductosDestacados";
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
+
 
 function FeaturedProducts() {
   const { productos, loading, error } = useProductosDestacados(4);
@@ -80,7 +80,7 @@ function FeaturedProducts() {
                 <div className="p-0">
                   <div className="relative overflow-hidden">
                     <img
-                      src={`${API_URL}/uploads/${product.image}`}
+                      src={product.image}
                       alt={product.name}
                       width={300}
                       height={300}

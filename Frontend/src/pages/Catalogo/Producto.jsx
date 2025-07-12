@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useProductosbyId from '../../hooks/productos/useProductosId';
 import {useCart} from'../../context/CartContext.jsx';
-import ValoracionesProducto from '../../components/ValoracionesProducto';
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
-import CardInfoProducto from "../../components/CardInfoProductos.jsx"
+import ValoracionesProducto from '../../components/ProductoClientes/ValoracionesProducto';
+import CardInfoProducto from "../../components/ProductoClientes/CardInfoProductos.jsx"
 
-const MINIO_URL = import.meta.env.VITE_MINIO_URL
-console.log("MINIO_URL", MINIO_URL)
+
 
 const Producto = () => {
   const { id_producto: id } = useParams()
@@ -49,44 +47,7 @@ const Producto = () => {
     }
   }
 
-if (loading) {
-  return (
-  <>  
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <nav className="text-sm text-gray-500 mb-4">
-            <span>Inicio</span> <span className="mx-2">/</span>
-            <span>Catálogo</span> <span className="mx-2">/</span>
-            <span className="text-[#a47148] font-medium">Cargando...</span>
-          </nav>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="h-96 lg:h-[600px] bg-gray-200 animate-pulse"></div>
-            <div className="p-8 space-y-6">
-              <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
-              <div className="h-6 bg-gray-200 rounded animate-pulse w-1/2"></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-              <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    {producto?.id_producto && (
-        <ValoracionesProducto id_producto={producto.id_producto} />
-      )}
-  </>
-  )
-}
 
 if (!producto) {
   return (
@@ -107,6 +68,7 @@ if (!producto) {
 }
 
 return (
+<>
 <div className="min-h-screen bg-gradient-to-br from-[#f5eee7] to-[#f0e6dd]">
   <div className="bg-white shadow-sm border-b">
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -154,7 +116,7 @@ return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="relative">
           <img
-            src={`${MINIO_URL}/minio/generar-pre-firma-url/${producto.imagen}`}
+            src={producto.imagen}
             alt={producto.nombre}
             className="w-full h-96 lg:h-[600px] object-cover"
           />
@@ -235,7 +197,10 @@ return (
     </div>
     <CardInfoProducto producto={producto} />
   </div>
-</div>
+  </div>
+    {producto?.id_producto && (
+      <ValoracionesProducto id_producto={producto.id_producto} />
+    )}</>
   )
 }
 
