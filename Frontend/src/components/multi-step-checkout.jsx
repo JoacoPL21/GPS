@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useCart } from "../context/CartContext";
+import RegionComunaSelector from "../components/RegionComunaSelector";
 import {
   Heart,
   Trash2,
@@ -186,6 +187,19 @@ const ShippingForm = ({ shippingData, setShippingData }) => {
         Información de Envío
       </h3>
 
+      {/* Selector región y comuna */}
+      <RegionComunaSelector
+        regionValue={shippingData.regionCode}
+        comunaValue={shippingData.comunaCode}
+        onChange={({ region, comuna }) => {
+          setShippingData(prev => ({
+            ...prev,
+            regionCode: region,
+            comunaCode: comuna,
+          }));
+        }}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -230,37 +244,6 @@ const ShippingForm = ({ shippingData, setShippingData }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Ciudad *
-          </label>
-          <input
-            type="text"
-            value={shippingData.city}
-            onChange={(e) => handleInputChange("city", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            placeholder="Santiago"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Región *
-          </label>
-          <select
-            value={shippingData.region}
-            onChange={(e) => handleInputChange("region", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-          >
-            <option value="">Seleccionar región</option>
-            <option value="metropolitana">Región Metropolitana</option>
-            <option value="valparaiso">Valparaíso</option>
-            <option value="biobio">Biobío</option>
-            <option value="araucania">La Araucanía</option>
-            <option value="los-lagos">Los Lagos</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
             Código Postal
           </label>
           <input
@@ -298,7 +281,7 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
 
       <div className="space-y-3 mb-4">
         {cart.map((item) => (
-          <div key={item.id_producto} className="flex justify-between items-center"> {/* Cambiar item.id por item.id_producto */}
+          <div key={item.id_producto} className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <span className="w-6 h-6 bg-amber-500 text-white text-xs rounded-full flex items-center justify-center">
                 {item.cantidad}
@@ -306,7 +289,7 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
               <span className="text-sm text-gray-700">{item.nombre}</span>
             </div>
             <span className="font-medium">
-                $
+              $
               {formatPrice(
                 Number(item.precio.toString().replace(/\./g, "")) *
                   item.cantidad
@@ -340,7 +323,7 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
             <p>{shippingData.fullName}</p>
             <p>{shippingData.address}</p>
             <p>
-              {shippingData.city}, {shippingData.region}
+              {shippingData.comunaCode}, {shippingData.regionCode}
             </p>
             <p>{shippingData.phone}</p>
           </div>
@@ -352,20 +335,22 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
 
 function MultiStepCheckout() {
   const {
-    cart: carrito, // Usar cart en lugar de carrito
+    cart: carrito,
     addItemToCart,
     removeItemFromCart,
     clearCart,
     total: totalCarrito
-  } = useCart(); // Cambiar useCarrito por useCart
+  } = useCart();
+
+  const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [shippingData, setShippingData] = useState({
     fullName: "",
     phone: "",
     address: "",
-    city: "",
-    region: "",
+    regionCode: "",
+    comunaCode: "",
     postalCode: "",
     instructions: "",
   });
@@ -395,8 +380,8 @@ function MultiStepCheckout() {
   };
 
   const validateShippingData = () => {
-    const required = ["fullName", "phone", "address", "city", "region"];
-    return required.every((field) => shippingData[field].trim() !== "");
+    const required = ["fullName", "phone", "address", "regionCode", "comunaCode"];
+    return required.every((field) => shippingData[field] && shippingData[field].trim() !== "");
   };
 
   const handleNextStep = () => {
@@ -490,10 +475,10 @@ function MultiStepCheckout() {
                     price={Number(item.precio.toString().replace(/\./g, ""))}
                     quantity={item.cantidad || 1}
                     image={item.imagen}
-                    onRemove={() => eliminarDelCarrito(item.id)}
+                    onRemove={() => removeItemFromCart(item.id)}
                     onAddToFavorites={() => handleAddToFavorites(item.id)}
-                    onIncrease={() => aumentarCantidad(item.id)}
-                    onDecrease={() => disminuirCantidad(item.id)}
+                    onIncrease={() => addItemToCart(item)}
+                    onDecrease={() => removeItemFromCart(item.id)}
                   />
                 ))}
 
@@ -576,8 +561,10 @@ function MultiStepCheckout() {
                   <strong>Dirección:</strong> {shippingData.address}
                 </p>
                 <p>
-                  <strong>Ciudad:</strong> {shippingData.city},{" "}
-                  {shippingData.region}
+                  <strong>Región:</strong> {shippingData.regionCode}
+                </p>
+                <p>
+                  <strong>Comuna:</strong> {shippingData.comunaCode}
                 </p>
                 {shippingData.postalCode && (
                   <p>
@@ -616,18 +603,28 @@ function MultiStepCheckout() {
     }
   };
 
+  // Botón "Volver" con lógica de pasos
+  const handleHeaderBack = () => {
+    if (currentStep === 0) {
+      navigate("/");
+    } else {
+      setCurrentStep((prev) => Math.max(prev - 1, 0));
+    }
+  };
+
   return (
     <section className="min-h-screen min-w-screen bg-white py-8 md:py-16">
       <div className="mx-auto max-w-7xl px-4">
         {/* Header */}
         <div className="relative mb-8">
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={handleHeaderBack}
             className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 text-amber-600 hover:text-amber-700"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver
-          </Link>
+          </button>
           <h1 className="text-center text-2xl font-bold text-amber-800">
             Finalizar Compra
           </h1>
