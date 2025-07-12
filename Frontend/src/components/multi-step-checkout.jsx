@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useCart } from "../context/CartContext";
 import RegionComunaSelector from "../components/RegionComunaSelector";
+import { useChilexpressCoverage } from "../hooks/useChilexpressCoverage";
+
 import {
   Heart,
   Trash2,
@@ -173,7 +175,13 @@ const CartItem = ({
   );
 };
 
-const ShippingForm = ({ shippingData, setShippingData }) => {
+const ShippingForm = ({
+  shippingData,
+  setShippingData,
+  cobertura,
+  loadingCobertura,
+  errorCobertura,
+}) => {
   const handleInputChange = (field, value) => {
     setShippingData((prev) => ({
       ...prev,
@@ -192,13 +200,27 @@ const ShippingForm = ({ shippingData, setShippingData }) => {
         regionValue={shippingData.regionCode}
         comunaValue={shippingData.comunaCode}
         onChange={({ region, comuna }) => {
-          setShippingData(prev => ({
+          setShippingData((prev) => ({
             ...prev,
             regionCode: region,
             comunaCode: comuna,
           }));
         }}
       />
+
+      {/* Mensaje de cobertura */}
+      {loadingCobertura && (
+        <p className="text-amber-700 text-sm">Consultando cobertura...</p>
+      )}
+      {errorCobertura && (
+        <p className="text-red-500 text-sm">{errorCobertura}</p>
+      )}
+      {cobertura === true && (
+        <p className="text-green-600 text-sm">¡Cobertura disponible para la comuna seleccionada!</p>
+      )}
+      {cobertura === false && (
+        <p className="text-red-600 text-sm">No hay cobertura en la comuna seleccionada.</p>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -358,6 +380,21 @@ function MultiStepCheckout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Chilexpress coverage hook
+  const {
+    loading: loadingCobertura,
+    error: errorCobertura,
+    cobertura,
+    checkCobertura,
+  } = useChilexpressCoverage();
+
+  // Consultar cobertura cada vez que cambian región o comuna (y ambos existen)
+  useEffect(() => {
+    if (shippingData.regionCode && shippingData.comunaCode) {
+      checkCobertura(shippingData.regionCode, shippingData.comunaCode);
+    }
+  }, [shippingData.regionCode, shippingData.comunaCode]);
+
   const steps = [
     { label: "Carrito", icon: <Package className="w-5 h-5" /> },
     { label: "Información de Envío", icon: <MapPin className="w-5 h-5" /> },
@@ -392,6 +429,12 @@ function MultiStepCheckout() {
 
     if (currentStep === 1 && !validateShippingData()) {
       setError("Por favor completa todos los campos obligatorios");
+      return;
+    }
+
+    // Solo permite avanzar si hay cobertura
+    if (currentStep === 1 && cobertura === false) {
+      setError("No hay cobertura de Chilexpress para la comuna seleccionada");
       return;
     }
 
@@ -522,6 +565,9 @@ function MultiStepCheckout() {
           <ShippingForm
             shippingData={shippingData}
             setShippingData={setShippingData}
+            cobertura={cobertura}
+            loadingCobertura={loadingCobertura}
+            errorCobertura={errorCobertura}
           />
         );
 
@@ -661,9 +707,14 @@ function MultiStepCheckout() {
                   {currentStep < 2 ? (
                     <button
                       onClick={handleNextStep}
-                      disabled={currentStep === 0 && carrito.length === 0}
+                      disabled={
+                        (currentStep === 0 && carrito.length === 0) ||
+                        (currentStep === 1 && cobertura === false)
+                      }
                       className={`px-8 py-2 rounded-lg text-white transition-colors ${
                         currentStep === 0 && carrito.length === 0
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : currentStep === 1 && cobertura === false
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-amber-600 hover:bg-amber-700"
                       }`}

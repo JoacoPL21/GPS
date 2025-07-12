@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 function transformComunasData(data) {
   return data.map(regionObj => ({
     nombre: regionObj.region,
-    codigo: regionObj.region_number, // o puedes poner un número correlativo si prefieres
+    codigo: regionObj.region_number, 
     comunas: regionObj.provincias.flatMap(prov =>
       prov.comunas.map(c => ({
         comuna: c.name,
