@@ -6,6 +6,7 @@ import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useCart } from "../context/CartContext";
 import RegionComunaSelector from "../components/RegionComunaSelector";
 import { useChilexpressCoverage } from "../hooks/useChilexpressCoverage";
+import ChilexpressRegionComunaSelector from "../components/ChilexpressRegionComunaSelector";
 
 import {
   Heart,
@@ -202,8 +203,9 @@ const ShippingForm = ({
         Información de Envío
       </h3>
 
-      {/* Selector región y comuna */}
-      <RegionComunaSelector
+      
+      {/* Selector región y comuna con datos de Chilexpress */}
+      <ChilexpressRegionComunaSelector
         regionValue={shippingData.regionCode}
         comunaValue={shippingData.comunaCode}
         onChange={({ region, comuna }) => {
@@ -398,7 +400,8 @@ function MultiStepCheckout() {
   // Consultar cobertura cada vez que cambian región o comuna (y ambos existen)
   useEffect(() => {
   if (shippingData.regionCode && shippingData.comunaCode) {
-    const regionNumber = regionRomanToNumber[shippingData.regionCode] || shippingData.regionCode;
+    // Convertir regionId de Chilexpress a número
+    const regionNumber = shippingData.regionCode.replace('R', '').replace('M', '13');
     checkCobertura(regionNumber, shippingData.comunaCode);
   }
 }, [shippingData.regionCode, shippingData.comunaCode]);
@@ -675,6 +678,7 @@ function MultiStepCheckout() {
             type="button"
             onClick={handleHeaderBack}
             className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 text-amber-600 hover:text-amber-700"
+            style={{ backgroundColor: "white" }}
           >
             <ArrowLeft className="h-4 w-4" />
             Volver

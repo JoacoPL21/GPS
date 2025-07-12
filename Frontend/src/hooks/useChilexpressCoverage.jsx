@@ -1,26 +1,23 @@
 import { useState } from "react";
 
-/**
- * Hook para consultar la cobertura Chilexpress de una comuna específica
- * @returns {Object} { loading, error, cobertura, checkCobertura }
- */
 export function useChilexpressCoverage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cobertura, setCobertura] = useState(null);
+  const [coberturaData, setCoberturaData] = useState(null);
 
-  /**
-   * Consulta la cobertura para una región y comuna usando tu backend
-   * @param {string} regionCode
-   * @param {string} comunaCode
-   */
   const checkCobertura = async (regionCode, comunaCode) => {
     setLoading(true);
     setError(null);
     setCobertura(null);
+    setCoberturaData(null);
 
     try {
-      const url = `/api/chilexpress/cobertura?regionCode=${regionCode}&comunaCode=${comunaCode}`;
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const url = `${apiUrl}/chilexpress/cobertura?regionCode=${regionCode}&comunaCode=${comunaCode}`;
+      
+      console.log('Consultando:', url);
+      
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -29,6 +26,11 @@ export function useChilexpressCoverage() {
 
       const data = await response.json();
       setCobertura(data.cobertura ?? false);
+      setCoberturaData(data.data || null);
+      
+      if (!data.cobertura && data.message) {
+        setError(data.message);
+      }
     } catch (err) {
       setError(err.message ?? "Error desconocido consultando cobertura");
       setCobertura(false);
@@ -37,5 +39,5 @@ export function useChilexpressCoverage() {
     }
   };
 
-  return { loading, error, cobertura, checkCobertura };
+  return { loading, error, cobertura, coberturaData, checkCobertura };
 }

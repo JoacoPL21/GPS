@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:10000',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       }
     },
     allowedHosts: ['localhost', 'eccomerce-cyizlkvn3-tyrf1ngs-projects.vercel.app','b896-190-5-38-87.ngrok-free.app']

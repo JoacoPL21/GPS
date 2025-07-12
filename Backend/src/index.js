@@ -25,6 +25,8 @@ import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
 import bodyParser from 'body-parser';
 import { handleWebhook } from './controller/payment.controller.js'; // <-- Importa tu controlador
+import chilexpressRoutes from './routes/chilexpress.js'; // Agregar esta importación
+
 
 async function setupServer() {
   try {
@@ -130,10 +132,11 @@ async function setupServer() {
 
     // Otras rutas
     app.use("/api", indexRoutes);
-    app.use('/api/payments', paymentRoutes); // <-- El webhook ya NO está aquí
+    app.use('/api/payments', paymentRoutes); // 
 
     const uploadPath = path.resolve("src/uploads");
     app.use("/api/uploads", express.static(uploadPath));
+    app.use('/api/chilexpress', chilexpressRoutes); // Agregar esta línea
 
     app.get("/", (req, res) => {
       res.send("Backend funcionando correctamente");
