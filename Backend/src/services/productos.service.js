@@ -2,40 +2,40 @@
 import Productos from "../entity/productos.entity.js";
 import { AppDataSource } from "../config/configDB.js";
 import Categorias from "../entity/categoria.entity.js";
-
-
+import { getUrlImage } from "../services/minio.service.js";
 
 //Funcion para traer productos con estado Activo
 export async function getProductosDisponibles() {
-    try {
-        const productoRepository = AppDataSource.getRepository(Productos);
-        const productos = await productoRepository.find({
-            where: {
-                estado: "activo",
-            },
-            relations: ["categoria"]
-        });
+  try {
+    const productoRepository = AppDataSource.getRepository(Productos);
+    const productos = await productoRepository.find({
+      where: { estado: "activo" },
+      relations: ["categoria"]
+    });
 
+    const productosData = await Promise.all(productos.map(async producto => {
+      const imagenUrlFirmada = await getUrlImage(producto.image_url);
 
-        const productosData = productos.map(producto => ({
-            id_producto: producto.id_producto,
-            prom_valoraciones: producto.prom_valoraciones,
-            nombre: producto.nombre,
-            precio: producto.precio,
-            stock: producto.stock,
-            descripcion: producto.descripcion,
-            estado: producto.estado,
-            destacado: producto.destacado,
-            imagen: producto.image_url,
-            categoria: producto.categoria?.nombre
-        }));
-        return [productosData, null];
-    } catch (error) {
-        console.error("Error al obtener productos disponibles:", error);
-        return [null, "Error al obtener productos disponibles"];
-    }
+      return {
+        id_producto: producto.id_producto,
+        prom_valoraciones: producto.prom_valoraciones,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        stock: producto.stock,
+        descripcion: producto.descripcion,
+        estado: producto.estado,
+        destacado: producto.destacado,
+        imagen: imagenUrlFirmada,
+        categoria: producto.categoria?.nombre
+      };
+    }));
+
+    return [productosData, null];
+  } catch (error) {
+    console.error("Error al obtener productos disponibles:", error);
+    return [null, "Error al obtener productos disponibles"];
+  }
 }
-
 //Funcion para traer todos los productos
 export async function getProductos() {
   try {
@@ -43,7 +43,9 @@ export async function getProductos() {
       relations: ["categoria"],
     });
 
-    const productosData = productos.map(producto => ({
+   const productosData = await Promise.all(productos.map(async producto => {
+    const imagenUrlFirmada = await getUrlImage(producto.image_url);
+    return {
       id_producto: producto.id_producto,
       prom_valoraciones: producto.prom_valoraciones,
       nombre: producto.nombre,
@@ -52,8 +54,9 @@ export async function getProductos() {
       descripcion: producto.descripcion,
       estado: producto.estado,
       destacado: producto.destacado,
-      imagen: producto.image_url,
+      imagen: imagenUrlFirmada,
       categoria: producto.categoria?.nombre
+    };
     }));
 
     return productosData;
@@ -75,7 +78,7 @@ export async function getProductoById(id) {
         if (!producto) {
             return { data: null, error: "Producto no encontrado" };
         }
-
+        const imagenUrlFirmada = await getUrlImage(producto.image_url);
         const productoData = {
             id: producto.id_producto,
             prom_valoraciones: producto.prom_valoraciones,
@@ -85,7 +88,7 @@ export async function getProductoById(id) {
             descripcion: producto.descripcion,
             estado: producto.estado,
             destacado: producto.destacado,
-            imagen: producto.image_url,
+            imagen: imagenUrlFirmada,
             categoria: producto.categoria?.nombre
         };
 
@@ -231,7 +234,10 @@ export async function getProductosDestacados() {
             }
         });
 
-        const productosData = productos.map(producto => ({
+        const productosData = await Promise.all(productos.map(async producto => {
+        const imagenUrlFirmada = await getUrlImage(producto.image_url);
+
+        return {
             id_producto: producto.id_producto,
             prom_valoraciones: producto.prom_valoraciones,
             nombre: producto.nombre,
@@ -240,8 +246,9 @@ export async function getProductosDestacados() {
             descripcion: producto.descripcion,
             estado: producto.estado,
             destacado: producto.destacado,
-            imagen: producto.image_url,
+            imagen:imagenUrlFirmada,
             categoria: producto.categoria?.nombre
+        }
         }));
         return [productosData, null];
     } catch (error) {
@@ -264,8 +271,9 @@ export async function getUltimosProductos(limit = 4) {
             },
             take: limit
         });
-
-        const productosData = productos.map(producto => ({
+        const productosData = await Promise.all(productos.map(async producto => {
+        const imagenUrlFirmada = await getUrlImage(producto.image_url);
+        return {
             id_producto: producto.id_producto,
             prom_valoraciones: producto.prom_valoraciones,
             nombre: producto.nombre,
@@ -274,8 +282,9 @@ export async function getUltimosProductos(limit = 4) {
             descripcion: producto.descripcion,
             estado: producto.estado,
             destacado: producto.destacado,
-            imagen: producto.image_url,
+            imagen: imagenUrlFirmada,
             categoria: producto.categoria?.nombre
+        };
         }));
         return [productosData, null];
     } catch (error) {

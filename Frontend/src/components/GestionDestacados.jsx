@@ -4,7 +4,6 @@ import { useToggleDestacado } from "../hooks/productos/useToggleDestacado";
 import { useConteoDestacados } from "../hooks/productos/useConteoDestacados";
 import { FaStar, FaRegStar, FaEye, FaEyeSlash, FaExclamationTriangle } from "react-icons/fa";
 
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 
 function GestionDestacados() {
   const { productos, loading, error, loadProductos } = useProductos();
@@ -145,7 +144,7 @@ function GestionDestacados() {
               {/* Imagen */}
               <div className="relative">
                 <img
-                  src={`${API_URL}/uploads/${producto.imagen}`}
+                  src={producto.imagen}
                   alt={producto.nombre}
                   className="w-full h-48 object-cover"
                 />

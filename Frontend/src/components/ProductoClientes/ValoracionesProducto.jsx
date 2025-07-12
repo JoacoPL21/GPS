@@ -2,7 +2,7 @@
  * Componente de valoraciones de producto con estética moderna y resumen
  */
 import { useEffect, useState, useMemo } from "react";
-import { getValoracionesPorProducto } from "../services/productos.service";
+import { getValoracionesPorProducto } from "../../services/productos.service";
 import { FaStar } from "react-icons/fa";
 
 const ValoracionesProducto = ({ id_producto }) => {
