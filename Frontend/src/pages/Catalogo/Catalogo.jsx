@@ -52,7 +52,18 @@ const CatalogoConnected = () => {
   }, [productos, searchTerm, sortBy, sortOrder, priceRange])
 
   const handleAddToCart = (producto) => {
-    addItemToCart(producto)
+    // CORRECCIÓN: Normalizar la estructura del producto antes de agregarlo
+    const itemToAdd = {
+      id_producto: producto.id_producto,
+      nombre: producto.nombre,
+      precio: producto.precio,
+      imagen: producto.imagen,
+      categoria: producto.categoria,
+      stock: producto.stock,
+      // No incluir cantidad aquí, el reducer la manejará
+    }
+
+    addItemToCart(itemToAdd)
     setAddedToCart(producto.id_producto)
     console.log(`Producto ${producto.nombre} agregado al carrito`)
 

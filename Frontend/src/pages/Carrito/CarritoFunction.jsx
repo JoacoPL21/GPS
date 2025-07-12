@@ -7,7 +7,7 @@ import {
   DialogTitle,
   Transition
 } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Fragment, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { Link } from 'react-router-dom';
@@ -20,10 +20,26 @@ const MenuCarrito = ({ open, setOpen }) => {
     removeItemFromCart,
     incrementItemQuantity,
     decrementItemQuantity
-    
   } = useCart();
 
+  // CORRECCIÓN: Agregar debounce y prevención de propagación
+  const handleIncrement = useCallback((e, id_producto) => {
+    e.preventDefault();
+    e.stopPropagation();
+    incrementItemQuantity(id_producto);
+  }, [incrementItemQuantity]);
 
+  const handleDecrement = useCallback((e, id_producto) => {
+    e.preventDefault();
+    e.stopPropagation();
+    decrementItemQuantity(id_producto);
+  }, [decrementItemQuantity]);
+
+  const handleRemove = useCallback((e, item) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeItemFromCart(item);
+  }, [removeItemFromCart]);
 
   return (
     <Transition show={open} as={Fragment}>
@@ -114,39 +130,34 @@ const MenuCarrito = ({ open, setOpen }) => {
 
                                     <div className="flex flex-1 items-end justify-between text-sm mt-2">
                                       <div className="flex items-center gap-2">
-                                        <div
-                                          role="button"
-                                          tabIndex={0}
-                                          onClick={() =>
-                                            decrementItemQuantity(item.id_producto)
-                                          }
-                                          className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
+                                        {/* CORRECCIÓN: Agregar prevención de propagación y usar las funciones con callback */}
+                                        <button
+                                          type="button"
+                                          onClick={(e) => handleDecrement(e, item.id_producto)}
+                                          className="px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                          disabled={item.cantidad <= 1}
                                         >
                                           -
-                                        </div>
-                                        <span>{item.cantidad || 1}</span>
-                                        <div
-                                          role="button"
-                                          tabIndex={0}
-                                          onClick={() =>
-                                            incrementItemQuantity(item.id_producto)
-                                          }
-                                         
-                                          className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
+                                        </button>
+                                        <span className="mx-2 min-w-[2rem] text-center">
+                                          {item.cantidad || 1}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => handleIncrement(e, item.id_producto)}
+                                          className="px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500"
                                         >
                                           +
-                                        </div>
+                                        </button>
                                       </div>
 
-                                      <div
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => removeItemFromCart(item)}
-                                       
-                                        className="font-medium border-yellow-600 p-2 border-2 rounded-3xl text-yellow-700 hover:border-red-600 hover:text-red-600 cursor-pointer"
+                                      <button
+                                        type="button"
+                                        onClick={(e) => handleRemove(e, item)}
+                                        className="font-medium border-yellow-600 p-2 border-2 rounded-3xl text-yellow-700 hover:border-red-600 hover:text-red-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500"
                                       >
                                         Eliminar
-                                      </div>
+                                      </button>
                                     </div>
                                   </div>
                                 </li>
@@ -178,16 +189,14 @@ const MenuCarrito = ({ open, setOpen }) => {
                         <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                           <p>
                             o{" "}
-                            <div
-  role="button"
-  tabIndex={0}
-  onClick={() => setOpen(false)}
-  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setOpen(false)}
-  className="font-medium text-yellow-800 cursor-pointer inline"
->
-  Continuar comprando
-  <span aria-hidden="true"> &rarr;</span>
-</div>
+                            <button
+                              type="button"
+                              onClick={() => setOpen(false)}
+                              className="font-medium text-yellow-800 cursor-pointer bg-transparent border-none underline"
+                            >
+                              Continuar comprando
+                              <span aria-hidden="true"> &rarr;</span>
+                            </button>
                           </p>
                         </div>
                       </div>
