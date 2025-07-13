@@ -195,12 +195,14 @@ async function createCompra_Producto() {
         id_compra: 1,
         id_producto: 1,
         cantidad: 1,
+        precio_unitario: 10000,
         createdAt: new Date(),
         updatedAt: new Date()
       })),
       Compra_ProductoRepository.save(Compra_ProductoRepository.create({
         id_compra: 1,
         id_producto: 2,
+        precio_unitario: 20000,
         cantidad: 2,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -209,6 +211,7 @@ async function createCompra_Producto() {
         id_compra: 1,
         id_producto: 3,
         cantidad: 1,
+        precio_unitario: 30000,
         createdAt: new Date(),
         updatedAt: new Date()
       })),

@@ -12,6 +12,7 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
+import MisCompras from "./Profile/MisCompras.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 
 
@@ -60,6 +61,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "mis-compras",
+        element: (
+          <ProtectedRoute>
+            <MisCompras />
           </ProtectedRoute>
         ),
       },
