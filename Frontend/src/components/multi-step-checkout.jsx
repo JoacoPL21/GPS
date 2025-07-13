@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useCart } from "../context/CartContext";
-import RegionComunaSelector from "../components/RegionComunaSelector";
 import { useChilexpressCoverage } from "../hooks/useChilexpressCoverage";
 import ChilexpressRegionComunaSelector from "../components/ChilexpressRegionComunaSelector";
 
@@ -24,13 +23,6 @@ import {
 const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/api";
 const mpPublicKey = import.meta.env.VITE_MP_PUBLIC_KEY;
 initMercadoPago(mpPublicKey, { locale: "es-CL" });
-
-// Mapeo de códigos de región romanos a números
-const regionRomanToNumber = {
-  'I': '1', 'II': '2', 'III': '3', 'IV': '4', 'V': '5', 'VI': '6', 'VII': '7',
-  'VIII': '8', 'IX': '9', 'X': '10', 'XI': '11', 'XII': '12', 'XIII': '13',
-  'XIV': '14', 'XV': '15', 'XVI': '16'
-};
 
 // Función para formatear precios
 const formatPrice = (price) => {
