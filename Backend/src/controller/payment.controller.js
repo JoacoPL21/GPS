@@ -121,16 +121,58 @@ export const handleWebhook = async (req, res) => {
 export const getTransaction = async (req, res) => {
   try {
     const paymentId = req.params.paymentId;
+    
+    console.log('=== GET TRANSACTION DEBUG ===');
+    console.log('Payment ID recibido:', paymentId);
+    console.log('Timestamp:', new Date().toISOString());
+    
+    // Buscar en la base de datos usando el servicio
     const paymentService = new PaymentService();
-    const transaction = await paymentService.getTransactionByPaymentId(paymentId);
-
-    if (!transaction) {
-      return res.status(404).json({ error: 'Transacción no encontrada' });
+    let transaction = await paymentService.getTransactionByPaymentId(paymentId);
+    
+    if (transaction) {
+      console.log('Transacción encontrada en BD:', transaction);
+      return res.status(200).json(transaction);
     }
-
-    res.status(200).json(transaction);
+    
+    // Si no está en BD, consultar directamente a MercadoPago
+    console.log('No encontrado en BD, consultando MercadoPago...');
+    
+    const payment = await mercadoPagoClient.payment.findById(paymentId);
+    
+    if (payment) {
+      console.log('Pago encontrado en MercadoPago:', payment);
+      
+      // Formatear la respuesta
+      const formattedTransaction = {
+        payment_id: payment.id,
+        external_reference: payment.external_reference,
+        amount: payment.transaction_amount,
+        status: payment.status,
+        payment_type: payment.payment_type_id,
+        merchant_order_id: payment.order?.id || payment.merchant_order_id,
+        created_at: payment.date_created,
+        collection_status: payment.collection_status,
+        processing_mode: payment.processing_mode,
+        site_id: payment.site_id
+      };
+      
+      console.log('Respuesta formateada:', formattedTransaction);
+      return res.status(200).json(formattedTransaction);
+    }
+    
+    console.log('No se encontró el pago en MercadoPago');
+    return res.status(404).json({ 
+      error: 'Transacción no encontrada',
+      payment_id: paymentId 
+    });
+    
   } catch (error) {
     console.error('Error al obtener transacción:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      error: 'Error interno del servidor',
+      message: error.message,
+      payment_id: req.params.paymentId
+    });
   }
 };
