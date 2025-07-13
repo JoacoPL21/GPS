@@ -24,8 +24,8 @@ import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
 import bodyParser from 'body-parser';
-import { handleWebhook } from './controller/payment.controller.js'; // <-- Importa tu controlador
-import chilexpressRoutes from './routes/chilexpress.js'; // Agregar esta importación
+import { handleWebhook } from './controller/payment.controller.js'; 
+import chilexpressRoutes from './routes/chilexpress.js'; 
 
 
 async function setupServer() {
@@ -76,10 +76,11 @@ async function setupServer() {
 
     // Configuración CORS igual que antes
     const allowedOrigins = [
-      'http://localhost:5173',
-      'https://eccomerce-tyrf1ngs-projects.vercel.app',
-      'https://eccomerce-frontend.vercel.app'
-    ];
+    'http://localhost:5173',
+    'https://eccomerce-tyrf1ngs-projects.vercel.app',
+    'https://eccomerce-frontend.vercel.app',
+    'https://eccomerce-cf7q5i33e-tyrf1ngs-projects.vercel.app' // ← Agregar este
+];
     const vercelPreviewPattern = /^https:\/\/eccomerce-[a-z0-9]+-tyrf1ngs-projects\.vercel\.app$/;
     const corsMiddleware = cors({
       credentials: true,

@@ -43,10 +43,8 @@ router.get("/cobertura", async (req, res) => {
     });
 
     try {
-        // Usar la URL de producción o desarrollo según el entorno
-        const baseUrl = process.env.NODE_ENV === 'production' 
-            ? 'https://services.wschilexpress.com'
-            : 'https://testservices.wschilexpress.com';
+        // FORZAR uso de URL de desarrollo/test
+        const baseUrl = 'https://testservices.wschilexpress.com';
             
         const url = `${baseUrl}/georeference/api/v1.0/coverage-areas?RegionCode=${chilexpressRegionCode}&type=0`;
         
@@ -93,18 +91,24 @@ router.get("/cobertura", async (req, res) => {
             // Normalizar códigos para comparación
             const normalizeCode = (code) => {
                 if (!code) return null;
-                return parseInt(code.toString().replace(/^0+/, '') || '0', 10);
+                const codeStr = code.toString();
+                if (codeStr.length === 5) {
+                    return parseInt(codeStr.substring(2), 10);
+                }
+                return parseInt(codeStr, 10);
             };
             
             const comunaNormalizada = normalizeCode(comunaCode);
             const areaNormalizada = normalizeCode(area.ineCountyCode);
             
-            return areaNormalizada === comunaNormalizada;
+            // Buscar por código normalizado O por código completo
+            return areaNormalizada === comunaNormalizada || 
+                   area.ineCountyCode?.toString() === comunaCode.toString();
         });
 
         console.log("Detalles de búsqueda:", {
             comunaCodeOriginal: comunaCode,
-            comunaNormalizada: parseInt(comunaCode.toString().replace(/^0+/, '') || '0', 10),
+            comunaNormalizada: parseInt(comunaCode.toString().substring(2), 10),
             totalAreas: data.coverageAreas.length,
             ejemploArea: data.coverageAreas[0] ? {
                 name: data.coverageAreas[0].countyName,
@@ -137,7 +141,7 @@ router.get("/cobertura", async (req, res) => {
                     regionCode: regionCode,
                     chilexpressRegionCode: chilexpressRegionCode,
                     comunaCode: comunaCode,
-                    comunaNormalizada: parseInt(comunaCode.toString().replace(/^0+/, '') || '0', 10),
+                    comunaNormalizada: parseInt(comunaCode.toString().substring(2), 10),
                     totalCoverageAreas: data.coverageAreas.length
                 }
             });
@@ -156,11 +160,15 @@ router.get("/cobertura", async (req, res) => {
 // Endpoint adicional para obtener todas las regiones
 router.get("/regiones", async (req, res) => {
     try {
-        const baseUrl = process.env.NODE_ENV === 'production' 
-            ? 'https://services.wschilexpress.com'
-            : 'https://testservices.wschilexpress.com';
+        console.log("CHILEXPRESS_API_KEY existe:", !!CHILEXPRESS_KEY);
+        console.log("NODE_ENV:", process.env.NODE_ENV);
+        
+        // FORZAR uso de URL de desarrollo/test
+        const baseUrl = 'https://testservices.wschilexpress.com';
             
         const url = `${baseUrl}/georeference/api/v1.0/regions`;
+        
+        console.log("URL de consulta:", url);
         
         const response = await fetch(url, {
             method: 'GET',
@@ -171,11 +179,16 @@ router.get("/regiones", async (req, res) => {
             },
         });
 
+        console.log("Response status:", response.status);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.log("Error response body:", errorText);
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
+        console.log("Respuesta exitosa de Chilexpress");
 
         if (data.statusCode !== 0) {
             return res.status(400).json({ 
@@ -209,9 +222,8 @@ router.get("/areas-cobertura/:regionCode", async (req, res) => {
     const chilexpressRegionCode = regionCodeMap[regionCode] || regionCode;
 
     try {
-        const baseUrl = process.env.NODE_ENV === 'production' 
-            ? 'https://services.wschilexpress.com'
-            : 'https://testservices.wschilexpress.com';
+        // FORZAR uso de URL de desarrollo/test
+        const baseUrl = 'https://testservices.wschilexpress.com';
             
         const url = `${baseUrl}/georeference/api/v1.0/coverage-areas?RegionCode=${chilexpressRegionCode}&type=0`;
         
@@ -225,7 +237,9 @@ router.get("/areas-cobertura/:regionCode", async (req, res) => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error(`Error HTTP ${response.status}:`, errorText);
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
@@ -248,6 +262,18 @@ router.get("/areas-cobertura/:regionCode", async (req, res) => {
             message: err.message
         });
     }
+});
+
+// Endpoint de debug (eliminar después)
+router.get("/debug", async (req, res) => {
+    res.json({
+        NODE_ENV: process.env.NODE_ENV,
+        CHILEXPRESS_KEY_EXISTS: !!process.env.CHILEXPRESS_API_KEY,
+        CHILEXPRESS_KEY_PREVIEW: process.env.CHILEXPRESS_API_KEY ? 
+            `${process.env.CHILEXPRESS_API_KEY.substring(0, 8)}...` : 'NO DEFINIDA',
+        baseUrl: 'https://testservices.wschilexpress.com',
+        timestamp: new Date().toISOString()
+    });
 });
 
 export default router;
