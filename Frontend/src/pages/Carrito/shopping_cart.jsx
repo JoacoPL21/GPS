@@ -29,7 +29,7 @@ const CartItem = ({
     <div className="rounded-lg border border-yellow-600 bg-white p-4 shadow-sm md:p-6">
       <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
         <div className="shrink-0 md:order-1">
-<img className="h-20 w-20" src={`${API_URL}/uploads/${image}`} alt={title} />
+          <img className="h-20 w-20" src={`${API_URL}/uploads/${image}`} alt={title} />
         </div>
 
         <div className="flex items-center justify-between md:order-3 md:justify-end">
@@ -100,11 +100,12 @@ const CartItem = ({
 };
 
 const ShoppingCart = () => {
+  // CORRECCIÓN: Usar las funciones correctas del CartContext
   const { 
     cart: carrito, 
-    removeItem: eliminarDelCarrito,
-    increaseQuantity: aumentarCantidad,
-    decreaseQuantity: disminuirCantidad
+    removeItemFromCart, // Cambiar de 'removeItem' a 'removeItemFromCart'
+    incrementItemQuantity, // Cambiar de 'increaseQuantity' a 'incrementItemQuantity'
+    decrementItemQuantity // Cambiar de 'decreaseQuantity' a 'decrementItemQuantity'
   } = useCart();
   
   const [preferenceId, setPreferenceId] = useState(null);
@@ -166,32 +167,33 @@ const ShoppingCart = () => {
   return (
     <section className="min-h-screen min-w-screen bg-white py-8 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4">
-<div className="relative mb-6 h-10">
-  <Link
-    to="/"
-    className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 hover:text-yellow-900 !no-underline !text-yellow-700"
-  >
-    <ArrowLeft className="h-4 w-4" />
-    Volver
-  </Link>
-  <h2 className="absolute left-1/3 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-semibold text-yellow-900 sm:text-2xl">
-    Carrito de compras
-  </h2>
-</div>
+        <div className="relative mb-6 h-10">
+          <Link
+            to="/"
+            className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 hover:text-yellow-900 !no-underline !text-yellow-700"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver
+          </Link>
+          <h2 className="absolute left-1/3 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-semibold text-yellow-900 sm:text-2xl">
+            Carrito de compras
+          </h2>
+        </div>
 
         <div className="lg:flex lg:gap-8">
           <div className="w-full lg:w-2/3 space-y-6">
             {carrito.map((item) => (
               <CartItem
-                key={item.id}
+                key={item.id_producto} // CORRECCIÓN: Usar id_producto como clave única
                 title={item.nombre}
                 price={formatPrice(Number(item.precio.toString().replace(/\./g, '')))}
                 quantity={item.cantidad || 1}
                 image={item.imagen}
-                onRemove={() => eliminarDelCarrito(item.id)}
-                onAddToFavorites={() => handleAddToFavorites(item.id)}
-                onIncrease={() => aumentarCantidad(item.id)}
-                onDecrease={() => disminuirCantidad(item.id)}
+                // CORRECCIÓN: Pasar el item completo a removeItemFromCart y usar id_producto para las otras funciones
+                onRemove={() => removeItemFromCart(item)}
+                onAddToFavorites={() => handleAddToFavorites(item.id_producto)}
+                onIncrease={() => incrementItemQuantity(item.id_producto)}
+                onDecrease={() => decrementItemQuantity(item.id_producto)}
               />
             ))}
           </div>
@@ -272,3 +274,4 @@ const ShoppingCart = () => {
 };
 
 export default ShoppingCart;
+

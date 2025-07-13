@@ -1,27 +1,29 @@
-"use strict";
+"use strict"
 import { EntitySchema } from "typeorm";
-
-const Servicios = new EntitySchema({
-    name: "Servicio",
-    //nombre de la tabla en la base de datos
-    tableName: "servicios",
+const Compras = new EntitySchema({
+    name: "Compra",
+    tableName: "compras",
     columns: {
-        id_servicio: {
+        id_compra: {
             primary: true,
             type: "int",
             generated: true,
         },
-        nombreServicio: {
+        id_usuario: { 
+            type: "int",
+            nullable: false,
+        },
+        facturacion: {
             type: "varchar",
             length: 100,
             nullable: false,
         },
-        descripcion: {
-            type: "text",
+        estado: {
+            type: "varchar",
+            length: 30,
             nullable: false,
         },
-        
-        id_cliente: {
+        total: {
             type: "int",
             nullable: false,
         },
@@ -37,19 +39,15 @@ const Servicios = new EntitySchema({
             nullable: false,
         },
     },
-
     relations: {
-        //relacion entre servicios y clientes
-        //un servicio pertenece a un cliente
-         cliente: {
-             target: "usuarios",
-             type: "many-to-one",
-                joinColumn: {
-                    name: "id_usuario",
-                    referencedColumnName: "id_usuario",
-                },
-         },
+        Usuarios: {
+            type: "many-to-one",
+            target: "Usuario",
+            joinColumn: {
+                name: "id_usuario",
+            },
+        }
     }
 });
 
-export default Servicios;
+export default Compras;

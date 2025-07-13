@@ -1,4 +1,3 @@
-
 import { EntitySchema } from "typeorm";
 
 const Productos = new EntitySchema({
@@ -19,8 +18,12 @@ const Productos = new EntitySchema({
         length: 255,
         nullable: true,
         },
+        prom_valoraciones: {
+        type: "int",
+        nullable: true
+        },
         precio: {
-        type: "decimal",
+        type: "int",
         },
         stock: {
         type: "int",
@@ -30,6 +33,10 @@ const Productos = new EntitySchema({
         },
         estado: {
         type:"varchar",
+        },
+        destacado: {
+        type: "boolean",
+        default: false,
         },
         id_categoria: {
         type: "int",

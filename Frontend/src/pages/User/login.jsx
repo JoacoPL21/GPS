@@ -15,7 +15,7 @@ const Login = () => {
     inputData
   } = useLogin();
 
-  const {  setIsAuthenticated,isAuthenticated,setAuthUser,authUser } = useAuth();
+  const {  setIsAuthenticated,isAuthenticated,setAuthUser } = useAuth();
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -42,26 +42,32 @@ const Login = () => {
   const loginSubmit = async (data) => {
     try {
       const response = await login(data);
+      console.log('Respuesta del login:', response);
+      
       if (response.status === "Success") {
         setSuccess(true);
         // Actualizar el estado de autenticación
         setIsAuthenticated(true);
         setAuthUser(response.data);
         
-        
-        console.log(authUser);
+        console.log('Usuario autenticado:', response.data);
         navigate("/");
       } else {
+        // Manejar errores de validación del backend
         if (response.data?.dataInfo && response.data?.message) {
           errorData(response.data);
+        } else if (response.dataInfo && response.message) {
+          // Estructura directa del error
+          errorData(response);
         } else {
           errorData({
             dataInfo: "email",
-            message: "Ocurrió un problema al iniciar sesión",
+            message: response.message || "Ocurrió un problema al iniciar sesión",
           });
         }
       }
     } catch (error) {
+      console.error('Error en loginSubmit:', error);
       if (
         error.response?.data?.dataInfo &&
         error.response?.data?.message

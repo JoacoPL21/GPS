@@ -18,15 +18,22 @@ import {
   DB_DATABASE
 } from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
-import { createProductos, createUser, createCategoria } from "./config/initialSetup.js";
+// COMBINAR AMBAS IMPORTACIONES
+import { createProductos, createUser, createCategoria, createCompras, createCompra_Producto, createEnvios, createValoraciones } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
+// MANTENER TUS IMPORTACIONES (pagos y chilexpress)
 import bodyParser from 'body-parser';
 import { handleWebhook } from './controller/payment.controller.js'; 
 import chilexpressRoutes from './routes/chilexpress.js'; 
-
+// MANTENER IMPORTACIONES DE TUS COMPAÑEROS (productos, minIO, etc.)
+import productosRoutes from "./routes/productos.routes.js";
+import categoriasRoutes from "./routes/categorias.routes.js";
+import minioRutes from "./routes/minio.routes.js";
+import valoracionesRoutes from './routes/valoraciones.routes.js';
+import { minioClient } from './config/configMinio.js';
 
 async function setupServer() {
   try {
@@ -76,11 +83,11 @@ async function setupServer() {
 
     // Configuración CORS igual que antes
     const allowedOrigins = [
-    'http://localhost:5173',
-    'https://eccomerce-tyrf1ngs-projects.vercel.app',
-    'https://eccomerce-frontend.vercel.app',
-    'https://eccomerce-cf7q5i33e-tyrf1ngs-projects.vercel.app' // ← Agregar este
-];
+      'http://localhost:5173',
+      'https://eccomerce-tyrf1ngs-projects.vercel.app',
+      'https://eccomerce-frontend.vercel.app',
+      'https://eccomerce-cf7q5i33e-tyrf1ngs-projects.vercel.app'
+    ];
     const vercelPreviewPattern = /^https:\/\/eccomerce-[a-z0-9]+-tyrf1ngs-projects\.vercel\.app$/;
     const corsMiddleware = cors({
       credentials: true,
@@ -131,23 +138,45 @@ async function setupServer() {
     app.use(passport.session());
     passportJwtSetup();
 
-    // Otras rutas
+    // COMBINAR TODAS LAS RUTAS
     app.use("/api", indexRoutes);
-    app.use('/api/payments', paymentRoutes); // 
+    
+    // TUS RUTAS (pagos y chilexpress)
+    app.use('/api/payments', paymentRoutes);
+    app.use('/api/chilexpress', chilexpressRoutes);
+    
+    // RUTAS DE TUS COMPAÑEROS (productos, categorías, etc.)
+    app.use("/api/productos", productosRoutes);
+    app.use("/api/categorias", categoriasRoutes);
+    app.use("/api/valoraciones", valoracionesRoutes);
+    app.use("/api/minio", minioRutes);
 
+    // TU CONFIGURACIÓN DE UPLOADS
     const uploadPath = path.resolve("src/uploads");
     app.use("/api/uploads", express.static(uploadPath));
-    app.use('/api/chilexpress', chilexpressRoutes); // Agregar esta línea
 
+    // RUTA DE PRUEBA MINÍO DE TUS COMPAÑEROS
+    app.get('/api/minio/test', (req, res) => {
+      minioClient.listBuckets((err, buckets) => {
+        if (err) {
+          return res.status(500).json({ message: 'No se pudo conectar a MinIO', error: err.message });
+        }
+        return res.status(200).json({ message: 'Conexión exitosa a MinIO', buckets });
+      });
+    });
+
+    // TU RUTA DE PRUEBA
     app.get("/", (req, res) => {
       res.send("Backend funcionando correctamente");
     });
 
+    // TU MANEJO DE ERRORES
     app.use((err, req, res, next) => {
       console.error('Error global:', err.stack);
       res.status(500).json({ error: 'Algo salió mal' });
     });
 
+    // USAR TUS VARIABLES DE CONFIGURACIÓN
     app.listen(WEB_PORT, WEB_HOST, () => {
       console.log(`=> Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
     });
@@ -163,6 +192,11 @@ async function setupAPI() {
     await createUser();
     await createCategoria();
     await createProductos();
+    // AGREGAR FUNCIONES DE TUS COMPAÑEROS
+    await createCompras();
+    await createCompra_Producto();
+    await createEnvios();
+    await createValoraciones();
   } catch (error) {
     console.log("Error en index.js -> setupAPI(), el error es: ", error);
   }

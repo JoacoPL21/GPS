@@ -1,26 +1,29 @@
 "use strict";
 import { Router } from "express";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
+import { getAllUsers, getUserProfile, registerDireccion, getDireccionByUserId, deleteDireccionByUserId, getUserProfileDetailed, updateUserProfile } from "../controller/user.controller.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
-import {
-  getAllUsers,
-  registerDireccion,
-  getDireccionByUserId,
-  deleteDireccionByUserId
-} from "../controller/user.controller.js";
 
-const router = Router();
+// Router para rutas de usuario autenticado (no requiere permisos de admin)
+const userRouter = Router();
+userRouter.use(authenticateJwt); // Middleware de autenticación
 
-// Middleware aplicado a TODAS las rutas (solo autenticación)
-router.use(authenticateJwt);
+userRouter
+    .get("/profile", getUserProfile)
+    .get("/profile/detailed", getUserProfileDetailed)
+    .put("/profile", updateUserProfile)
+    .post("/direccion", registerDireccion)
+    .get("/direcciones", getDireccionByUserId)
+    .delete("/direccion/:id", deleteDireccionByUserId);
 
-// Ruta específica que requiere admin (obtener todos los usuarios)
-router.get("/", isAdmin, getAllUsers);
+// Router para rutas de administración (requiere permisos de admin)
+const adminRouter = Router();
+adminRouter.use(authenticateJwt); // Middleware de autenticación
+adminRouter.use(isAdmin); // Middleware de autorización
 
-// Rutas de direcciones (accesibles para usuarios normales)
-router
-  .post("/direccion", registerDireccion)
-  .get("/direccion/:id", getDireccionByUserId)
-  .delete("/direccion/:id", deleteDireccionByUserId);
+adminRouter
+    .get("/", getAllUsers);
 
-export default router;
+// Exportar ambos routers
+export { userRouter };
+export default adminRouter;

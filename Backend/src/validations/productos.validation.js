@@ -39,10 +39,10 @@ export const productoCreateValidation = Joi.object({
       "string.base": "La descripción debe ser una cadena de texto",
     }),
   estado: Joi.string()
-    .valid("disponible", "agotado")
+    .valid("activo", "inactivo")
     .required()
     .messages({
-      "any.only": 'El estado debe ser uno de los siguientes valores: "disponible", "agotado"',
+      "any.only": 'El estado debe ser uno de los siguientes valores: "activo", "inactivo"',
       "any.required": "El estado es obligatorio",
       "string.base": "El estado debe ser una cadena de texto",
     }),

@@ -7,22 +7,52 @@ import {
   DialogTitle,
   Transition,
 } from "@headlessui/react";
-import { Fragment } from "react";
+import { Fragment, useCallback } from "react";
 import { X } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { Link } from "react-router-dom";
 const API_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/api";
 
 const MenuCarrito = ({ open, setOpen }) => {
-  const { cart, total, removeItemFromCart, dispatch } = useCart();
+  const {
+    cart,
+    total,
+    removeItemFromCart,
+    incrementItemQuantity,
+    decrementItemQuantity,
+    // MANTENER COMPATIBILIDAD CON TUS FUNCIONES ORIGINALES
+    dispatch,
+    increaseQuantity,
+    decreaseQuantity
+  } = useCart();
 
-  const aumentarCantidad = (id) => {
+  // FUNCIONES OPTIMIZADAS DE TUS COMPAÑEROS (recomendadas)
+  const handleIncrement = useCallback((e, id_producto) => {
+    e.preventDefault();
+    e.stopPropagation();
+    incrementItemQuantity(id_producto);
+  }, [incrementItemQuantity]);
+
+  const handleDecrement = useCallback((e, id_producto) => {
+    e.preventDefault();
+    e.stopPropagation();
+    decrementItemQuantity(id_producto);
+  }, [decrementItemQuantity]);
+
+  const handleRemove = useCallback((e, item) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeItemFromCart(item);
+  }, [removeItemFromCart]);
+
+  // MANTENER TUS FUNCIONES ORIGINALES COMO FALLBACK
+  const aumentarCantidad = useCallback((id) => {
     dispatch({ type: "INCREMENT_QUANTITY", payload: { id } });
-  };
+  }, [dispatch]);
 
-  const disminuirCantidad = (id) => {
+  const disminuirCantidad = useCallback((id) => {
     dispatch({ type: "DECREMENT_QUANTITY", payload: { id } });
-  };
+  }, [dispatch]);
 
   return (
     <Transition show={open} as={Fragment}>
@@ -85,7 +115,7 @@ const MenuCarrito = ({ open, setOpen }) => {
                               className="-my-6 divide-y divide-gray-200"
                             >
                               {cart.map((item) => (
-                                <li key={item.id} className="flex py-6">
+                                <li key={item.id_producto} className="flex py-6">
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img
                                       src={`${API_URL}/uploads/${item.imagen}`}
@@ -113,52 +143,34 @@ const MenuCarrito = ({ open, setOpen }) => {
 
                                     <div className="flex flex-1 items-end justify-between text-sm mt-2">
                                       <div className="flex items-center gap-2">
-                                        <div
-                                          role="button"
-                                          tabIndex={0}
-                                          onClick={() =>
-                                            disminuirCantidad(item.id)
-                                          }
-                                          onKeyDown={(e) =>
-                                            (e.key === "Enter" ||
-                                              e.key === " ") &&
-                                            disminuirCantidad(item.id)
-                                          }
-                                          className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
+                                        {/* USAR FUNCIONES OPTIMIZADAS CON PREVENCIÓN DE PROPAGACIÓN */}
+                                        <button
+                                          type="button"
+                                          onClick={(e) => handleDecrement(e, item.id_producto)}
+                                          className="px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                          disabled={item.cantidad <= 1}
                                         >
                                           -
-                                        </div>
-                                        <span>{item.cantidad || 1}</span>
-                                        <div
-                                          role="button"
-                                          tabIndex={0}
-                                          onClick={() =>
-                                            aumentarCantidad(item.id)
-                                          }
-                                          onKeyDown={(e) =>
-                                            (e.key === "Enter" ||
-                                              e.key === " ") &&
-                                            aumentarCantidad(item.id)
-                                          }
-                                          className="px-2 py-1 bg-yellow-600 p-3 text-white rounded hover:bg-yellow-500 cursor-pointer"
+                                        </button>
+                                        <span className="mx-2 min-w-[2rem] text-center">
+                                          {item.cantidad || 1}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => handleIncrement(e, item.id_producto)}
+                                          className="px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-500"
                                         >
                                           +
-                                        </div>
+                                        </button>
                                       </div>
 
-                                      <div
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => removeItemFromCart(item)}
-                                        onKeyDown={(e) =>
-                                          (e.key === "Enter" ||
-                                            e.key === " ") &&
-                                          removeItemFromCart(item)
-                                        }
-                                        className="font-medium border-yellow-600 p-2 border-2 rounded-3xl text-yellow-700 hover:border-red-600 hover:text-red-600 cursor-pointer"
+                                      <button
+                                        type="button"
+                                        onClick={(e) => handleRemove(e, item)}
+                                        className="font-medium border-yellow-600 p-2 border-2 rounded-3xl text-yellow-700 hover:border-red-600 hover:text-red-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500"
                                       >
                                         Eliminar
-                                      </div>
+                                      </button>
                                     </div>
                                   </div>
                                 </li>
@@ -188,24 +200,17 @@ const MenuCarrito = ({ open, setOpen }) => {
                           </Link>
                         </div>
                         <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
-                          <div>
-                            {" "}
-                            {/* Cambiar <p> por <div> */}o{" "}
-                            <span // Cambiar <div> por <span>
-                              role="button"
-                              tabIndex={0}
+                          <p>
+                            o{" "}
+                            <button
+                              type="button"
                               onClick={() => setOpen(false)}
-                              onKeyDown={(e) =>
-                                (e.key === "Enter" || e.key === " ") &&
-                                setOpen(false)
-                              }
-                              className="font-medium text-yellow-800 cursor-pointer inline"
+                              className="font-medium text-yellow-800 cursor-pointer bg-transparent border-none underline hover:text-yellow-600"
                             >
                               Continuar comprando
                               <span aria-hidden="true"> &rarr;</span>
-                            </span>
-                          </div>{" "}
-                          {/* Cerrar </div> */}
+                            </button>
+                          </p>
                         </div>
                       </div>
                     )}
