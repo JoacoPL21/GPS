@@ -27,7 +27,7 @@ export const cookieKey = process.env.CookieKey;
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export const FRONTEND_URL = NODE_ENV === 'production'
-  ? 'https://eccomerce-80159rg7k-tyrf1ngs-projects.vercel.app' //  URL Frontend en Vercel
+  ? 'https://eccomerce-7vv67gc79-tyrf1ngs-projects.vercel.app' //  URL Frontend en Vercel
   : 'http://localhost:5173';
 
 export const MP_WEBHOOK_URL = NODE_ENV === 'production'
