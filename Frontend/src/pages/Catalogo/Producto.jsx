@@ -4,6 +4,7 @@ import useProductosbyId from '../../hooks/productos/useProductosId';
 import {useCart} from'../../context/CartContext.jsx';
 import ValoracionesProducto from '../../components/ProductoClientes/ValoracionesProducto';
 import CardInfoProducto from "../../components/ProductoClientes/CardInfoProductos.jsx"
+import PageHeader from "../../components/PageHeader"
 
 
 
@@ -70,40 +71,15 @@ if (!producto) {
 return (
 <>
 <div className="min-h-screen bg-gradient-to-br from-[#f5eee7] to-[#f0e6dd]">
-  <div className="bg-white shadow-sm border-b">
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <nav className="text-sm text-gray-500 mb-4">
-        <span>Inicio</span> <span className="mx-2">/</span>
-        <span>Catálogo</span> <span className="mx-2">/</span>
-        <span className="text-[#a47148] font-medium">{producto.nombre}</span>
-      </nav>
-
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Detalle del Producto</h1>
-          <p className="text-gray-600">Artesanía única en madera</p>
-        </div>
-
-        <div className="mt-4 md:mt-0 flex items-center space-x-4">
-          <div className="bg-[#f5eee7] px-4 py-2 rounded-full">
-            <span className="text-sm font-medium text-gray-700">
-              {producto.stock > 0 ? `${producto.stock} disponibles` : "Sin stock"}
-            </span>
-          </div>
-
-          <button
-            onClick={() => window.history.back()}
-            className="flex items-center space-x-2 px-4 py-2 text-[#a47148] hover:bg-[#f0e6dd] rounded-xl transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Volver</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <PageHeader
+  breadcrumbs={[
+    { label: "Inicio", to: "/" },
+    { label: "Catálogo", to: "/catalogo" },
+    { label: producto.nombre }
+  ]}
+  title="Detalle del Producto"
+  subtitle="Artesanía única en madera"
+/>
 
   <div className="max-w-7xl mx-auto px-6 py-8">
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden relative mb-8">
