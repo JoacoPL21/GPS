@@ -11,7 +11,7 @@ import { Fragment, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { Link } from 'react-router-dom';
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
+
 
 const MenuCarrito = ({ open, setOpen }) => {
   const {
@@ -105,7 +105,7 @@ const MenuCarrito = ({ open, setOpen }) => {
                                 <li key={item.id_producto} className="flex py-6">
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img
-                                      src={`${API_URL}/uploads/${item.imagen}`}
+                                      src={item.imagen}
                                       alt={item.nombre}
                                       className="h-full w-full object-cover"
                                     />
