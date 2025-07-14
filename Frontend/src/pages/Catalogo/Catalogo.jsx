@@ -105,7 +105,7 @@ const CatalogoConnected = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+    <div className="bg-gradient-to-br from-amber-50 to-orange-50 min-h-screen">
       {/* Header del Catálogo */}
       <PageHeader
         breadcrumbs={[
@@ -257,7 +257,7 @@ const CatalogoConnected = () => {
                       setSortBy("nombre")
                       setSortOrder("asc")
                     }}
-                    className="px-4 py-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                    className="px-4 py-2 text-[#a47148] hover:bg-orange-50 rounded-lg transition-colors"
                   >
                     Limpiar filtros
                   </button>
@@ -337,21 +337,21 @@ const CatalogoConnected = () => {
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-orange-600">{productos.length}</div>
+                <div className="text-2xl font-bold text-[#a47148]">{productos.length}</div>
                 <div className="text-sm text-gray-600">Total productos</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-orange-600">{filteredAndSortedProducts.length}</div>
+                <div className="text-2xl font-bold text-[#a47148]">{filteredAndSortedProducts.length}</div>
                 <div className="text-sm text-gray-600">Mostrando</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-orange-600">
+                <div className="text-2xl font-bold text-[#a47148]">
                   ${Math.min(...productos.map((p) => p.precio)).toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">Precio mínimo</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-orange-600">
+                <div className="text-2xl font-bold text-[#a47148]">
                   ${Math.max(...productos.map((p) => p.precio)).toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">Precio máximo</div>
