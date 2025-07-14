@@ -1,6 +1,5 @@
 "use strict";
 import Usuario from "../entity/usuario.entity.js";
-import Direccion from "../entity/direccion.entity.js";
 import jwt from "jsonwebtoken";
 import { AppDataSource } from "../config/configDB.js";
 import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
@@ -30,18 +29,29 @@ export async function loginService(user) {
       return [null, createErrorMessage("password", "La contraseña es incorrecta")];
     }
 
-    //
+    
+    // Payload mínimo para el JWT - solo información esencial
     const payload = {
-      nombreCompleto: userFound.nombreCompleto,
+      id: userFound.id_usuario,
       email: userFound.email,
       rol: userFound.rol,
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-      expiresIn: "0.5h", // 30 minutos
+      expiresIn: "1h", // Aumentado a 1 hora para mejor UX
     });
 
-    return [accessToken, null];
+    // Información completa del usuario para el frontend (sin contraseña)
+    const userInfo = {
+      id: userFound.id_usuario,
+      nombreCompleto: userFound.nombreCompleto,
+      email: userFound.email,
+      rol: userFound.rol,
+      telefono: userFound.telefono || "",
+      
+    };
+
+    return [accessToken, null, userInfo];
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     return [null, "Error interno del servidor"];
@@ -52,9 +62,9 @@ export async function loginService(user) {
 export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(Usuario);
-    const direccionRepository = AppDataSource.getRepository(Direccion);
+   
 
-    const { nombreCompleto, telefono, email,direccion } = user;
+    const { nombreCompleto, telefono, email } = user;
     
 
     const createErrorMessage = (dataInfo, message) => ({
@@ -70,23 +80,10 @@ export async function registerService(user) {
     
     if (existingEmailUser) return [null, createErrorMessage("email", "Correo electrónico en uso")];
 
-    // crear una nueva dirección si se proporciona
-    let newDireccion = null;
-    if (direccion) {
-      newDireccion = direccionRepository.create(
-        {
-          calle: direccion.calle,
-          numero: direccion.numero,
-          ciudad: direccion.ciudad,
-          region: direccion.region,
-          pais: direccion.pais,
-          codigo_postal: direccion.codigo_postal,
-          tipo_de_direccion: direccion.tipo_de_direccion
-        }
-      );
-      await direccionRepository.save(newDireccion);
+    if (!nombreCompleto || !email || !user.password) {
+      return [null, createErrorMessage("fields", "Todos los campos son obligatorios")
+      ];
     }
-
     const newUser = userRepository.create({
       nombreCompleto,
       email,

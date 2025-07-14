@@ -1,18 +1,19 @@
-
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './../src/styles/index.css';
 import App from './pages/App.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
+import { initializeAuth } from './services/auth.service.js';
+
+// Inicializar la autenticación al cargar la aplicación
+initializeAuth();
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <CartProvider>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </CartProvider>
-  </StrictMode>
+  // Temporalmente quitar StrictMode para debugging
+  <CartProvider>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </CartProvider>
 );
 

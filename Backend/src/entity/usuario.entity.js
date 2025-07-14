@@ -10,10 +10,6 @@ const Usuarios = new EntitySchema({
             type: "int",
             generated: true,
         },
-        id_direccion: {
-            type: "int",
-            nullable: true,
-        },
         nombreCompleto: { 
             type: "varchar",
             length: 100,
@@ -41,6 +37,10 @@ const Usuarios = new EntitySchema({
             default: "cliente",
             nullable: false,
         },
+        id_direccion: {
+            type: "int",
+            nullable: true,
+        },
         createdAt: {
             type: "timestamp",
             default: () => "CURRENT_TIMESTAMP",
@@ -53,21 +53,15 @@ const Usuarios = new EntitySchema({
             nullable: false,
         },
     },
-
     relations: {
-        direcciones: {
-            type: "one-to-many",
+        Direcciones: {
+            type: "many-to-one",
             target: "Direccion",
-            inverseSide: "usuario",
-            cascade: true,
             joinColumn: {
-                name: "id_usuario",
-                referencedColumnName: "id_usuario",
+                name: "id_direccion",
             },
         },
-    }
-
-   
+    },
 });
 
 export default Usuarios;

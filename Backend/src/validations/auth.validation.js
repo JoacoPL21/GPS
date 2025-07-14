@@ -118,6 +118,15 @@ export const direccionValidation = Joi.object({
       "string.base": "El código postal debe ser una cadena de texto",
 
     }),
+  tipo_de_direccion: Joi.string()
+    .valid("predeterminada", "opcional")
+    .required()
+    .messages({
+      "any.only": "El tipo de dirección debe ser 'predeterminado' u 'opcional'",
+      "any.required": "El tipo de dirección es obligatorio",
+      "string.empty": "El tipo de dirección no puede estar vacío",
+      "string.base": "El tipo de dirección debe ser una cadena de texto",
+    }),
 }).unknown(false).messages({
     "object.unknown": "Los campos adicionales no están permitidos",
     "any.required": "Todos los campos son obligatorios",

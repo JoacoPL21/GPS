@@ -11,6 +11,9 @@ import Error404 from "./Error404.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
+import Profile from "./Profile/profile.jsx";
+import GestionDestacados from "../components/GestionDestacados.jsx";
+
 
 const router = createBrowserRouter([
   {
@@ -21,7 +24,7 @@ const router = createBrowserRouter([
       { path: "", element: <Homepage /> },
       { path: "cart", element: <Cart /> },
       { path: "catalogo", element: <Catalogo /> },
-      { path: "producto/:id_producto", element: <Producto /> }, 
+      { path: "producto/:id_producto", element: <Producto /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "logout", element: <Logout /> },
@@ -34,10 +37,29 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "gestiondestac",
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <GestionDestacados />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "productos",
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
             <Productos />
+          </ProtectedRoute>
+        ),
+      },
+      {
+
+
+
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         ),
       },

@@ -3,14 +3,17 @@ import chalk from 'chalk';
 import { AppDataSource } from './configDB.js';
 import Productos from '../entity/productos.entity.js';
 import Usuarios from '../entity/usuario.entity.js';
-import Direccion from '../entity/direccion.entity.js';
 import Categoria from '../entity/categoria.entity.js';
+import Compras from '../entity/compra.entity.js';
+import Compra_Producto from '../entity/compra_producto.entity.js';
+import Envios from '../entity/envio.entity.js';
+import Valoraciones from '../entity/valoraciones.entity.js';
 import { encryptPassword } from '../helpers/bcrypt.helper.js';
+
 
 async function createUser() {
   try {
     const UserRepository = AppDataSource.getRepository(Usuarios);
-    const DireccionRepository = AppDataSource.getRepository(Direccion);
 
     const count = await UserRepository.count();
     if (count > 0) {
@@ -25,17 +28,9 @@ async function createUser() {
         telefono: "966433091",
         password: await encryptPassword("admin123"),
         rol: "admin",
-        id_direccion: 1
         
-      })),
-      DireccionRepository.save(DireccionRepository.create({
-        calle: "Avnda Los carreras",
-        numero: "505",
-        ciudad: "Concepcion",
-        region: "Biobio",
-        codigo_postal: "1234567",
-        tipo_de_direccion: "envio"
       }))
+
     ]);
 
     console.log(chalk.green("✅ Usuarios creados exitosamente."));
@@ -86,31 +81,53 @@ async function createProductos() {
 
     await Promise.all([
       ProductosRepository.save(ProductosRepository.create({
-        nombre: "Picaro",
-        precio: 12000,
+        nombre: "Jardinera",
+        precio: 79990,
+        prom_valoraciones: 3,
         stock: 10,
-        descripcion: "Artesania Tipica",
-        estado: "disponible",
-        image_url: "picaro.jpg",
-        id_categoria:1
+        descripcion: "Esta es una descripcion de prueba.",
+        estado: "activo",
+        image_url: "jardinera.jpg",
+        id_categoria:3
       })),
       ProductosRepository.save(ProductosRepository.create({
-        nombre: "Tung",
-        precio: 8500,
-        stock: 20,
-        descripcion: "Juguete de Madera",
-        estado: "disponible",
-        image_url:"tung.png",
+        nombre: "Macetero",
+        precio: 9990,
+        prom_valoraciones: 3,
+        stock: 10,
+        descripcion: "Esta es una descripcion de prueba.",
+        estado: "activo",
+        image_url: "macetero.webp",
+        id_categoria:3
+      })),
+      ProductosRepository.save(ProductosRepository.create({
+        nombre: "Medallero",
+        precio: 29990,
+        prom_valoraciones: 3,
+        stock: 10,
+        descripcion: "Esta es una descripcion de prueba.",
+        estado: "activo",
+        image_url: "medallero.webp",
         id_categoria:2
       })),
       ProductosRepository.save(ProductosRepository.create({
-        nombre: "Tralalero",
-        precio: 18000,
+        nombre: "Escaño",
+        precio: 119990,
+        prom_valoraciones: 5,
+        stock: 20,
+        descripcion: "Esta es una descripcion de prueba.",
+        estado: "activo",
+        image_url:"escaño.webp",
+        id_categoria:2
+      })),
+      ProductosRepository.save(ProductosRepository.create({
+        nombre: "Mesa de centro",
+        precio: 69990,
         stock: 5,
-        descripcion: "Tralalero Decorativo",
-        estado: "disponible",
-        image_url:"tralalero.jpg",
-        id_categoria:3
+        descripcion: "Esta es una descripcion de prueba.",
+        estado: "activo",
+        image_url:"mesacentro.webp",
+        id_categoria:2
       })),
     ]);
 
@@ -120,4 +137,169 @@ async function createProductos() {
   }
 }
 
-export { createUser,  createCategoria, createProductos, };
+async function createCompras() {
+  try {
+    const ComprasRepository = AppDataSource.getRepository(Compras);
+
+    const count = await ComprasRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Compras ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 1,
+        facturacion: "1234567890",
+        estado: "pendiente",
+        total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 1,
+        facturacion: "1234567890",
+        estado: "pendiente",
+        total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 1,
+        facturacion: "1234567890",
+        estado: "pendiente",
+          total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Compras creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear compras:", error));
+  }
+}
+
+async function createCompra_Producto() {
+  try {
+    const Compra_ProductoRepository = AppDataSource.getRepository(Compra_Producto);
+
+    const count = await Compra_ProductoRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Compra_Producto ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 1,
+        id_producto: 1,
+        cantidad: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 1,
+        id_producto: 2,
+        cantidad: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 1,
+        id_producto: 3,
+        cantidad: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Compra_Producto creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear Compra_Producto:", error));
+  }
+}
+
+async function createEnvios() {
+  try {
+    const EnviosRepository = AppDataSource.getRepository(Envios);
+
+    const count = await EnviosRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Envios ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 1,
+        estado: "pendiente",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 1,
+        estado: "pendiente",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 1,
+        estado: "pendiente",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Envios creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear Envios:", error));
+  }
+}
+
+async function createValoraciones() {
+  try {
+    const ValoracionesRepository = AppDataSource.getRepository(Valoraciones);
+
+    const count = await ValoracionesRepository.count();
+    if (count > 0) {
+      console.log(chalk.yellow("ℹ️  Valoraciones ya existen. Se omite creación."));
+      return;
+    }
+
+    await Promise.all([
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 1,
+        id_producto: 1,
+        puntuacion: 5,
+        descripcion: "Excelente producto",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 1,
+        id_producto: 2,
+        puntuacion: 4,
+        descripcion: "Buen producto",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 1,
+        id_producto: 3,
+        puntuacion: 3,
+        descripcion: "Producto regular",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+    ]);
+
+    console.log(chalk.green("✅ Valoraciones creadas exitosamente."));
+  } catch (error) {
+    console.error(chalk.red("❌ Error al crear Valoraciones:", error));
+  }
+}
+
+
+
+export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones};
