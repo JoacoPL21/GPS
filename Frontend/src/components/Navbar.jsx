@@ -1,7 +1,7 @@
 import { Sling as Hamburger } from "hamburger-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { FaUserCircle, FaChevronUp, FaChevronDown, FaShoppingCart } from "react-icons/fa";
+import { FaUserCircle, FaChevronUp, FaChevronDown, FaShoppingCart, FaShoppingBag, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import MenuCarrito from "../pages/Carrito/CarritoFunction";
 
@@ -67,18 +67,28 @@ function Navbar({ isOpen, setOpen }) {
                 ) : (
                   <>
                     <Link
-                      to="/logout"
-                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
+                      to="/profile"
+                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-t-lg transition flex items-center gap-2"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      Cerrar Sesión
+                      <FaUser className="text-sm" />
+                      Mi perfil
                     </Link>
                     <Link
-                      to="/profile"
-                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
+                      to="/profile/mis-compras"
+                      className="navbar_text block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      Mi perfil
+                      <FaShoppingBag className="text-sm" />
+                      Mis Compras
+                    </Link>
+                    <Link
+                      to="/logout"
+                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-b-lg transition flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <FaSignOutAlt className="text-sm" />
+                      Cerrar Sesión
                     </Link>
                   </>
                 )}

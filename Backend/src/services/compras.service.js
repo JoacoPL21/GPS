@@ -46,25 +46,25 @@ export async function verificarCompraProducto(id_usuario, id_producto) {
     try {
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
         
-        // Buscar si existe una compra del usuario específico que incluya el producto
-        const compraProducto = await compraProductoRepository.findOne({
-            where: {
-                id_producto: parseInt(id_producto)
-            },
-            relations: ["Compras"]
-        });
+        // Usar una consulta más específica que incluya la relación con Compras
+        // y filtre directamente por el usuario
+        const compraProducto = await compraProductoRepository
+            .createQueryBuilder("cp")
+            .leftJoinAndSelect("cp.Compras", "compra")
+            .where("cp.id_producto = :id_producto", { id_producto: parseInt(id_producto) })
+            .andWhere("compra.id_usuario = :id_usuario", { id_usuario: parseInt(id_usuario) })
+            .getOne();
 
-        if (!compraProducto) {
+        console.log(`Buscando compra para usuario ${id_usuario} y producto ${id_producto}`);
+        console.log(`Resultado de la consulta:`, compraProducto);
+
+        if (compraProducto) {
+            console.log(`Usuario ${id_usuario} ha comprado el producto ${id_producto}`);
+            return [true, null];
+        } else {
+            console.log(`Usuario ${id_usuario} NO ha comprado el producto ${id_producto}`);
             return [false, null];
         }
-
-        // Verificar que la compra pertenece al usuario específico
-        const compra = compraProducto.Compras;
-        if (compra && compra.id_usuario === parseInt(id_usuario)) {
-            return [true, null];
-        }
-
-        return [false, null];
     } catch (error) {
         console.error("Error al verificar compra del producto:", error);
         return [null, "Error al verificar compra del producto"];

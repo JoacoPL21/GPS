@@ -65,7 +65,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "mis-compras",
+        path: "profile/mis-compras",
         element: (
           <ProtectedRoute>
             <MisCompras />

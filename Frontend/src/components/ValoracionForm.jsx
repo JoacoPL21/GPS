@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,6 +12,23 @@ const ValoracionForm = ({
   const [puntuacion, setPuntuacion] = useState(valoracionExistente?.puntuacion || 0);
   const [descripcion, setDescripcion] = useState(valoracionExistente?.descripcion || '');
   const [hover, setHover] = useState(null);
+
+  // Actualizar el estado cuando valoracionExistente cambie
+  useEffect(() => {
+    console.log('ValoracionForm - valoracionExistente:', valoracionExistente);
+    if (valoracionExistente) {
+      console.log('ValoracionForm - Actualizando con valoración existente:', {
+        puntuacion: valoracionExistente.puntuacion,
+        descripcion: valoracionExistente.descripcion
+      });
+      setPuntuacion(valoracionExistente.puntuacion || 0);
+      setDescripcion(valoracionExistente.descripcion || '');
+    } else {
+      console.log('ValoracionForm - Limpiando formulario');
+      setPuntuacion(0);
+      setDescripcion('');
+    }
+  }, [valoracionExistente]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -97,7 +114,7 @@ const ValoracionForm = ({
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
             placeholder="Comparte tu experiencia con este producto..."
             required
             minLength={10}

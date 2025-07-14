@@ -14,12 +14,14 @@ export const useValoraciones = (id_producto) => {
   const [puedeValorar, setPuedeValorar] = useState(false);
   const [valoracionUsuario, setValoracionUsuario] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [valoracionUsuarioLoading, setValoracionUsuarioLoading] = useState(true);
 
   // Cargar valoraciones del producto
   const cargarValoraciones = useCallback(async () => {
     if (!id_producto) return;
     
     setLoading(true);
+    setValoracionUsuarioLoading(true);
     setError(null);
     
     try {
@@ -34,6 +36,7 @@ export const useValoraciones = (id_producto) => {
           const valoracionExistente = data.data?.find(
             v => v.id_usuario === authUser.id
           );
+          console.log('useValoraciones - Valoración encontrada para usuario:', valoracionExistente);
           setValoracionUsuario(valoracionExistente || null);
         }
       }
@@ -42,6 +45,7 @@ export const useValoraciones = (id_producto) => {
       console.error('Error al cargar valoraciones:', error);
     } finally {
       setLoading(false);
+      setValoracionUsuarioLoading(false);
     }
   }, [id_producto, authUser]);
 
@@ -122,6 +126,7 @@ export const useValoraciones = (id_producto) => {
     error,
     puedeValorar,
     valoracionUsuario,
+    valoracionUsuarioLoading,
     submitting,
     promedioValoraciones,
     enviarValoracion,
