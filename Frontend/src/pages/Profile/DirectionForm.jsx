@@ -6,8 +6,9 @@ import Swal from "sweetalert2"
 
 // En el componente FormDireccionEnvio, agregar el prop onDireccionAdded
 const FormDireccionEnvio = ({ onDireccionAdded }) => {
-  const [success, setSuccess] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState({});
   const [form, setForm] = useState({
     calle: "",
     numero: "",
@@ -31,16 +32,52 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
     }
   }, [success])
 
-  const handleChange = (e) => {
+
+
+//validacion del formulario
+const validateForm = () => {
+  const newError = {}
+  if (!form.calle) newError.calle = "La calle es requerida";
+  if (!form.numero) newError.numero = "El número es requerido";
+  //si numero no es un numero entero
+  if (form.numero && !Number.isInteger(Number(form.numero))) {
+    newError.numero = "El número debe ser un valor entero";
+  }
+  if (!form.ciudad) newError.ciudad = "La ciudad es requerida";
+  if (!form.region) newError.region = "La región es requerida";
+  if (!form.codigo_postal) newError.codigo_postal = "El código postal es requerido";
+  // Validación del código postal
+  const postalCodePattern = /^\d{7}$/;
+  if (form.codigo_postal && !postalCodePattern.test(form.codigo_postal)) {
+    newError.codigo_postal = "El codigo postal debe ser correcto";
+  }
+  return newError;
+}
+
+
+
+  // Manejo de cambios en los inputs del formulario
+  const handleInputChange = (e) => {
     const { name, value } = e.target
-    setForm((prev) => ({
-      ...prev,
+    setForm((prevForm) => ({
+      ...prevForm,
       [name]: value,
     }))
+    if (error[name]) {
+      setError((prevError) => ({
+        ...prevError,
+        [name]: "",
+      }))
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const validationErrors = validateForm()
+    if (Object.keys(validationErrors).length > 0) {
+      setError(validationErrors)
+      return
+    }
 
     // Validar que todos los campos requeridos estén completos
     if (!form.calle || !form.numero || !form.ciudad || !form.region || !form.codigo_postal) {
@@ -117,6 +154,9 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
       <form
         onSubmit={handleSubmit}
         className="p-6"
+        autoComplete="off"
+        noValidate
+        
       >
         <div className="grid md:grid-cols-2 gap-6">
           {/* Calle */}
@@ -130,8 +170,10 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
                 type="text"
                 name="calle"
                 value={form.calle}
-                onChange={handleChange}
-                className="w-full border-2 border-amber-200 rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white"
+                onChange={handleInputChange}
+                className={`w-full border-2 ${
+                  error.calle ? 'border-red-500' : 'border-amber-200'
+                } rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white`}
                 placeholder="Ingresa el nombre de la calle"
                 required
               />
@@ -146,6 +188,15 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
                 </svg>
               </div>
             </div>
+            {/* AGREGAR ESTE BLOQUE DE ERROR */}
+            {error.calle && (
+              <p className="text-red-500 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error.calle}
+              </p>
+            )}
           </div>
 
           {/* Número */}
@@ -158,11 +209,22 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
               type="text"
               name="numero"
               value={form.numero}
-              onChange={handleChange}
-              className="w-full border-2 border-amber-200 rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white"
+              onChange={handleInputChange}
+              className={`w-full border-2 ${
+                error.numero ? 'border-red-500' : 'border-amber-200'
+              } rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white`}
               placeholder="Número de la dirección"
               required
             />
+            {/* AGREGAR ESTE BLOQUE DE ERROR */}
+            {error.numero && (
+              <p className="text-red-500 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error.numero}
+              </p>
+            )}
           </div>
 
           {/* Ciudad */}
@@ -176,8 +238,10 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
                 type="text"
                 name="ciudad"
                 value={form.ciudad}
-                onChange={handleChange}
-                className="w-full border-2 border-amber-200 rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white"
+                onChange={handleInputChange}
+                className={`w-full border-2 ${
+                  error.ciudad ? 'border-red-500' : 'border-amber-200'
+                } rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white`}
                 placeholder="Ciudad"
                 required
               />
@@ -192,6 +256,15 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
                 </svg>
               </div>
             </div>
+            {/* AGREGAR ESTE BLOQUE DE ERROR */}
+            {error.ciudad && (
+              <p className="text-red-500 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error.ciudad}
+              </p>
+            )}
           </div>
 
           {/* Región */}
@@ -204,11 +277,22 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
               type="text"
               name="region"
               value={form.region}
-              onChange={handleChange}
-              className="w-full border-2 border-amber-200 rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white"
+              onChange={handleInputChange}
+              className={`w-full border-2 ${
+                error.region ? 'border-red-500' : 'border-amber-200'
+              } rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white`}
               placeholder="Región o estado"
               required
             />
+            {/* AGREGAR ESTE BLOQUE DE ERROR */}
+            {error.region && (
+              <p className="text-red-500 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error.region}
+              </p>
+            )}
           </div>
 
           {/* Código Postal */}
@@ -221,11 +305,22 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
               type="text"
               name="codigo_postal"
               value={form.codigo_postal}
-              onChange={handleChange}
-              className="w-full border-2 border-amber-200 rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white"
+              onChange={handleInputChange}
+              className={`w-full border-2 ${
+                error.codigo_postal ? 'border-red-500' : 'border-amber-200'
+              } rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 bg-white`}
               placeholder="Código postal"
               required
             />
+            {/* AGREGAR ESTE BLOQUE DE ERROR */}
+            {error.codigo_postal && (
+              <p className="text-red-500 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error.codigo_postal}
+              </p>
+            )}
           </div>
 
           {/* Tipo de dirección */}
@@ -235,7 +330,7 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
               <select
                 name="tipo_de_direccion"
                 value={form.tipo_de_direccion}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 className="w-full border-2 border-amber-200 rounded-xl px-4 py-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-200 group-hover:border-amber-300 appearance-none bg-white"
               >
                 <option value="predeterminada">Predeterminada</option>
