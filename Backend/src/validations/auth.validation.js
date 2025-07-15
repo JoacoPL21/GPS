@@ -97,6 +97,17 @@ export const direccionValidation = Joi.object({
       "string.empty": "La ciudad no puede estar vacía",
       "string.base": "La ciudad debe ser una cadena de texto",
     }),
+  comuna: Joi.string()  // NUEVA VALIDACIÓN
+    .min(2)
+    .max(50)
+    .required()
+    .messages({
+      "string.min": "La comuna debe tener al menos 2 caracteres",
+      "any.required": "La comuna es obligatoria",
+      "string.max": "La comuna no puede tener más de 50 caracteres",
+      "string.empty": "La comuna no puede estar vacía",
+      "string.base": "La comuna debe ser una cadena de texto",
+    }),
   region: Joi.string()
     .min(2)
     .max(50)
@@ -109,7 +120,6 @@ export const direccionValidation = Joi.object({
       "string.base": "La región debe ser una cadena de texto",
     }),
   codigo_postal: Joi.string()
-  
     .pattern(/^\d{7}$/)
     .required()
     .messages({
@@ -117,7 +127,6 @@ export const direccionValidation = Joi.object({
       "any.required": "El código postal es obligatorio",
       "string.empty": "El código postal no puede estar vacío",
       "string.base": "El código postal debe ser una cadena de texto",
-
     }),
   tipo_de_direccion: Joi.string()
     .valid("predeterminada", "opcional")

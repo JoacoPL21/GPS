@@ -24,6 +24,11 @@ const Direcciones = new EntitySchema({
             length: 100,
             nullable: false,
         },
+        comuna: {  // NUEVA COLUMNA
+            type: "varchar",
+            length: 100,
+            nullable: false,
+        },
         region: {
             type: "varchar",
             length: 100,
@@ -43,7 +48,6 @@ const Direcciones = new EntitySchema({
             type: "enum",
             enum: ["predeterminada","opcional"],
             nullable: false,
-
         },
         createdAt: {
             type: "timestamp",
@@ -56,7 +60,6 @@ const Direcciones = new EntitySchema({
             onUpdate: "CURRENT_TIMESTAMP",
             nullable: false,
         },
-
     },
 });
 
