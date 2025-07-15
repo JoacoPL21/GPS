@@ -1,5 +1,5 @@
 import { Preference } from 'mercadopago';
-import mercadoPagoClient from '../config/mercadoPago.js';
+import mercadoPagoClient from '../config/mercadopago.js';
 
 const preference = new Preference(mercadoPagoClient);
 
