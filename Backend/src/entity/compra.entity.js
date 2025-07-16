@@ -91,6 +91,11 @@ const Compra = new EntitySchema({
             length: 20,
             nullable: true,
         },
+        instrucciones: { 
+            type: "varchar",
+            length: 500,
+            nullable: true,
+        },
         createdAt: {
             type: "timestamp",
             default: () => "CURRENT_TIMESTAMP",

@@ -33,7 +33,7 @@ const Usuarios = new EntitySchema({
         },
         rol: {
             type: "enum",
-            enum: ["admin", "cliente", "Invitado"],
+            enum: ["admin", "cliente", "invitado"],
             default: "cliente",
             nullable: false,
         },

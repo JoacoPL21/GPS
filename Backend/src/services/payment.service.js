@@ -3,7 +3,7 @@ import { AppDataSource } from "../config/configDB.js";
 import Compra from "../entity/compra.entity.js";
 import CompraProducto from "../entity/compra_producto.entity.js";
 import Usuario from "../entity/usuario.entity.js";
-import Direcciones from "../entity/direccion.entity.js";
+import Direccion from "../entity/direccion.entity.js";
 
 export class PaymentService {
   async saveTransaction(transactionData, productos = [], datosPersonales = {}) {
@@ -11,7 +11,7 @@ export class PaymentService {
       const compraRepository = AppDataSource.getRepository(Compra);
       const compraProductoRepository = AppDataSource.getRepository(CompraProducto);
       const usuarioRepository = AppDataSource.getRepository(Usuario);
-      const direccionRepository = AppDataSource.getRepository(Direcciones);
+      const direccionRepository = AppDataSource.getRepository(Direccion);
 
       // 1. Obtener el email del comprador desde el formulario
       const emailForm = datosPersonales.email || "";
@@ -27,13 +27,13 @@ export class PaymentService {
         // Crear dirección
         const direccionData = {
           direccion: datosPersonales.address || "",
-          ciudad: datosPersonales.ciudad || datosPersonales.comunaCode || "",
-          region: datosPersonales.region || datosPersonales.regionCode || "",
-          codigo_postal: datosPersonales.postalCode || "",
+          ciudad: datosPersonales.ciudad || datosPersonales.comunaCode || "No especificada",
+          region: datosPersonales.region || datosPersonales.regionCode || "No especificada",
+          codigo_postal: datosPersonales.postalCode || "00000",
           pais: "Chile",
           tipo_de_direccion: "predeterminada"
         };
-        const direccionGuardada = await direccionRepository.save(direccionData);
+        direccionGuardada = await direccionRepository.save(direccionData);
 
         // Usar los campos separados y nombre incremental
         const baseName = (datosPersonales.nombres || "Invitado").replace(/\s+/g, '');
@@ -53,8 +53,8 @@ export class PaymentService {
           email: emailForm,
           telefono: datosPersonales.phone || "",
           password: "null",
-          rol: "Invitado",
-          id_direccion: direccionGuardada.id_direccion
+          rol: "invitado",
+          id_direccion: direccionGuardada.id_direccion 
         });
         usuarioInvitado = await usuarioRepository.save(usuarioInvitado);
       }
@@ -75,7 +75,7 @@ export class PaymentService {
         apellido: datosPersonales.apellidos || "",
         email: emailForm, // Email del formulario
         telefono: datosPersonales.phone || "",
-        direccion: datosPersonales.calle || datosPersonales.address || "",
+        direccion: datosPersonales.address || "",
         region: datosPersonales.region || datosPersonales.regionCode || "",
         ciudad: datosPersonales.ciudad || datosPersonales.comunaCode || "",
         codigo_postal: datosPersonales.postalCode || "",
@@ -117,7 +117,7 @@ export class PaymentService {
       const compraRepository = AppDataSource.getRepository(Compra);
       return await compraRepository.findOne({
         where: { payment_id: paymentId },
-        relations: ["Productos", "Usuario", "Usuario.direccion"]
+        relations: ["Productos", "Usuario", "Usuario.direccion"] // Cambié el formato de relaciones
       });
     } catch (error) {
       console.error('Error al obtener compra por paymentId:', error);

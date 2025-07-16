@@ -126,22 +126,23 @@ export const getTransaction = async (req, res) => {
     }
 
     console.log('No encontrado en BD, consultando MercadoPago...');
-    const payment = await mercadoPagoClient.payment.findById(paymentId);
+    const payment = new Payment(mercadoPagoClient);
+    const paymentData = await payment.get({ id: paymentId });
 
-    if (payment) {
-      console.log('Pago encontrado en MercadoPago:', payment);
+    if (paymentData) {
+      console.log('Pago encontrado en MercadoPago:', paymentData);
 
       const formattedTransaction = {
-        payment_id: payment.id,
-        external_reference: payment.external_reference,
-        amount: payment.transaction_amount,
-        status: payment.status,
-        payment_type: payment.payment_type_id,
-        merchant_order_id: payment.order?.id || payment.merchant_order_id,
-        created_at: payment.date_created,
-        collection_status: payment.collection_status,
-        processing_mode: payment.processing_mode,
-        site_id: payment.site_id
+        payment_id: paymentData.id,
+        external_reference: paymentData.external_reference,
+        amount: paymentData.transaction_amount,
+        status: paymentData.status,
+        payment_type: paymentData.payment_type_id,
+        merchant_order_id: paymentData.order?.id || paymentData.merchant_order_id,
+        created_at: paymentData.date_created,
+        collection_status: paymentData.collection_status,
+        processing_mode: paymentData.processing_mode,
+        site_id: paymentData.site_id
       };
 
       console.log('Respuesta formateada:', formattedTransaction);
