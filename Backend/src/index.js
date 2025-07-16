@@ -19,7 +19,7 @@ import {
 } from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
 // COMBINAR AMBAS IMPORTACIONES
-import { createProductos, createUser, createCategoria, createCompras, createCompra_Producto, createEnvios, createValoraciones } from "./config/initialSetup.js";
+import { createProductos, createUser, createCategoria, createValoraciones } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';
@@ -192,10 +192,6 @@ async function setupAPI() {
     await createUser();
     await createCategoria();
     await createProductos();
-    // AGREGAR FUNCIONES DE TUS COMPAÑEROS
-    await createCompras();
-    await createCompra_Producto();
-    await createEnvios();
     await createValoraciones();
   } catch (error) {
     console.log("Error en index.js -> setupAPI(), el error es: ", error);

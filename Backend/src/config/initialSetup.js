@@ -4,23 +4,17 @@ import { AppDataSource } from './configDB.js';
 import Productos from '../entity/productos.entity.js';
 import Usuarios from '../entity/usuario.entity.js';
 import Categoria from '../entity/categoria.entity.js';
-import Compras from '../entity/compra.entity.js';
-import Compra_Producto from '../entity/compra_producto.entity.js';
-import Envios from '../entity/envio.entity.js';
 import Valoraciones from '../entity/valoraciones.entity.js';
 import { encryptPassword } from '../helpers/bcrypt.helper.js';
-
 
 async function createUser() {
   try {
     const UserRepository = AppDataSource.getRepository(Usuarios);
-
     const count = await UserRepository.count();
     if (count > 0) {
       console.log(chalk.yellow("ℹ️  Usuarios ya existen. Se omite creación."));
       return;
     }
-
     await Promise.all([
       UserRepository.save(UserRepository.create({
         nombreCompleto: "Admin",
@@ -28,26 +22,22 @@ async function createUser() {
         telefono: "966433091",
         password: await encryptPassword("admin123"),
         rol: "admin",
-        
       }))
-
     ]);
-
     console.log(chalk.green("✅ Usuarios creados exitosamente."));
   } catch (error) {
     console.error(chalk.red("❌ Error al crear usuarios:", error));
   }
 }
+
 async function createCategoria() {
   try {
     const CategoriaRepository = AppDataSource.getRepository(Categoria);
-
     const count = await CategoriaRepository.count();
     if (count > 0) {
       console.log(chalk.yellow("ℹ️  Categorías ya existen. Se omite creación."));
       return;
     }
-
     await Promise.all([
       CategoriaRepository.save(CategoriaRepository.create({
         nombre: "Juguetes",
@@ -62,7 +52,6 @@ async function createCategoria() {
         descripcion: "Piezas artesanales únicas"
       })),
     ]);
-
     console.log(chalk.green("✅ Categorías creadas exitosamente."));
   } catch (error) {
     console.error(chalk.red("❌ Error al crear categorías:", error));
@@ -72,13 +61,11 @@ async function createCategoria() {
 async function createProductos() {
   try {
     const ProductosRepository = AppDataSource.getRepository(Productos);
-
     const count = await ProductosRepository.count();
     if (count > 0) {
       console.log(chalk.yellow("ℹ️  Productos ya existen. Se omite creación."));
       return;
     }
-
     await Promise.all([
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Jardinera",
@@ -130,143 +117,20 @@ async function createProductos() {
         id_categoria:2
       })),
     ]);
-
     console.log(chalk.green("✅ Productos creados exitosamente."));
   } catch (error) {
     console.error(chalk.red("❌ Error al crear productos:", error));
   }
 }
 
-async function createCompras() {
-  try {
-    const ComprasRepository = AppDataSource.getRepository(Compras);
-
-    const count = await ComprasRepository.count();
-    if (count > 0) {
-      console.log(chalk.yellow("ℹ️  Compras ya existen. Se omite creación."));
-      return;
-    }
-
-    await Promise.all([
-      ComprasRepository.save(ComprasRepository.create({
-        id_usuario: 1,
-        facturacion: "1234567890",
-        estado: "pendiente",
-        total: 12000,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-      ComprasRepository.save(ComprasRepository.create({
-        id_usuario: 1,
-        facturacion: "1234567890",
-        estado: "pendiente",
-        total: 12000,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-      ComprasRepository.save(ComprasRepository.create({
-        id_usuario: 1,
-        facturacion: "1234567890",
-        estado: "pendiente",
-          total: 12000,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-    ]);
-
-    console.log(chalk.green("✅ Compras creadas exitosamente."));
-  } catch (error) {
-    console.error(chalk.red("❌ Error al crear compras:", error));
-  }
-}
-
-async function createCompra_Producto() {
-  try {
-    const Compra_ProductoRepository = AppDataSource.getRepository(Compra_Producto);
-
-    const count = await Compra_ProductoRepository.count();
-    if (count > 0) {
-      console.log(chalk.yellow("ℹ️  Compra_Producto ya existen. Se omite creación."));
-      return;
-    }
-
-    await Promise.all([
-      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
-        id_compra: 1,
-        id_producto: 1,
-        cantidad: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
-        id_compra: 1,
-        id_producto: 2,
-        cantidad: 2,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
-        id_compra: 1,
-        id_producto: 3,
-        cantidad: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-    ]);
-
-    console.log(chalk.green("✅ Compra_Producto creadas exitosamente."));
-  } catch (error) {
-    console.error(chalk.red("❌ Error al crear Compra_Producto:", error));
-  }
-}
-
-async function createEnvios() {
-  try {
-    const EnviosRepository = AppDataSource.getRepository(Envios);
-
-    const count = await EnviosRepository.count();
-    if (count > 0) {
-      console.log(chalk.yellow("ℹ️  Envios ya existen. Se omite creación."));
-      return;
-    }
-
-    await Promise.all([
-      EnviosRepository.save(EnviosRepository.create({
-        id_compra: 1,
-        estado: "pendiente",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-      EnviosRepository.save(EnviosRepository.create({
-        id_compra: 1,
-        estado: "pendiente",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-      EnviosRepository.save(EnviosRepository.create({
-        id_compra: 1,
-        estado: "pendiente",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })),
-    ]);
-
-    console.log(chalk.green("✅ Envios creadas exitosamente."));
-  } catch (error) {
-    console.error(chalk.red("❌ Error al crear Envios:", error));
-  }
-}
-
 async function createValoraciones() {
   try {
     const ValoracionesRepository = AppDataSource.getRepository(Valoraciones);
-
     const count = await ValoracionesRepository.count();
     if (count > 0) {
       console.log(chalk.yellow("ℹ️  Valoraciones ya existen. Se omite creación."));
       return;
     }
-
     await Promise.all([
       ValoracionesRepository.save(ValoracionesRepository.create({
         id_usuario: 1,
@@ -293,13 +157,10 @@ async function createValoraciones() {
         updatedAt: new Date()
       })),
     ]);
-
     console.log(chalk.green("✅ Valoraciones creadas exitosamente."));
   } catch (error) {
     console.error(chalk.red("❌ Error al crear Valoraciones:", error));
   }
 }
 
-
-
-export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones};
+export { createUser, createCategoria, createProductos, createValoraciones };
