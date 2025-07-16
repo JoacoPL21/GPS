@@ -52,8 +52,8 @@ export class PaymentService {
           nombreCompleto: `${datosPersonales.nombres} ${datosPersonales.apellidos}` || nuevoNombre,
           email: emailForm,
           telefono: datosPersonales.phone || "",
-          password: "invited_user",
-          rol: "cliente",
+          password: "null",
+          rol: "Invitado",
           id_direccion: direccionGuardada.id_direccion
         });
         usuarioInvitado = await usuarioRepository.save(usuarioInvitado);
@@ -117,7 +117,7 @@ export class PaymentService {
       const compraRepository = AppDataSource.getRepository(Compra);
       return await compraRepository.findOne({
         where: { payment_id: paymentId },
-        relations: ["Productos", "Usuario"]
+        relations: ["Productos", "Usuario", "Usuario.direccion"]
       });
     } catch (error) {
       console.error('Error al obtener compra por paymentId:', error);
