@@ -249,7 +249,7 @@ const ShippingForm = ({
             value={shippingData.apellidos}
             onChange={(e) => handleInputChange("apellidos", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            placeholder="Sahur" 
+            placeholder="Sahur"
           />
         </div>
 
@@ -376,7 +376,7 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
             Envío estimado: 3-5 días hábiles
           </p>
           <div className="text-sm text-gray-600">
-            <p>{shippingData.fullName}</p>
+            <p>{shippingData.nombres} {shippingData.apellidos}</p>
             <p>{shippingData.address}</p>
             <p>
               {shippingData.comunaCode}, {shippingData.regionCode}
@@ -402,16 +402,16 @@ function MultiStepCheckout() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [shippingData, setShippingData] = useState({
-  nombres: "",
-  apellidos: "",
-  email: "",
-  phone: "",
-  address: "",
-  regionCode: "",
-  comunaCode: "",
-  postalCode: "",
-  instructions: "",
-});
+    nombres: "",
+    apellidos: "",
+    email: "",
+    phone: "",
+    address: "",
+    regionCode: "",
+    comunaCode: "",
+    postalCode: "",
+    instructions: "",
+  });
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -458,7 +458,9 @@ function MultiStepCheckout() {
 
   const validateShippingData = () => {
     const required = [
-      "fullName",
+      "nombres",
+      "apellidos",
+      "email",
       "phone",
       "address",
       "regionCode",
@@ -647,7 +649,11 @@ function MultiStepCheckout() {
               </h4>
               <div className="text-sm text-gray-600 space-y-1">
                 <p>
-                  <strong>Nombre:</strong> {shippingData.fullName}
+                  <strong>Nombre:</strong> {shippingData.nombres}{" "}
+                  {shippingData.apellidos}
+                </p>
+                <p>
+                  <strong>Email:</strong> {shippingData.email}
                 </p>
                 <p>
                   <strong>Teléfono:</strong> {shippingData.phone}
