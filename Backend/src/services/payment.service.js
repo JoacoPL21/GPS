@@ -17,8 +17,6 @@ export class PaymentService {
       const usuarioRepository = AppDataSource.getRepository(Usuario);
 
       // 1. Obtener el email del comprador desde MercadoPago
-      // transactionData.email debe pasarse desde el webhook
-      // Si no está, intentar usar el del form (menos confiable)
       const emailComprador =
         transactionData.email ||
         datosPersonales.email ||
@@ -28,14 +26,30 @@ export class PaymentService {
       let usuarioInvitado = await usuarioRepository.findOne({
         where: { email: emailComprador }
       });
-      // 3. Si no existe, crear usuario invitado con ese email
+
+      // 3. Si no existe, crear usuario invitado con nombre incremental
       if (!usuarioInvitado) {
+        // Usar el nombre del form o "Invitado" si no hay
+        const baseName = (datosPersonales.fullName || datosPersonales.nombre || "Invitado").replace(/\s+/g, '');
+        const invitadoNamePrefix = `${baseName}_invitado_`;
+
+        // Buscar cuántos invitados hay con ese nombre base
+        const existingInvitados = await usuarioRepository
+          .createQueryBuilder("usuario")
+          .where("usuario.nombreCompleto LIKE :prefix", { prefix: `${invitadoNamePrefix}%` })
+          .getCount();
+
+        // Siguiente número incremental
+        const nuevoNombre = `${invitadoNamePrefix}${existingInvitados + 1}`;
+
+        // Crear usuario invitado con valores obligatorios
         usuarioInvitado = usuarioRepository.create({
-          nombre: datosPersonales.fullName || datosPersonales.nombre || "",
-          apellido: datosPersonales.apellido || "",
+          nombreCompleto: nuevoNombre,
           email: emailComprador,
           telefono: datosPersonales.phone || "",
-          tipo: "invitado"
+          password: "invited_user", // Valor seguro
+          rol: "cliente", // Cambia si usas un rol "invitado"
+          // id_direccion: null // Si lo necesitas
         });
         usuarioInvitado = await usuarioRepository.save(usuarioInvitado);
       }
@@ -51,7 +65,7 @@ export class PaymentService {
         merchant_order_id: transactionData.merchant_order_id,
         preference_id: transactionData.preference_id,
         id_usuario: idUsuario,
-        nombre: datosPersonales.fullName || datosPersonales.nombre || "",
+        nombre: datosPersonales.fullName || datosPersonales.nombre || usuarioInvitado.nombreCompleto,
         apellido: datosPersonales.apellido || "",
         email: emailComprador,
         telefono: datosPersonales.phone || "",
