@@ -195,7 +195,6 @@ const ShippingForm = ({
         Información de Envío
       </h3>
 
-      
       {/* Selector región y comuna con datos de Chilexpress */}
       <ChilexpressRegionComunaSelector
         regionValue={shippingData.regionCode}
@@ -217,23 +216,54 @@ const ShippingForm = ({
         <p className="text-red-500 text-sm">{errorCobertura}</p>
       )}
       {cobertura === true && (
-        <p className="text-green-600 text-sm">¡Cobertura disponible para la comuna seleccionada!</p>
+        <p className="text-green-600 text-sm">
+          ¡Cobertura disponible para la comuna seleccionada!
+        </p>
       )}
       {cobertura === false && (
-        <p className="text-red-600 text-sm">No hay cobertura en la comuna seleccionada.</p>
+        <p className="text-red-600 text-sm">
+          No hay cobertura en la comuna seleccionada.
+        </p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre completo *
+            Nombres *
           </label>
           <input
             type="text"
-            value={shippingData.fullName}
-            onChange={(e) => handleInputChange("fullName", e.target.value)}
+            value={shippingData.nombres}
+            onChange={(e) => handleInputChange("nombres", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            placeholder="Juan Pérez"
+            placeholder="Tung Tung"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Apellidos *
+          </label>
+          <input
+            type="text"
+            value={shippingData.apellidos}
+            onChange={(e) => handleInputChange("apellidos", e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            placeholder="Sahur" 
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Email *
+          </label>
+          <input
+            type="email"
+            value={shippingData.email}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            placeholder="correo@ejemplo.com"
+            required
           />
         </div>
 
@@ -304,7 +334,10 @@ const OrderSummary = ({ cart, shippingData, subtotal, shipping, total }) => {
 
       <div className="space-y-3 mb-4">
         {cart.map((item) => (
-          <div key={item.id_producto} className="flex justify-between items-center">
+          <div
+            key={item.id_producto}
+            className="flex justify-between items-center"
+          >
             <div className="flex items-center gap-2">
               <span className="w-6 h-6 bg-amber-500 text-white text-xs rounded-full flex items-center justify-center">
                 {item.cantidad}
@@ -362,21 +395,23 @@ function MultiStepCheckout() {
     addItemToCart,
     removeItemFromCart,
     clearCart,
-    total: totalCarrito
+    total: totalCarrito,
   } = useCart();
 
   const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [shippingData, setShippingData] = useState({
-    fullName: "",
-    phone: "",
-    address: "",
-    regionCode: "",
-    comunaCode: "",
-    postalCode: "",
-    instructions: "",
-  });
+  nombres: "",
+  apellidos: "",
+  email: "",
+  phone: "",
+  address: "",
+  regionCode: "",
+  comunaCode: "",
+  postalCode: "",
+  instructions: "",
+});
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -391,12 +426,14 @@ function MultiStepCheckout() {
 
   // Consultar cobertura cada vez que cambian región o comuna (y ambos existen)
   useEffect(() => {
-  if (shippingData.regionCode && shippingData.comunaCode) {
-    // Convertir regionId de Chilexpress a número
-    const regionNumber = shippingData.regionCode.replace('R', '').replace('M', '13');
-    checkCobertura(regionNumber, shippingData.comunaCode);
-  }
-}, [shippingData.regionCode, shippingData.comunaCode]);
+    if (shippingData.regionCode && shippingData.comunaCode) {
+      // Convertir regionId de Chilexpress a número
+      const regionNumber = shippingData.regionCode
+        .replace("R", "")
+        .replace("M", "13");
+      checkCobertura(regionNumber, shippingData.comunaCode);
+    }
+  }, [shippingData.regionCode, shippingData.comunaCode]);
 
   const steps = [
     { label: "Carrito", icon: <Package className="w-5 h-5" /> },
@@ -420,8 +457,16 @@ function MultiStepCheckout() {
   };
 
   const validateShippingData = () => {
-    const required = ["fullName", "phone", "address", "regionCode", "comunaCode"];
-    return required.every((field) => shippingData[field] && shippingData[field].trim() !== "");
+    const required = [
+      "fullName",
+      "phone",
+      "address",
+      "regionCode",
+      "comunaCode",
+    ];
+    return required.every(
+      (field) => shippingData[field] && shippingData[field].trim() !== ""
+    );
   };
 
   const handleNextStep = () => {
@@ -456,6 +501,7 @@ function MultiStepCheckout() {
 
     try {
       const items = carrito.map((item) => ({
+        id_producto: item.id_producto,
         title: item.nombre,
         unit_price: Number(item.precio.toString().replace(/\./g, "")),
         quantity: item.cantidad || 1,

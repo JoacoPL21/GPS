@@ -10,15 +10,6 @@ const Direcciones = new EntitySchema({
             type: "int",
             generated: true,
         },
-        calle: {
-            type: "varchar",
-            length: 255,
-            nullable: false,
-        },
-        numero: {
-            type: "int",
-            nullable: false,
-        },
         ciudad: {
             type: "varchar",
             length: 100,

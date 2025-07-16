@@ -3,34 +3,40 @@ import { AppDataSource } from "../config/configDB.js";
 import Compra from "../entity/compra.entity.js";
 import CompraProducto from "../entity/compra_producto.entity.js";
 import Usuario from "../entity/usuario.entity.js";
+import Direcciones from "../entity/direccion.entity.js";
 
 export class PaymentService {
-  /**
-   * transactionData: datos de MercadoPago (incluyendo payment_id, status, amount, payer.email, etc)
-   * productos: array de productos comprados
-   * datosPersonales: datos del formulario (nombre, dirección, teléfono, etc)
-   */
   async saveTransaction(transactionData, productos = [], datosPersonales = {}) {
     try {
       const compraRepository = AppDataSource.getRepository(Compra);
       const compraProductoRepository = AppDataSource.getRepository(CompraProducto);
       const usuarioRepository = AppDataSource.getRepository(Usuario);
+      const direccionRepository = AppDataSource.getRepository(Direcciones);
 
-      // 1. Obtener el email del comprador desde MercadoPago
-      const emailComprador =
-        transactionData.email ||
-        datosPersonales.email ||
-        "";
+      // 1. Obtener el email del comprador desde el formulario
+      const emailForm = datosPersonales.email || "";
 
-      // 2. Buscar usuario por email
+      // 2. Buscar usuario por email del formulario
       let usuarioInvitado = await usuarioRepository.findOne({
-        where: { email: emailComprador }
+        where: { email: emailForm }
       });
 
-      // 3. Si no existe, crear usuario invitado con nombre incremental
+      // 3. Si no existe, crear dirección y usuario invitado con los datos del form
+      let direccionGuardada = null;
       if (!usuarioInvitado) {
-        // Usar el nombre del form o "Invitado" si no hay
-        const baseName = (datosPersonales.fullName || datosPersonales.nombre || "Invitado").replace(/\s+/g, '');
+        // Crear dirección
+        const direccionData = {
+          direccion: datosPersonales.address || "",
+          ciudad: datosPersonales.ciudad || datosPersonales.comunaCode || "",
+          region: datosPersonales.region || datosPersonales.regionCode || "",
+          codigo_postal: datosPersonales.postalCode || "",
+          pais: "Chile",
+          tipo_de_direccion: "predeterminada"
+        };
+        const direccionGuardada = await direccionRepository.save(direccionData);
+
+        // Usar los campos separados y nombre incremental
+        const baseName = (datosPersonales.nombres || "Invitado").replace(/\s+/g, '');
         const invitadoNamePrefix = `${baseName}_invitado_`;
 
         // Buscar cuántos invitados hay con ese nombre base
@@ -42,20 +48,20 @@ export class PaymentService {
         // Siguiente número incremental
         const nuevoNombre = `${invitadoNamePrefix}${existingInvitados + 1}`;
 
-        // Crear usuario invitado con valores obligatorios
         usuarioInvitado = usuarioRepository.create({
-          nombreCompleto: nuevoNombre,
-          email: emailComprador,
+          nombreCompleto: `${datosPersonales.nombres} ${datosPersonales.apellidos}` || nuevoNombre,
+          email: emailForm,
           telefono: datosPersonales.phone || "",
-          password: "invited_user", // Valor seguro
-          rol: "cliente", // Cambia si usas un rol "invitado"
-          // id_direccion: null // Si lo necesitas
+          password: "invited_user",
+          rol: "cliente",
+          id_direccion: direccionGuardada.id_direccion
         });
         usuarioInvitado = await usuarioRepository.save(usuarioInvitado);
       }
+
       const idUsuario = usuarioInvitado.id_usuario;
 
-      // 4. Guardar la compra
+      // 4. Guardar la compra, incluyendo ambos emails
       const compraData = {
         payment_id: transactionData.payment_id,
         payment_status: transactionData.status,
@@ -65,29 +71,33 @@ export class PaymentService {
         merchant_order_id: transactionData.merchant_order_id,
         preference_id: transactionData.preference_id,
         id_usuario: idUsuario,
-        nombre: datosPersonales.fullName || datosPersonales.nombre || usuarioInvitado.nombreCompleto,
-        apellido: datosPersonales.apellido || "",
-        email: emailComprador,
+        nombre: datosPersonales.nombres || "",
+        apellido: datosPersonales.apellidos || "",
+        email: emailForm, // Email del formulario
         telefono: datosPersonales.phone || "",
-        direccion: datosPersonales.address || "",
-        region: datosPersonales.regionCode || datosPersonales.region || "",
-        ciudad: datosPersonales.comunaCode || datosPersonales.ciudad || "",
+        direccion: datosPersonales.calle || datosPersonales.address || "",
+        region: datosPersonales.region || datosPersonales.regionCode || "",
+        ciudad: datosPersonales.ciudad || datosPersonales.comunaCode || "",
         codigo_postal: datosPersonales.postalCode || "",
-        instrucciones: datosPersonales.instructions || ""
+        instrucciones: datosPersonales.instructions || "",
+        // Puedes agregar campo para email de MercadoPago si quieres:
+        email_mp: transactionData.email || ""
       };
 
       const compra = compraRepository.create(compraData);
       const compraGuardada = await compraRepository.save(compra);
 
-      // 5. Guardar productos comprados
+      // 5. Guardar productos comprados (con id_producto ya incluido desde frontend)
       if (Array.isArray(productos)) {
         for (const prod of productos) {
-          const compraProd = compraProductoRepository.create({
-            id_compra: compraGuardada.id_compra,
-            id_producto: prod.id_producto || prod.id || prod.id_producto,
-            cantidad: prod.cantidad || prod.quantity || 1
-          });
-          await compraProductoRepository.save(compraProd);
+          if (prod.id_producto) {
+            const compraProd = compraProductoRepository.create({
+              id_compra: compraGuardada.id_compra,
+              id_producto: prod.id_producto,
+              cantidad: prod.cantidad || prod.quantity || 1
+            });
+            await compraProductoRepository.save(compraProd);
+          }
         }
       }
 
