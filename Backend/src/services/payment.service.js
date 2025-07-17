@@ -115,25 +115,10 @@ export class PaymentService {
   async getTransactionByPaymentId(paymentId) {
     try {
       const compraRepository = AppDataSource.getRepository(Compra);
-      const compra = await compraRepository.findOne({
-        where: { payment_id: paymentId },
-        relations: ["Productos", "Usuario"]
+      return await compraRepository.findOne({
+        where: { payment_id: paymentId }
+        // Quitar todas las relaciones por ahora
       });
-      
-      if (compra && compra.Usuario) {
-        // Cargar manualmente la dirección del usuario si es necesario
-        const usuarioRepository = AppDataSource.getRepository(Usuario);
-        const usuarioConDireccion = await usuarioRepository.findOne({
-          where: { id_usuario: compra.Usuario.id_usuario },
-          relations: ["direccion"]
-        });
-        
-        if (usuarioConDireccion) {
-          compra.Usuario.direccion = usuarioConDireccion.direccion;
-        }
-      }
-      
-      return compra;
     } catch (error) {
       console.error('Error al obtener compra por paymentId:', error);
       throw error;

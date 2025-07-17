@@ -57,16 +57,14 @@ const SuccessPage = () => {
           console.error("Error obteniendo transacción:", err);
 
           // Si no se puede obtener de la API, usar los datos de la URL
-          const transactionFromUrl = {
+           const transactionFromUrl = {
             payment_id: finalPaymentId,
             external_reference: externalReference,
             status: status,
             payment_type: paymentType,
             merchant_order_id: merchantOrderId,
             created_at: new Date().toISOString(),
-            amount:
-              queryParams.get("amount") ||
-              queryParams.get("transaction_amount"), // <-- AGREGADO
+            amount: queryParams.get("transaction_amount") || queryParams.get("amount"),
             collection_status: queryParams.get("collection_status"),
             processing_mode: queryParams.get("processing_mode"),
             site_id: queryParams.get("site_id"),
@@ -74,7 +72,7 @@ const SuccessPage = () => {
 
           console.log("Usando datos de URL:", transactionFromUrl);
           setTransaction(transactionFromUrl);
-          setError("Detalles limitados - No se pudo conectar con el servidor");
+          setError("Información obtenida de la URL de respuesta"); // Mensaje más amigable
           setLoading(false);
 
           // Limpiar carrito si el estado es aprobado
@@ -107,10 +105,15 @@ const SuccessPage = () => {
 
   const formatAmount = (amount) => {
     if (!amount) return "No disponible";
+    
+    // Convertir a número y asegurar que sea válido
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount)) return "No disponible";
+    
     return new Intl.NumberFormat("es-CL", {
       style: "currency",
       currency: "CLP",
-    }).format(amount);
+    }).format(numAmount);
   };
 
   const getStatusColor = (status) => {
