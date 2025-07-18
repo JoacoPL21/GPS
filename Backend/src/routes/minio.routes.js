@@ -1,7 +1,12 @@
 import { Router } from "express";
-import { generarUrl,getrUrlImagen } from "../controller/minio.controller.js";
-
+import { getrUrlImagen,postImagen } from "../controller/minio.controller.js";
+import { isAdmin } from "../middlewares/authorization.middleware.js";
+import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import multer from 'multer';
+const upload =multer();
 const router = Router();
-router.post("/generar-url", generarUrl);
-router.get("/obtener-url-imagen", generarUrl); 
+
+router.get("/imagen/:fileName", getrUrlImagen);
+//solo admin
+router.post("/imagen", upload.single('file'), postImagen);
 export default router;

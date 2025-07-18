@@ -46,6 +46,13 @@ export const productoCreateValidation = Joi.object({
       "any.required": "El estado es obligatorio",
       "string.base": "El estado debe ser una cadena de texto",
     }),
+
+ image_url: Joi.string()
+    .optional()
+    .messages({
+      "string.uri": "La URL de la imagen no es válida",
+      "string.base": "La imagen debe ser una cadena de texto",
+  }),
   id_categoria: Joi.number()
     .required()
     .messages({

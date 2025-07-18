@@ -2,6 +2,8 @@
 import { getProductos, getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados, updateProductoStock } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
+import { postImagen } from "./minio.controller.js";
+
 
 export async function getProductosDisponiblesController(req, res) {
   try {
@@ -40,28 +42,44 @@ export async function getProductoByIdController(req, res) {
 
 export async function createProductoController(req, res) {
   try {
-    const productoData = req.body;
-    delete productoData.image_url;
+    const { body, file } = req;
+    let imagen_nombre = null;
 
-    console.log("Datos del producto a crear controller:", productoData);
+    if (file) {
+    const validMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validMimeTypes.includes(file.mimetype)) {
+    return handleErrorClient(res, 400, "Formato de imagen no válido (solo JPG, PNG o WEBP)");
+  }
 
+    imagen_nombre = await postImagen(file.buffer, body.nombre);
+  }
+    const productoData = {
+    nombre: body.nombre,
+    precio: Number(body.precio),
+    stock: Number(body.stock),
+    descripcion: body.descripcion,
+    estado: body.estado,
+    id_categoria: Number(body.id_categoria),
+    image_url: imagen_nombre, 
+  };
+
+    // Validar datos
     const { error } = productoCreateValidation.validate(productoData);
-
     if (error) {
       return handleErrorClient(res, 400, "Datos inválidos", error.message);
     }
-
-    const [nuevoProducto] = await createProducto(productoData);
-
-    if (!nuevoProducto) {
-      return handleErrorClient(res, 400, "No se pudo crear el producto. Verifica los datos proporcionados.");
+    const [nuevoProducto, err] = await createProducto(productoData);
+    if (err || !nuevoProducto) {
+      return handleErrorClient(res, 400, "No se pudo crear el producto.");
     }
     return handleSuccess(res, 201, "Producto creado exitosamente", nuevoProducto);
   } catch (error) {
-
+    console.error(error);
     return handleErrorServer(res, 500, "Error interno del servidor al crear producto");
   }
 }
+
+
 
 export const updateProductoController = async (req, res) => {
   try {

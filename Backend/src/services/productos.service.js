@@ -117,11 +117,10 @@ export async function createProducto(productoData) {
             stock: productoData.stock,
             descripcion: productoData.descripcion,
             estado: productoData.estado,
+            image_url: productoData.image_url,
             categoria: categoria,  // relacionando correctamente
         });
 
-        
-    console.log("Nuevo producto preparado para guardar:", nuevoProducto);
 
         await productoRepository.save(nuevoProducto);
 
