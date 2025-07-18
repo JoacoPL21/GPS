@@ -14,6 +14,8 @@ import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
 import MisCompras from "./Profile/MisCompras.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
+import Valoraciones from "./Profile/Valoraciones.jsx";
+import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
 
 
 const router = createBrowserRouter([
@@ -69,6 +71,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MisCompras />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile/valoraciones",
+        element: (
+          <ProtectedRoute>
+            <Valoraciones />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile/valoraciones/valorar/:id_producto",
+        element: (
+          <ProtectedRoute>
+            <ValoracionFormPage />
           </ProtectedRoute>
         ),
       },

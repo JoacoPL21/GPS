@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
 import { getAllUsers, getUserProfile, registerDireccion, getDireccionByUserId, deleteDireccionByUserId, getUserProfileDetailed, updateUserProfile } from "../controller/user.controller.js";
-import { getComprasUsuarioController, verificarCompraProductoController } from "../controller/compras.controller.js";
+import { getComprasUsuarioController, verificarCompraProductoController, getProductosCompradosConValoracionController } from "../controller/compras.controller.js";
 import { authenticateToken } from "../middlewares/authentication.middleware.js";
 
 // Router para rutas de usuario autenticado (no requiere permisos de admin)
@@ -17,7 +17,8 @@ userRouter
     .get("/direcciones", getDireccionByUserId)
     .delete("/direccion/:id", deleteDireccionByUserId)
     .get("/compras", getComprasUsuarioController)
-    .get("/compras/producto/:id_producto", verificarCompraProductoController);
+    .get("/compras/producto/:id_producto", verificarCompraProductoController)
+    .get("/productos-comprados", getProductosCompradosConValoracionController);
 
 // Router para rutas de administración (requiere permisos de admin)
 const adminRouter = Router();

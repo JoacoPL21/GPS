@@ -1,4 +1,4 @@
-import { getComprasUsuario, verificarCompraProducto } from "../services/compras.service.js";
+import { getComprasUsuario, verificarCompraProducto, getProductosCompradosConValoracion } from "../services/compras.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 
 // Obtener todas las compras del usuario autenticado
@@ -35,5 +35,20 @@ export async function verificarCompraProductoController(req, res) {
         });
     } catch (error) {
         return handleErrorServer(res, 500, "Error interno del servidor al verificar compra");
+    }
+} 
+
+export async function getProductosCompradosConValoracionController(req, res) {
+    try {
+        const userId = req.user.id;
+        const [productos, error] = await getProductosCompradosConValoracion(userId);
+
+        if (error) {
+            return handleErrorClient(res, 400, error);
+        }
+
+        return handleSuccess(res, 200, "Productos comprados obtenidos exitosamente", productos);
+    } catch (error) {
+        return handleErrorServer(res, 500, "Error interno del servidor al obtener productos comprados");
     }
 } 
