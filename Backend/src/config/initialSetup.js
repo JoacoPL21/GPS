@@ -215,6 +215,22 @@ async function createCompra_Producto() {
         createdAt: new Date(),
         updatedAt: new Date()
       })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 2,
+        id_producto: 4,
+        cantidad: 1,
+        precio_unitario: 30000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 3,
+        id_producto: 1,
+        cantidad: 1,
+        precio_unitario: 30000,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })),
     ]);
 
     console.log(chalk.green("✅ Compra_Producto creadas exitosamente."));

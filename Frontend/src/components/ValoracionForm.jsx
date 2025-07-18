@@ -60,13 +60,7 @@ const ValoracionForm = ({
   }
 
   if (!puedeValorar) {
-    return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <p className="text-blue-800 text-center">
-          Solo puedes valorar productos que hayas comprado
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -122,7 +116,7 @@ const ValoracionForm = ({
           />
           <p className="text-sm text-gray-500 mt-1">
             {descripcion.length}/500 caracteres (mínimo 10)
-          </p>
+          </p>sol
         </div>
 
         {/* Botón de envío */}

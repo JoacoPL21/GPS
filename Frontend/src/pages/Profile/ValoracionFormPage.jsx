@@ -80,7 +80,7 @@ const ValoracionFormPage = () => {
     <div className="min-h-screen w-full max-w-2xl mx-auto py-8">
       <div className="bg-white rounded-lg shadow-md border p-6 flex flex-col gap-6">
         <div className="flex items-center gap-4">
-          <img src={producto.imagen_producto || '/images/imagenotfound.png'} alt={producto.nombre_producto} className="w-20 h-20 object-cover rounded" />
+          <img src={producto.imagen || '/images/imagenotfound.png'} alt={producto.nombre_producto} className="w-20 h-20 object-cover rounded" />
           <div>
             <div className="font-semibold text-gray-900 text-lg">{producto.nombre_producto}</div>
             <div className="text-gray-500 text-sm">Comprado el {new Date(producto.fecha_compra).toLocaleDateString('es-CL', { year: 'numeric', month: 'short', day: 'numeric' })}</div>

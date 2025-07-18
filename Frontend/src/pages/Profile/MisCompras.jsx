@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import { getComprasUsuario } from '../../services/valoraciones.service';
 import { FaShoppingBag, FaCalendar, FaDollarSign, FaStar, FaStarHalfAlt, FaBox, FaTruck } from 'react-icons/fa';
 import ValoracionForm from '../../components/ValoracionForm';
-import { useValoraciones } from '../../hooks/valoraciones/useValoraciones';
 
 const MisCompras = () => {
   const { authUser } = useAuth();
@@ -66,19 +65,6 @@ const MisCompras = () => {
     }
   };
 
-  const getEstadoIcon = (estado) => {
-    switch (estado) {
-      case 'completada':
-        return <FaBox className="w-4 h-4" />;
-      case 'pendiente':
-        return <FaTruck className="w-4 h-4" />;
-      case 'en_proceso':
-        return <FaTruck className="w-4 h-4" />;
-      default:
-        return <FaBox className="w-4 h-4" />;
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -105,69 +91,77 @@ const MisCompras = () => {
   }
 
   return (
-    <div className="min-h-screen w-full max-w-6xl py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mis Compras</h1>
-          <p className="text-gray-600">Historial de todas tus compras realizadas</p>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* Header */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold mb-2">Mis Compras</h2>
+        <p className="text-gray-500">Revisa el historial de tus compras realizadas</p>
+      </div>
+      {loading ? (
+        <div className="text-center text-gray-500 py-8">Cargando historial de compras...</div>
+      ) : error ? (
+        <div className="text-center text-red-500 py-8">{error}</div>
+      ) : compras.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-sm border-gray-400 p-8 text-center">
+          <FaShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Aún no tienes compras</h3>
+          <p className="text-gray-600 mb-6">Cuando realices tu primera compra, aparecerá aquí tu historial.</p>
+          <a
+            href="/catalogo"
+            className="inline-flex items-center px-6 py-3 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors"
+          >
+            <FaShoppingBag className="w-5 h-5 mr-2" /> Ir al catálogo
+          </a>
         </div>
-
-        {compras.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-            <FaShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Aún no tienes compras</h3>
-            <p className="text-gray-600 mb-6">
-              Cuando realices tu primera compra, aparecerá aquí tu historial.
-            </p>
-            <a
-              href="/catalogo"
-              className="inline-flex items-center px-6 py-3 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors"
-            >
-              <FaShoppingBag className="w-5 h-5 mr-2" />
-              Ir al catálogo
-            </a>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Resumen de compras */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Resumen de Compras</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">{compras.length}</div>
-                  <div className="text-sm text-gray-600">Compras realizadas</div>
+      ) : (
+        <div className="space-y-8">
+          {compras.map((compra) => (
+            <div key={compra.id_compra} className="bg-white rounded-lg shadow-sm border-gray-400 p-6 flex flex-col gap-4">
+              {/* Header de la compra */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-semibold text-gray-900">Compra #{compra.id_compra}</span>
+                  <span className={`inline-block px-3 py-1 text-xs rounded border font-medium ${getEstadoColor(compra.estado)}`}>{compra.estado}</span>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {compras.filter(c => c.estado === 'completada').length}
-                  </div>
-                  <div className="text-sm text-gray-600">Completadas</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {compras.reduce((total, compra) => total + (compra.productos?.length || 0), 0)}
-                  </div>
-                  <div className="text-sm text-gray-600">Productos comprados</div>
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <FaCalendar className="w-4 h-4 mr-1" />
+                  {formatearFecha(compra.createdAt)}
+                  <FaDollarSign className="w-4 h-4 ml-4 mr-1" />
+                  {formatearPrecio(compra.total)}
                 </div>
               </div>
+              {/* Productos resumen */}
+              <div className="flex flex-wrap gap-4">
+                {(compra.productos || []).slice(0, 3).map((producto) => (
+                  <div key={producto.id_producto} className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 flex-1 min-w-[220px]">
+                    <img
+                      src={producto.imagen || producto.imagen_producto || '/images/imagenotfound.png'}
+                      alt={producto.nombre_producto}
+                      className="w-16 h-16 object-cover rounded-lg border-gray-300"
+                    />
+                    <div>
+                      <div className="font-medium text-gray-900 text-sm line-clamp-2">{producto.nombre_producto}</div>
+                      <div className="text-xs text-gray-500">Cantidad: {producto.cantidad}</div>
+                    </div>
+                  </div>
+                ))}
+                {compra.productos && compra.productos.length > 3 && (
+                  <div className="flex items-center text-xs text-gray-500 ml-2">+{compra.productos.length - 3} más</div>
+                )}
+              </div>
+              {/* Botón de detalles */}
+              <div className="flex justify-end mt-2">
+                <button
+                  className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors"
+                  // onClick={() => navigate(`/profile/mis-compras/${compra.id_compra}`)}
+                >
+                  Ver más detalles
+                </button>
+              </div>
             </div>
-
-            {/* Lista de compras agrupadas */}
-            <div className="space-y-6">
-              {compras.map((compra) => (
-                <CompraCard 
-                  key={compra.id_compra}
-                  compra={compra}
-                  formatearFecha={formatearFecha}
-                  formatearPrecio={formatearPrecio}
-                  getEstadoColor={getEstadoColor}
-                  getEstadoIcon={getEstadoIcon}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -227,7 +221,6 @@ const CompraCard = ({ compra, formatearFecha, formatearPrecio, getEstadoColor, g
                  key={`${compra.id_compra}-${producto.id_producto}`}
                  producto={producto}
                  formatearPrecio={formatearPrecio}
-                 compra={compra}
                />
              ))}
           </div>
@@ -242,37 +235,15 @@ const CompraCard = ({ compra, formatearFecha, formatearPrecio, getEstadoColor, g
 };
 
 // Componente para mostrar un producto individual dentro de una compra
-const ProductoCompra = ({ producto, formatearPrecio, compra }) => {
-  const {
-    valoraciones,
-    loading: loadingValoraciones,
-    puedeValorar,
-    valoracionUsuario,
-    valoracionUsuarioLoading,
-    submitting,
-    promedioValoraciones,
-    enviarValoracion
-  } = useValoraciones(producto.id_producto);
-
-  const handleSubmitValoracion = async (valoracionData) => {
-    try {
-      await enviarValoracion(valoracionData);
-      alert(valoracionUsuario ? 'Valoración actualizada exitosamente' : 'Valoración enviada exitosamente');
-    } catch (error) {
-      alert(`Error: ${error.message}`);
-    }
-  };
-
-  // Solo permitir valorar si la compra está completada
-  const puedeValorarProducto = puedeValorar && compra.estado === 'completada';
-
+const ProductoCompra = ({ producto, formatearPrecio }) => {
+  // Mostrar solo información básica del producto, sin valoraciones
   return (
     <div className="border border-gray-200 rounded-lg p-4">
       <div className="flex items-start space-x-4">
         {/* Imagen del producto */}
         <div className="flex-shrink-0">
           <img
-            src={producto.imagen_producto || '/images/imagenotfound.png'}
+            src={producto.imagen || '/images/imagenotfound.png'}
             alt={producto.nombre_producto}
             className="w-20 h-20 object-cover rounded-lg"
             onError={(e) => {
@@ -280,7 +251,6 @@ const ProductoCompra = ({ producto, formatearPrecio, compra }) => {
             }}
           />
         </div>
-
         {/* Información del producto */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
@@ -295,57 +265,6 @@ const ProductoCompra = ({ producto, formatearPrecio, compra }) => {
               </div>
             </div>
           </div>
-
-          {/* Valoraciones */}
-          <div className="mt-3">
-            {loadingValoraciones ? (
-              <div className="text-sm text-gray-500">Cargando valoraciones...</div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star} className="text-yellow-400">
-                      {star <= promedioValoraciones ? (
-                        <FaStar className="w-4 h-4" />
-                      ) : star - 0.5 <= promedioValoraciones ? (
-                        <FaStarHalfAlt className="w-4 h-4" />
-                      ) : (
-                        <FaStar className="w-4 h-4 text-gray-300" />
-                      )}
-                    </span>
-                  ))}
-                </div>
-                <span className="text-sm text-gray-600">
-                  ({promedioValoraciones.toFixed(1)})
-                </span>
-                <span className="text-sm text-gray-500">
-                  ({valoraciones.length} valoraciones)
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Formulario de valoración */}
-          {puedeValorarProducto && !valoracionUsuarioLoading && (
-            <div className="mt-4">
-              <ValoracionForm
-                productoId={producto.id_producto}
-                onSubmit={handleSubmitValoracion}
-                valoracionExistente={valoracionUsuario}
-                submitting={submitting}
-                puedeValorar={puedeValorarProducto}
-              />
-            </div>
-          )}
-          {/* Indicador de carga para valoraciones del usuario */}
-          {puedeValorarProducto && valoracionUsuarioLoading && (
-            <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-2"></div>
-                <span className="text-sm text-gray-600">Cargando valoración...</span>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -29,7 +29,7 @@ const Valoraciones = () => {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Mis Valoraciones</h1>
+        <h2 className="text-3xl font-bold mb-2">Mis Valoraciones</h2>
         <p className="text-gray-500">Gestiona las valoraciones de tus productos comprados</p>
       </div>
 
@@ -51,17 +51,25 @@ const Valoraciones = () => {
         </div>
       </div>
 
-      {/* Tabs visuales */}
-      <div className="w-full mb-6">
-        <div className="grid grid-cols-2 border-gray-400 rounded-lg overflow-hidden">
+      {/* Tabs visuales con animación */}
+      <div className="w-full bg-white mb-6 relative">
+        <div className="grid grid-cols-2 border-gray-400 rounded-lg overflow-hidden relative">
+          {/* Highlight animado sólido */}
+          <div
+            className="absolute top-0 left-0 h-full w-1/2 transition-transform duration-300 ease-in-out z-0 rounded-lg bg-[#A47048]"
+            style={{
+              transform: activeTab === 'pending' ? 'translateX(0%)' : 'translateX(100%)',
+              transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
+            }}
+          />
           <button
-            className={`flex items-center justify-center gap-2 py-3 font-medium transition ${activeTab === 'pending' ? 'bg-[#A47048] text-white border-b-2 border-[#A47048]' : 'bg-white text-gray-500'}`}
+            className={`relative z-10 flex items-center justify-center gap-2 py-3 font-medium transition w-full ${activeTab === 'pending' ? 'text-white' : 'text-[#A47048]'}`}
             onClick={() => setActiveTab('pending')}
           >
             <FaClock className="w-4 h-4" /> Pendientes ({pendientes.length})
           </button>
           <button
-            className={`flex items-center justify-center gap-2 py-3 font-medium transition ${activeTab === 'completed' ? 'bg-[#A47048] text-white border-b-2 border-[#A47048]' : 'bg-white text-gray-500'}`}
+            className={`relative z-10 flex items-center justify-center gap-2 py-3 font-medium transition w-full ${activeTab === 'completed' ? 'text-white' : 'text-[#A47048]'}`}
             onClick={() => setActiveTab('completed')}
           >
             <FaCheckCircle className="w-4 h-4" /> Realizadas ({realizados.length})
@@ -88,7 +96,7 @@ const Valoraciones = () => {
                 {/* Imagen del producto */}
                 <div className="flex-shrink-0">
                   <img
-                    src={item.imagen_producto || '/images/imagenotfound.png'}
+                    src={item.imagen || item.imagen_producto || '/images/imagenotfound.png'}
                     alt={item.nombre_producto}
                     className="w-20 h-20 object-cover rounded-lg border-gray-400"
                   />
@@ -143,7 +151,7 @@ const Valoraciones = () => {
                 {/* Imagen del producto */}
                 <div className="flex-shrink-0">
                   <img
-                    src={review.imagen_producto || '/images/imagenotfound.png'}
+                    src={review.imagen || review.imagen_producto || '/images/imagenotfound.png'}
                     alt={review.nombre_producto}
                     className="w-20 h-20 object-cover rounded-lg border"
                   />

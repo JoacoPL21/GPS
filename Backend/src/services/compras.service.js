@@ -2,6 +2,7 @@ import Compras from "../entity/compra.entity.js";
 import Compra_Producto from "../entity/compra_producto.entity.js";
 import { AppDataSource } from "../config/configDB.js";
 import Valoraciones from "../entity/valoraciones.entity.js";
+import { getUrlImage } from "../services/minio.service.js";
 
 // Obtener todas las compras de un usuario con sus productos
 export async function getComprasUsuario(id_usuario) {
@@ -22,15 +23,24 @@ export async function getComprasUsuario(id_usuario) {
                     relations: ["Productos"]
                 });
 
+                // Obtener la URL firmada de la imagen para cada producto
+                const productos = await Promise.all(productosCompra.map(async cp => {
+                  let imagen = null;
+                  if (cp.Productos?.image_url) {
+                    imagen = await getUrlImage(cp.Productos.image_url);
+                  }
+                  return {
+                    id_producto: cp.id_producto,
+                    cantidad: cp.cantidad,
+                    precio_unitario: cp.precio_unitario,
+                    nombre_producto: cp.Productos?.nombre || 'Producto no disponible',
+                    imagen,
+                  };
+                }));
+
                 return {
                     ...compra,
-                    productos: productosCompra.map(cp => ({
-                        id_producto: cp.id_producto,
-                        cantidad: cp.cantidad,
-                        precio_unitario: cp.precio_unitario,
-                        nombre_producto: cp.Productos?.nombre || 'Producto no disponible',
-                        imagen_producto: cp.Productos?.imagen || null
-                    }))
+                    productos
                 };
             })
         );
@@ -81,7 +91,7 @@ export async function getProductosCompradosConValoracion(id_usuario) {
         });
 
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
-        const productos = [];
+        const productosMap = new Map(); // Usar Map para evitar duplicados por id_producto
 
         for (const compra of compras) {
             const productosCompra = await compraProductoRepository.find({
@@ -90,30 +100,42 @@ export async function getProductosCompradosConValoracion(id_usuario) {
             });
 
             for (const cp of productosCompra) {
-                // Buscar valoración del usuario para ese producto
-                const valoracion = await AppDataSource.getRepository(Valoraciones).findOne({
-                    where: {
-                        id_usuario: parseInt(id_usuario),
-                        id_producto: cp.id_producto
-                    }
-                });
-
-                productos.push({
-                    id_producto: cp.id_producto,
-                    nombre_producto: cp.Productos?.nombre || 'Producto no disponible',
-                    imagen_producto: cp.Productos?.imagen || null,
-                    fecha_compra: compra.createdAt,
-                    id_compra: compra.id_compra,
-                    valoracion: valoracion
-                        ? {
-                            puntuacion: valoracion.puntuacion,
-                            descripcion: valoracion.descripcion,
-                            updatedAt: valoracion.updatedAt
+                // Solo agregar si el producto no existe ya en el Map
+                if (!productosMap.has(cp.id_producto)) {
+                    // Buscar valoración del usuario para ese producto
+                    const valoracion = await AppDataSource.getRepository(Valoraciones).findOne({
+                        where: {
+                            id_usuario: parseInt(id_usuario),
+                            id_producto: cp.id_producto
                         }
-                        : null
-                });
+                    });
+
+                    // Obtener la URL firmada de la imagen
+                    let imagen = null;
+                    if (cp.Productos?.image_url) {
+                      imagen = await getUrlImage(cp.Productos.image_url);
+                    }
+
+                    productosMap.set(cp.id_producto, {
+                        id_producto: cp.id_producto,
+                        nombre_producto: cp.Productos?.nombre || 'Producto no disponible',
+                        imagen: imagen,
+                        fecha_compra: compra.createdAt,
+                        id_compra: compra.id_compra,
+                        valoracion: valoracion
+                            ? {
+                                puntuacion: valoracion.puntuacion,
+                                descripcion: valoracion.descripcion,
+                                updatedAt: valoracion.updatedAt
+                            }
+                            : null
+                    });
+                }
             }
         }
+
+        // Convertir el Map a array
+        const productos = Array.from(productosMap.values());
 
         return [productos, null];
     } catch (error) {
