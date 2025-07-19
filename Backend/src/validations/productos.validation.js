@@ -52,6 +52,42 @@ export const productoCreateValidation = Joi.object({
       "any.required": "La categoría es obligatoria",
       "number.base": "La categoría debe ser un número",
     }),
+  peso: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El peso debe ser un número positivo",
+      "number.base": "El peso debe ser un número",
+      "number.precision": "El peso debe tener máximo 2 decimales",
+    }),
+  ancho: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El ancho debe ser un número positivo",
+      "number.base": "El ancho debe ser un número",
+      "number.precision": "El ancho debe tener máximo 2 decimales",
+    }),
+  alto: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El alto debe ser un número positivo",
+      "number.base": "El alto debe ser un número",
+      "number.precision": "El alto debe tener máximo 2 decimales",
+    }),
+  profundidad: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "La profundidad debe ser un número positivo",
+      "number.base": "La profundidad debe ser un número",
+      "number.precision": "La profundidad debe tener máximo 2 decimales",
+    }),
 }).unknown(false).messages({
   "object.unknown": "Los campos adicionales no están permitidos",
 });

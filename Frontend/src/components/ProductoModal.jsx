@@ -63,6 +63,46 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
           />
         </svg>
       ),
+      peso: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16l-3-3m3 3l3-3"
+          />
+        </svg>
+      ),
+      ancho: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+          />
+        </svg>
+      ),
+      alto: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+          />
+        </svg>
+      ),
+      profundidad: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+          />
+        </svg>
+      ),
     }
     return icons[field] || null
   }
@@ -75,6 +115,10 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
       stock: "Cantidad en stock",
       categoria: "Categoría",
       estado: "Estado",
+      peso: "Peso (kg)",
+      ancho: "Ancho (cm)",
+      alto: "Alto (cm)",
+      profundidad: "Profundidad (cm)",
     }
     return labels[field] || field
   }
@@ -317,8 +361,8 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             {getFieldIcon("categoria")}
                           </div>
                           <select
-                            name="categoria"
-                            value={form.categoria}
+                            name="id_categoria"
+                            value={form.id_categoria}
                             onChange={onChange}
                             className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all appearance-none bg-white ${
                               errors.categoria
@@ -388,6 +432,171 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             </svg>
                           </div>
                         </div>
+                      </div>
+
+                      {/* Separador visual para dimensiones */}
+                      <div className="md:col-span-2">
+                        <div className="flex items-center my-4">
+                          <div className="flex-grow border-t border-gray-300"></div>
+                          <span className="flex-shrink mx-4 text-gray-500 font-medium">Dimensiones y Peso (Opcional)</span>
+                          <div className="flex-grow border-t border-gray-300"></div>
+                        </div>
+                      </div>
+
+                      {/* Peso */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          {getFieldLabel("peso")}
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            {getFieldIcon("peso")}
+                          </div>
+                          <input
+                            type="number"
+                            name="peso"
+                            value={form.peso || ''}
+                            onChange={onChange}
+                            min="0"
+                            step="0.01"
+                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                              errors.peso
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300 focus:border-orange-500"
+                            }`}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        {errors.peso && (
+                          <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            {errors.peso}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Ancho */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          {getFieldLabel("ancho")}
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            {getFieldIcon("ancho")}
+                          </div>
+                          <input
+                            type="number"
+                            name="ancho"
+                            value={form.ancho || ''}
+                            onChange={onChange}
+                            min="0"
+                            step="0.01"
+                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                              errors.ancho
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300 focus:border-orange-500"
+                            }`}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        {errors.ancho && (
+                          <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            {errors.ancho}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Alto */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          {getFieldLabel("alto")}
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            {getFieldIcon("alto")}
+                          </div>
+                          <input
+                            type="number"
+                            name="alto"
+                            value={form.alto || ''}
+                            onChange={onChange}
+                            min="0"
+                            step="0.01"
+                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                              errors.alto
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300 focus:border-orange-500"
+                            }`}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        {errors.alto && (
+                          <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            {errors.alto}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Profundidad */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          {getFieldLabel("profundidad")}
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            {getFieldIcon("profundidad")}
+                          </div>
+                          <input
+                            type="number"
+                            name="profundidad"
+                            value={form.profundidad || ''}
+                            onChange={onChange}
+                            min="0"
+                            step="0.01"
+                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                              errors.profundidad
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300 focus:border-orange-500"
+                            }`}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        {errors.profundidad && (
+                          <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            {errors.profundidad}
+                          </p>
+                        )}
                       </div>
                     </div>
 
