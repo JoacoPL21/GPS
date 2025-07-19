@@ -103,6 +103,17 @@ export const updateProductoController = async (req, res) => {
       });
     }
 
+    // Validar campos numéricos opcionales (dimensiones y peso)
+    const camposNumericos = ['peso', 'ancho', 'alto', 'profundidad'];
+    for (const campo of camposNumericos) {
+      if (productoData[campo] !== undefined && (isNaN(productoData[campo]) || productoData[campo] < 0)) {
+        return res.status(400).json({
+          message: `El campo ${campo} debe ser un número positivo`,
+          data: null
+        });
+      }
+    }
+
     const resultado = await updateProductoService(id_producto, productoData);
 
     if (resultado.success) {

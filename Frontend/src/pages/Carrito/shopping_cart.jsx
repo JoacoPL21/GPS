@@ -143,7 +143,7 @@ const ShoppingCart = () => {
         quantity: item.cantidad || 1,
       }));
 
-      const response = await fetch('http://localhost:3000/api/payments/create_preference', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/create_preference`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

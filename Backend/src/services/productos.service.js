@@ -25,8 +25,13 @@ export async function getProductosDisponibles() {
         descripcion: producto.descripcion,
         estado: producto.estado,
         destacado: producto.destacado,
+        peso: producto.peso,
+        ancho: producto.ancho,
+        alto: producto.alto,
+        profundidad: producto.profundidad,
         imagen: imagenUrlFirmada,
-        categoria: producto.categoria?.nombre
+        categoria: producto.categoria?.nombre,
+        id_categoria: producto.categoria?.id_categoria
       };
     }));
 
@@ -54,8 +59,13 @@ export async function getProductos() {
       descripcion: producto.descripcion,
       estado: producto.estado,
       destacado: producto.destacado,
+      peso: producto.peso,
+      ancho: producto.ancho,
+      alto: producto.alto,
+      profundidad: producto.profundidad,
       imagen: imagenUrlFirmada,
-      categoria: producto.categoria?.nombre
+      categoria: producto.categoria?.nombre,
+      id_categoria: producto.categoria?.id_categoria
     };
     }));
 
@@ -88,8 +98,13 @@ export async function getProductoById(id) {
             descripcion: producto.descripcion,
             estado: producto.estado,
             destacado: producto.destacado,
+            peso: producto.peso,
+            ancho: producto.ancho,
+            alto: producto.alto,
+            profundidad: producto.profundidad,
             imagen: imagenUrlFirmada,
-            categoria: producto.categoria?.nombre
+            categoria: producto.categoria?.nombre,
+            id_categoria: producto.categoria?.id_categoria
         };
 
         return { data: productoData, error: null };
@@ -101,9 +116,6 @@ export async function getProductoById(id) {
 
 //Funcion para crear un producto con validaciones
 export async function createProducto(productoData) {
-
-    console.log("Datos del producto a crear:", productoData);
-
     try {
         const productoRepository = AppDataSource.getRepository(Productos);
         const categoriaRepository = AppDataSource.getRepository(Categorias);
@@ -118,9 +130,12 @@ export async function createProducto(productoData) {
             descripcion: productoData.descripcion,
             estado: productoData.estado,
             image_url: productoData.image_url,
+            peso: productoData.peso,
+            ancho: productoData.ancho,
+            alto: productoData.alto,
+            profundidad: productoData.profundidad,
             categoria: categoria,  // relacionando correctamente
         });
-
 
         await productoRepository.save(nuevoProducto);
 
@@ -158,6 +173,10 @@ export const updateProductoService = async (id_producto, productoData) => {
             stock: productoData.stock !== undefined ? productoData.stock : productoExistente.stock,
             id_categoria: productoData.id_categoria || productoExistente.id_categoria,
             estado: productoData.estado || productoExistente.estado,
+            peso: productoData.peso !== undefined ? productoData.peso : productoExistente.peso,
+            ancho: productoData.ancho !== undefined ? productoData.ancho : productoExistente.ancho,
+            alto: productoData.alto !== undefined ? productoData.alto : productoExistente.alto,
+            profundidad: productoData.profundidad !== undefined ? productoData.profundidad : productoExistente.profundidad,
             image_url: productoData.image_url !== undefined ? productoData.image_url : productoExistente.image_url,
             updated_at: new Date()
         };
@@ -245,8 +264,13 @@ export async function getProductosDestacados() {
             descripcion: producto.descripcion,
             estado: producto.estado,
             destacado: producto.destacado,
+            peso: producto.peso,
+            ancho: producto.ancho,
+            alto: producto.alto,
+            profundidad: producto.profundidad,
             imagen:imagenUrlFirmada,
-            categoria: producto.categoria?.nombre
+            categoria: producto.categoria?.nombre,
+            id_categoria: producto.categoria?.id_categoria
         }
         }));
         return [productosData, null];
@@ -281,8 +305,13 @@ export async function getUltimosProductos(limit = 4) {
             descripcion: producto.descripcion,
             estado: producto.estado,
             destacado: producto.destacado,
+            peso: producto.peso,
+            ancho: producto.ancho,
+            alto: producto.alto,
+            profundidad: producto.profundidad,
             imagen: imagenUrlFirmada,
-            categoria: producto.categoria?.nombre
+            categoria: producto.categoria?.nombre,
+            id_categoria: producto.categoria?.id_categoria
         };
         }));
         return [productosData, null];
@@ -364,7 +393,6 @@ export async function updateProductoStock(id, cantidad) {
         }
 
         producto.stock -= cantidad;
-        console.log(cantidad);
         await productoRepository.save(producto);
         return [producto, null];
     } catch (error) {

@@ -31,19 +31,25 @@ function ProductosManagerConnected() {
 
   const fetchProductos = async () => {
     setLoading(true);
-    const response = await getProductos();
-    console.log("productosAll antes de la carga:", response.data);
-    if (response.success) {
-      setProductosAll(response.data);
+    try {
+      const response = await getProductos();
+      if (response.success && response.data) {
+        setProductosAll(response.data);
+      } else {
+        console.error("Error al cargar productos:", response.error);
+        setProductosAll([]);
+      }
+    } catch (error) {
+      console.error("Error inesperado al cargar productos:", error);
+      setProductosAll([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     fetchProductos();
   }, []);
-
-  console.log("produtosAll antes del render:", productosAll)
 
   const { categorias, loading: categoriasLoading, addCategoria, editCategoria, removeCategoria } = useCategorias()
 
@@ -54,6 +60,10 @@ function ProductosManagerConnected() {
     stock: "",
     id_categoria: "",
     estado: "",
+    peso: "",
+    ancho: "",
+    alto: "",
+    profundidad: "",
   })
   const [formCategoria, setFormCategoria] = useState({
     nombre: "",
@@ -72,17 +82,26 @@ function ProductosManagerConnected() {
 
   const fetchCategorias = async () => {
     setLoadingCategorias(true)
-    const response = await getCategorias()
-    if (response.success) {
-      setCategorias(response.data.data[0])
+    try {
+      const response = await getCategorias()
+      if (response.success && response.data?.data) {
+        setCategorias(response.data.data[0])
+      } else {
+        console.error("Error al cargar categorías:", response.error)
+        setCategorias([])
+      }
+    } catch (error) {
+      console.error("Error inesperado al cargar categorías:", error)
+      setCategorias([])
+    } finally {
+      setLoadingCategorias(false)
     }
-    setLoadingCategorias(false)
   }
 
   const handleAddCategoria = async (data) => {
     const response = await createCategoria(data)
     if (response.success) {
-      fetchCategorias()
+      await fetchCategorias() // Esperar a que se actualicen las categorías
     }
     return response
   }
@@ -90,7 +109,7 @@ function ProductosManagerConnected() {
   const handleEditCategoria = async (id, data) => {
     const response = await updateCategoria(id, data)
     if (response.success) {
-      fetchCategorias()
+      await fetchCategorias() // Esperar a que se actualicen las categorías
     }
     return response
   }
@@ -98,7 +117,7 @@ function ProductosManagerConnected() {
   const handleDeleteCategoria = async (id) => {
     const response = await deleteCategoria(id)
     if (response.success) {
-      fetchCategorias()
+      await fetchCategorias() // Esperar a que se actualicen las categorías
     }
     return response
   }
@@ -168,7 +187,22 @@ function ProductosManagerConnected() {
     if (isNaN(form.precio) || Number(form.precio) < 0) newErrors.precio = "Precio inválido"
     if (!form.stock) newErrors.stock = "El stock es obligatorio"
     if (isNaN(form.stock) || Number(form.stock) < 0) newErrors.stock = "Stock inválido"
-    if (!form.categoria.trim()) newErrors.categoria = "La categoría es obligatoria"
+    if (!form.id_categoria) newErrors.categoria = "La categoría es obligatoria"
+    
+    // Validaciones opcionales para dimensiones y peso
+    if (form.peso && (isNaN(form.peso) || Number(form.peso) < 0)) {
+      newErrors.peso = "El peso debe ser un número positivo"
+    }
+    if (form.ancho && (isNaN(form.ancho) || Number(form.ancho) < 0)) {
+      newErrors.ancho = "El ancho debe ser un número positivo"
+    }
+    if (form.alto && (isNaN(form.alto) || Number(form.alto) < 0)) {
+      newErrors.alto = "El alto debe ser un número positivo"
+    }
+    if (form.profundidad && (isNaN(form.profundidad) || Number(form.profundidad) < 0)) {
+      newErrors.profundidad = "La profundidad debe ser un número positivo"
+    }
+    
     return newErrors
   }
 
@@ -186,7 +220,11 @@ function ProductosManagerConnected() {
       precio: "",
       stock: "",
       id_categoria: "",
-      estado: "",
+      estado: "activo",
+      peso: "",
+      ancho: "",
+      alto: "",
+      profundidad: "",
     })
     setModalOpen(true)
   }
@@ -201,6 +239,10 @@ function ProductosManagerConnected() {
       stock: producto.stock,
       id_categoria: producto.id_categoria,
       estado: producto.estado,
+      peso: producto.peso || "",
+      ancho: producto.ancho || "",
+      alto: producto.alto || "",
+      profundidad: producto.profundidad || "",
     })
     setEditingId(producto.id_producto)
     setModalOpen(true)
@@ -304,8 +346,20 @@ function ProductosManagerConnected() {
 
   const handleExport = () => {
     const csvContent = [
-      ["ID", "Nombre", "Descripción", "Precio", "Stock", "Categoría", "Estado"],
-      ...productosAll.map((p) => [p.id_producto, p.nombre, p.descripcion, p.precio, p.stock, p.categoria, p.estado]),
+      ["ID", "Nombre", "Descripción", "Precio", "Stock", "Categoría", "Estado", "Peso (kg)", "Ancho (cm)", "Alto (cm)", "Profundidad (cm)"],
+      ...productosAll.map((p) => [
+        p.id_producto, 
+        p.nombre, 
+        p.descripcion, 
+        p.precio, 
+        p.stock, 
+        p.categoria, 
+        p.estado,
+        p.peso || '',
+        p.ancho || '',
+        p.alto || '',
+        p.profundidad || ''
+      ]),
     ]
       .map((row) => row.join(","))
       .join("\n")
@@ -332,35 +386,63 @@ function ProductosManagerConnected() {
     try {
       let response
       if (editingId) {
+        // Primero actualizar el producto y esperar a que termine COMPLETAMENTE
         response = await editProducto(editingId, form)
         if (response.success) {
-          Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
+          // Solo después de que la actualización termine, recargar productos
           await fetchProductos()
+          
+          // Resetear formulario y cerrar modal
+          setForm({
+            nombre: "",
+            descripcion: "",
+            precio: "",
+            stock: "",
+            id_categoria: "",
+            estado: "activo",
+            peso: "",
+            ancho: "",
+            alto: "",
+            profundidad: "",
+          })
+          setEditingId(null)
+          setModalOpen(false)
+          
+          // Mostrar mensaje de éxito
+          Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
         }
       } else {
+        // Primero crear el producto y esperar a que termine COMPLETAMENTE
         response = await addProducto(form)
         if (response.success) {
-          Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
+          // Solo después de que la creación termine, recargar productos
           await fetchProductos()
+          
+          // Resetear formulario y cerrar modal
+          setForm({
+            nombre: "",
+            descripcion: "",
+            precio: "",
+            stock: "",
+            id_categoria: "",
+            estado: "activo",
+            peso: "",
+            ancho: "",
+            alto: "",
+            profundidad: "",
+          })
+          setEditingId(null)
+          setModalOpen(false)
+          
+          // Mostrar mensaje de éxito
+          Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
         }
       }
 
-      if (response.success) {
-        setForm({
-          nombre: "",
-          descripcion: "",
-          precio: "",
-          stock: "",
-          id_categoria: "",
-          estado: "",
-        })
-        setEditingId(null)
-        setModalOpen(false)
-      } else {
+      if (!response.success) {
         Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
       }
     } catch (error) {
-      console.log("Error al procesar la solicitud:", error)
       Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
     } finally {
       setSubmitting(false)
@@ -418,7 +500,6 @@ function ProductosManagerConnected() {
       </div>
     )
   }
-  console.log("categoriasSet antes del render:", categoriasSet)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -982,9 +1063,9 @@ function ProductosManagerConnected() {
         isOpen={modalCategoriaOpen}
         onClose={() => setModalCategoriaOpen(false)}
         categorias={categoriasSet}
-        onAdd={handleAddCategoria}
-        onEdit={handleEditCategoria}
-        onDelete={handleDeleteCategoria}
+        onAddCategoria={handleAddCategoria}
+        onEditCategoria={handleEditCategoria}
+        onDeleteCategoria={handleDeleteCategoria}
         loading={loadingCategorias}
       />
     </div>

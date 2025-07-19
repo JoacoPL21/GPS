@@ -7,6 +7,13 @@ function withTimeout(promise, ms) {
   ]);
 }
 
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise(resolve => setTimeout(() => resolve(null), ms))
+  ]);
+}
+
 export async function getUrlImage(fileName, bucketName = 'gps', folder = 'productos') {
   if (!fileName) return null;
 

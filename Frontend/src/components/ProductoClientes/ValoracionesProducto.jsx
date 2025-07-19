@@ -1,37 +1,21 @@
 /**
  * Componente de valoraciones de producto con estética moderna y resumen
  */
-import { useEffect, useState, useMemo } from "react";
-import { getValoracionesPorProducto } from "../../services/productos.service";
 import { FaStar } from "react-icons/fa";
+import { useValoraciones } from "../../hooks/valoraciones/useValoraciones";
+import ValoracionForm from "../ValoracionForm";
 
 const ValoracionesProducto = ({ id_producto }) => {
-  const [valoraciones, setValoraciones] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchValoraciones = async () => {
-      setLoading(true);
-      setError(null);
-      const { data, error } = await getValoracionesPorProducto(id_producto);
-      if (error) {
-        setError(error);
-      } else {
-        setValoraciones(data.data || []);
-      }
-      setLoading(false);
-    };
-    if (id_producto) fetchValoraciones();
-  }, [id_producto]);
-
-  // Calcular promedio
-  const averageRating = useMemo(() => {
-    if (valoraciones.length === 0) return 0;
-    return (
-      valoraciones.reduce((sum, v) => sum + (v.puntuacion || 0), 0) / valoraciones.length
-    );
-  }, [valoraciones]);
+  const {
+    valoraciones,
+    loading,
+    error,
+    puedeValorar,
+    valoracionUsuario,
+    submitting,
+    promedioValoraciones,
+    enviarValoracion
+  } = useValoraciones(id_producto);
 
   // Renderizar estrellas
   const renderStars = (rating) => (
@@ -43,6 +27,15 @@ const ValoracionesProducto = ({ id_producto }) => {
     ))
   );
 
+  const handleSubmitValoracion = async (valoracionData) => {
+    try {
+      await enviarValoracion(valoracionData);
+      alert(valoracionUsuario ? 'Valoración actualizada exitosamente' : 'Valoración enviada exitosamente');
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
+  };
+
   if (loading) return <div className="mt-8">Cargando valoraciones...</div>;
   if (error) return <div className="mt-8 text-red-600">Error al cargar valoraciones: {error}</div>;
 
@@ -52,13 +45,21 @@ const ValoracionesProducto = ({ id_producto }) => {
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-2">Valoraciones del producto</h2>
         <div className="flex items-center gap-2 mb-1">
-          <div className="flex items-center">{renderStars(Math.round(averageRating))}</div>
-          <span className="text-lg font-semibold">{averageRating.toFixed(1)}</span>
+          <div className="flex items-center">{renderStars(Math.round(promedioValoraciones))}</div>
+          <span className="text-lg font-semibold">{promedioValoraciones.toFixed(1)}</span>
           <span className="text-gray-500">
             ({valoraciones.length} {valoraciones.length === 1 ? "valoración" : "valoraciones"})
           </span>
         </div>
       </div>
+
+      {/* Formulario de valoración */}
+      <ValoracionForm
+        onSubmit={handleSubmitValoracion}
+        valoracionExistente={valoracionUsuario}
+        submitting={submitting}
+        puedeValorar={puedeValorar}
+      />
 
       {/* Lista de valoraciones */}
       <div className="space-y-4">

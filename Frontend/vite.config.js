@@ -2,10 +2,17 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    allowedHosts: ['localhost', 'a223-190-211-41-93.ngrok-free.app']
+    proxy: {
+      '/api': {
+        target: 'http://localhost:10000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
+      }
+    },
+    allowedHosts: ['localhost', 'eccomerce-cyizlkvn3-tyrf1ngs-projects.vercel.app','b896-190-5-38-87.ngrok-free.app']
   }
 })

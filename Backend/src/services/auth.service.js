@@ -29,7 +29,7 @@ export async function loginService(user) {
       return [null, createErrorMessage("password", "La contraseña es incorrecta")];
     }
 
-    
+
     // Payload mínimo para el JWT - solo información esencial
     const payload = {
       id: userFound.id_usuario,
@@ -48,7 +48,7 @@ export async function loginService(user) {
       email: userFound.email,
       rol: userFound.rol,
       telefono: userFound.telefono || "",
-      
+
     };
 
     return [accessToken, null, userInfo];
@@ -62,10 +62,13 @@ export async function loginService(user) {
 export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(Usuario);
-   
+
 
     const { nombreCompleto, telefono, email } = user;
-    
+
+    if ((rol === "cliente" || rol === "admin") && (!password || password.trim() === "")) {
+      return [null, { dataInfo: "password", message: "La contraseña es obligatoria" }];
+    }
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
@@ -77,7 +80,7 @@ export async function registerService(user) {
         email,
       },
     });
-    
+
     if (existingEmailUser) return [null, createErrorMessage("email", "Correo electrónico en uso")];
 
     if (!nombreCompleto || !email || !user.password) {

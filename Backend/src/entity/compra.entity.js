@@ -1,6 +1,6 @@
 "use strict"
 import { EntitySchema } from "typeorm";
-const Compras = new EntitySchema({
+const Compra = new EntitySchema({
     name: "Compra",
     tableName: "compras",
     columns: {
@@ -11,21 +11,90 @@ const Compras = new EntitySchema({
         },
         id_usuario: { 
             type: "int",
+            nullable: true, // Se puso null en caso de que el comprador este como invitado y no se haya podido extraer el id del usuario 
+        },
+        payment_id: {
+            type: "varchar",
+            length: 255,
+            nullable: true,
+            unique: true,
+        },
+        payment_status: {
+            type: "varchar",
+            length: 50,
+            nullable: true,
+        },
+        external_reference: {
+            type: "varchar",
+            length: 255,
+            nullable: true,
+        },
+        payment_amount: {
+            type: "decimal",
+            precision: 10,
+            scale: 2,
             nullable: false,
         },
-        facturacion: {
+        payment_type: {
             type: "varchar",
             length: 100,
-            nullable: false,
+            nullable: true,
         },
-        estado: {
+        merchant_order_id: {
             type: "varchar",
-            length: 30,
-            nullable: false,
+            length: 100,
+            nullable: true,
         },
-        total: {
-            type: "int",
-            nullable: false,
+        preference_id: {
+            type: "varchar",
+            length: 100,
+            nullable: true,
+        },
+        // --------- la informacion  rescatada del form implementado antes del pago y en base a esta informacion se creara el id del usuario invitado---------
+        nombre: {
+            type: "varchar",
+            length: 100,
+            nullable: true,
+        },
+        apellido: {
+            type: "varchar",
+            length: 100,
+            nullable: true,
+        },
+        email: {
+            type: "varchar",
+            length: 150,
+            nullable: true,
+        },
+        telefono: {
+            type: "varchar",
+            length: 50,
+            nullable: true,
+        },
+        direccion: {
+            type: "varchar",
+            length: 255,
+            nullable: true,
+        },
+        region: {
+            type: "varchar",
+            length: 100,
+            nullable: true,
+        },
+        ciudad: {
+            type: "varchar",
+            length: 100,
+            nullable: true,
+        },
+        codigo_postal: {
+            type: "varchar",
+            length: 20,
+            nullable: true,
+        },
+        instrucciones: { 
+            type: "varchar",
+            length: 500,
+            nullable: true,
         },
         createdAt: {
             type: "timestamp",
@@ -40,14 +109,24 @@ const Compras = new EntitySchema({
         },
     },
     relations: {
-        Usuarios: {
+        Usuario: {
             type: "many-to-one",
             target: "Usuario",
             joinColumn: {
                 name: "id_usuario",
             },
+        },
+        Productos: {
+            type: "one-to-many",
+            target: "Compra_Producto",
+            inverseSide: "Compra",
+        },
+        Envios: {
+            type: "one-to-many",
+            target: "Envio",
+            inverseSide: "Compra",
         }
     }
 });
 
-export default Compras;
+export default Compra;
