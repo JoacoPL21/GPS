@@ -2,7 +2,7 @@ import axios from 'axios';
 import cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 const instance = axios.create({
   baseURL: API_URL,

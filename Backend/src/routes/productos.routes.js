@@ -2,8 +2,9 @@ import { Router } from "express";
 import { getProductosController ,getProductosDisponiblesController,getProductoByIdController, createProductoController, updateProductoController, deleteProductoController, getProductosDestacadosController, toggleDestacadoController, getConteoDestacadosController,updateProductoStockController} from "../controller/productos.controller.js";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import multer from 'multer';
 const router = Router();
-
+const upload = multer();
 router
   .get("/", getProductosDisponiblesController)
   .get("/all", getProductosController)
@@ -14,6 +15,6 @@ router
   .delete('/:id_producto', deleteProductoController)
   .patch("/:id_producto/stock", updateProductoStockController)
   // Rutas para crear y actualizar productos solo admin (ORDEN CORREGIDO)
-  .post("/crear", authenticateJwt, isAdmin, createProductoController)
+  .post("/crear", authenticateJwt, isAdmin, upload.single('imagen'), createProductoController)
   .put('/:id_producto', authenticateJwt, isAdmin, updateProductoController);
 export default router;

@@ -18,6 +18,10 @@ const Compra_Producto = new EntitySchema({
             type: "int",
             nullable: false,
         },
+        precio_unitario: {
+            type: "int",
+            nullable: false,
+        },
         createdAt: {
             type: "timestamp",
             default: () => "CURRENT_TIMESTAMP",

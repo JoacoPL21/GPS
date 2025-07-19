@@ -170,8 +170,9 @@ return (
           </div>
         </div>
       </div>
+      
     </div>
-    <CardInfoProducto producto={producto} />
+      <CardInfoProducto producto={producto} />
   </div>
   </div>
     {producto?.id_producto && (

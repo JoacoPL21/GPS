@@ -2,7 +2,7 @@ import { MercadoPagoConfig } from 'mercadopago';
 
 const mercadoPagoClient = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
-  options: { timeout: 5000 } // opcional
+  options: { timeout: 5000 } 
 });
 
 export default mercadoPagoClient;
