@@ -29,6 +29,14 @@ async function createUser() {
         password: await encryptPassword("admin123"),
         rol: "admin",
         
+      })),
+      UserRepository.save(UserRepository.create({
+        nombreCompleto: "Benjamin Ortiz",
+        email: "benjamin@gmail.com",
+        telefono: "966433091",
+        password: await encryptPassword("benja123"),
+        rol: "cliente",
+        
       }))
 
     ]);
