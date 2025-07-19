@@ -9,8 +9,6 @@ import passport from "passport";
 import express, { json, urlencoded } from "express";
 import {
   cookieKey,
-  WEB_HOST,
-  WEB_PORT,
   DB_HOST,
   DB_PORT,
   DB_USERNAME,
@@ -177,8 +175,8 @@ async function setupServer() {
     });
 
     // USAR TUS VARIABLES DE CONFIGURACIÓN
-    app.listen(WEB_PORT, WEB_HOST, () => {
-      console.log(`=> Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
+    app.listen(DB_PORT, DB_HOST, () => {
+      console.log(`=> Servidor corriendo en http://${DB_HOST}:${DB_PORT}/api`);
     });
   } catch (error) {
     console.log("Error en index.js -> setupServer(), el error es: ", error);
