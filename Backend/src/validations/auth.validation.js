@@ -109,7 +109,8 @@ export const direccionValidation = Joi.object({
       "string.base": "La región debe ser una cadena de texto",
     }),
   codigo_postal: Joi.string()
-    .pattern(/^\d{3}0000$/)
+  
+    .pattern(/^\d{7}$/)
     .required()
     .messages({
       "string.pattern.base": "El código postal debe tener el formato XXX0000",

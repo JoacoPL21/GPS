@@ -15,14 +15,15 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
-// MANTENER TUS IMPORTACIONES (pagos, contacto, etc.)
 import Sidebar from '../components/Sidebar'; 
 import ContactSection from './Contact/contact_us';   
 import SuccessPage from './Carrito/success.jsx';
 import FailurePage from './Carrito/failure.jsx';
 import MultiStepCart from './Carrito/multi-step-cart.jsx';
-// IMPORTACIONES DE TUS COMPAÑEROS
+import MisCompras from "./Profile/MisCompras.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
+import Valoraciones from "./Profile/Valoraciones.jsx";
+import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +38,6 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "logout", element: <Logout /> },
-      // TUS RUTAS DE PAGO
       { path: "success", element: <SuccessPage /> },
       { path: "failure", element: <FailurePage /> },
       {
@@ -48,7 +48,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // RUTA DE TUS COMPAÑEROS
       {
         path: "gestiondestac",
         element: (
@@ -70,6 +69,30 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile/mis-compras",
+        element: (
+          <ProtectedRoute>
+            <MisCompras />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile/valoraciones",
+        element: (
+          <ProtectedRoute>
+            <Valoraciones />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile/valoraciones/valorar/:id_producto",
+        element: (
+          <ProtectedRoute>
+            <ValoracionFormPage />
           </ProtectedRoute>
         ),
       },

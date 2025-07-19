@@ -78,6 +78,7 @@ function FeaturedProducts() {
                 className="group cursor-pointer hover:shadow-xl transition-shadow border border-amber-200 rounded-lg overflow-hidden bg-white"
               >
                 <div className="p-0">
+                  <Link to={`/producto/${product.id}`}>
                   <div className="relative overflow-hidden">
                     <img
                       src={product.image}
@@ -95,10 +96,13 @@ function FeaturedProducts() {
                       <FaHeart className="h-4 w-4" />
                     </div>
                   </div>
+                  </Link>
                   <div className="p-4">
+                     <Link to={`/producto/${product.id}`}>
                     <h3 className="font-semibold text-amber-900 mb-2 group-hover:text-amber-800 transition-colors">
                       {product.name}
                     </h3>
+                    </Link>
                     <div className="flex items-center mb-2">
                       <div className="flex items-center">
                         {[...Array(5)].map((_, i) => (

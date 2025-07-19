@@ -66,34 +66,34 @@ const cartReducer = (state, action) => {
       const existingItemIndex = state.cart.findIndex(item => item.id_producto === action.payload.id_producto);
       
       if (existingItemIndex >= 0) {
+        // Si el item ya existe, sumar la cantidad nueva
         if (isDebugMode) console.log("✅ Item existente encontrado, aumentando cantidad");
         
         const updatedCart = [...state.cart];
-        updatedCart[existingItemIndex] = {
-          ...updatedCart[existingItemIndex],
-          cantidad: updatedCart[existingItemIndex].cantidad + 1
-        };
+        const cantidadAAgregar = action.payload.cantidad || 1;
+        updatedCart[existingItemIndex].cantidad += cantidadAAgregar;
         
         const newState = {
           ...state,
           cart: updatedCart,
-          total: state.total + action.payload.precio,
+          total: state.total + (action.payload.precio * cantidadAAgregar),
         };
         
         if (isDebugMode) console.log("🔄 Nuevo estado:", newState.cart);
         return newState;
       } else {
+        // Si es un nuevo item, usar la cantidad especificada
         if (isDebugMode) console.log("🆕 Item nuevo, agregando al carrito");
         
         const newItem = {
           ...action.payload,
-          cantidad: 1
+          cantidad: action.payload.cantidad || 1
         };
         
         const newState = {
           ...state,
           cart: [...state.cart, newItem],
-          total: state.total + action.payload.precio,
+          total: state.total + (action.payload.precio * newItem.cantidad),
         };
         
         if (isDebugMode) console.log("🔄 Nuevo estado:", newState.cart);

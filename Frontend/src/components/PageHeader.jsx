@@ -1,4 +1,4 @@
-// src/components/PageHeader.jsx
+
 import { Link } from "react-router-dom"
 
 const PageHeader = ({ breadcrumbs = [], title, subtitle }) => {
@@ -14,7 +14,7 @@ const PageHeader = ({ breadcrumbs = [], title, subtitle }) => {
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-orange-600 font-medium">{crumb.label}</span>
+                <span className="text-[#a47148] font-medium ">{crumb.label}</span>
               )}
               {index < breadcrumbs.length - 1 && <span className="mx-2">/</span>}
             </span>
