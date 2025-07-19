@@ -17,7 +17,7 @@ const Register = () => {
       ciudad: '',
       region: '',
       codigo_postal: '',
-      tipo_de_direccion: 'envio' // Valor por defecto
+      tipo_de_direccion: 'predeterminada' //
     }
 
   });

@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext.jsx"
 import { getUserDirecciones, deleteDireccion, updateUserProfile } from "../../services/user.service.js"
 import swal from "sweetalert2"
 import { useEffect, useState, useCallback } from "react"
+import { Link } from "react-router-dom"
 import FormDireccionEnvio from "./DirectionForm.jsx"
 import EditProfileModal from "../../components/EditProfileModal.jsx"
 
@@ -91,8 +92,6 @@ const Profile = () => {
       })
     }
   }
-
-
 
   // Función para actualizar perfil
   const handleProfileUpdate = async (updateData) => {
@@ -235,8 +234,8 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* Botón para editar perfil */}
-                <div className="mt-6">
+                {/* Botones de perfil */}
+                <div className="mt-6 space-y-3">
                   <button
                     onClick={() => setIsEditModalOpen(true)}
                     className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white px-4 py-3 rounded-xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
@@ -251,9 +250,23 @@ const Profile = () => {
                     </svg>
                     <span>Editar Perfil</span>
                   </button>
+                  
+                  {/* Enlace a Mis Compras */}
+                  <Link
+                    to="/mis-compras"
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
+                    </svg>
+                    <span>Mis Compras</span>
+                  </Link>
                 </div>
-
-               
               </div>
             </div>
           </div>

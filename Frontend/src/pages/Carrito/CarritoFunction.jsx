@@ -1,17 +1,16 @@
-'use client';
+"use client";
 
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Transition
-} from '@headlessui/react';
-import { Fragment, useCallback } from 'react';
-import { X } from 'lucide-react';
-import { useCart } from '../../context/CartContext';
-import { Link } from 'react-router-dom';
-
+  Transition,
+} from "@headlessui/react";
+import { Fragment, useCallback } from "react";
+import { X } from "lucide-react";
+import { useCart } from "../../context/CartContext";
+import { Link } from "react-router-dom";
 
 const MenuCarrito = ({ open, setOpen }) => {
   const {
@@ -19,10 +18,14 @@ const MenuCarrito = ({ open, setOpen }) => {
     total,
     removeItemFromCart,
     incrementItemQuantity,
-    decrementItemQuantity
+    decrementItemQuantity,
+    // MANTENER COMPATIBILIDAD CON TUS FUNCIONES ORIGINALES
+    dispatch,
+    increaseQuantity,
+    decreaseQuantity
   } = useCart();
 
-  // CORRECCIÓN: Agregar debounce y prevención de propagación
+  // FUNCIONES OPTIMIZADAS DE TUS COMPAÑEROS (recomendadas)
   const handleIncrement = useCallback((e, id_producto) => {
     e.preventDefault();
     e.stopPropagation();
@@ -40,6 +43,15 @@ const MenuCarrito = ({ open, setOpen }) => {
     e.stopPropagation();
     removeItemFromCart(item);
   }, [removeItemFromCart]);
+
+  // MANTENER TUS FUNCIONES ORIGINALES COMO FALLBACK
+  const aumentarCantidad = useCallback((id) => {
+    dispatch({ type: "INCREMENT_QUANTITY", payload: { id } });
+  }, [dispatch]);
+
+  const disminuirCantidad = useCallback((id) => {
+    dispatch({ type: "DECREMENT_QUANTITY", payload: { id } });
+  }, [dispatch]);
 
   return (
     <Transition show={open} as={Fragment}>
@@ -130,7 +142,7 @@ const MenuCarrito = ({ open, setOpen }) => {
 
                                     <div className="flex flex-1 items-end justify-between text-sm mt-2">
                                       <div className="flex items-center gap-2">
-                                        {/* CORRECCIÓN: Agregar prevención de propagación y usar las funciones con callback */}
+                                        {/* USAR FUNCIONES OPTIMIZADAS CON PREVENCIÓN DE PROPAGACIÓN */}
                                         <button
                                           type="button"
                                           onClick={(e) => handleDecrement(e, item.id_producto)}
@@ -192,7 +204,7 @@ const MenuCarrito = ({ open, setOpen }) => {
                             <button
                               type="button"
                               onClick={() => setOpen(false)}
-                              className="font-medium text-yellow-800 cursor-pointer bg-transparent border-none underline"
+                              className="font-medium text-yellow-800 cursor-pointer bg-transparent border-none underline hover:text-yellow-600"
                             >
                               Continuar comprando
                               <span aria-hidden="true"> &rarr;</span>
