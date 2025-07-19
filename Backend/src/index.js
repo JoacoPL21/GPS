@@ -26,7 +26,7 @@ import paymentRoutes from './routes/payment.routes.js';
 import bodyParser from 'body-parser';
 import { handleWebhook } from './controller/payment.controller.js'; 
 import chilexpressRoutes from './routes/chilexpress.js'; 
-// MANTENER IMPORTACIONES DE TUS COMPAÑEROS (productos, minIO, etc.)
+// MANTENER IMPORTACIONES (productos, minIO, etc.)
 import productosRoutes from "./routes/productos.routes.js";
 import categoriasRoutes from "./routes/categorias.routes.js";
 import minioRutes from "./routes/minio.routes.js";
@@ -38,7 +38,7 @@ async function setupServer() {
     dotenv.config();
     const app = express();
 
-    // 1. Configura el almacén de sesiones para PostgreSQL
+    
     const PgStore = pgSession(session);
     const sessionStore = new PgStore({
       conObject: {
@@ -49,7 +49,7 @@ async function setupServer() {
       tableName: 'session',
     });
 
-    // 2. Webhook de Mercado Pago: SOLO aquí aplica bodyParser.raw
+    // 2. Webhook de Mercado Pago
     app.post(
       '/api/payments/webhook',
       bodyParser.raw({ type: 'application/json' }),
@@ -79,7 +79,7 @@ async function setupServer() {
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
 
-    // Configuración CORS igual que antes
+   
     const allowedOrigins = [
       'http://localhost:5173',
       'https://eccomerce-tyrf1ngs-projects.vercel.app',
@@ -113,7 +113,7 @@ async function setupServer() {
     app.use(cookieParser());
     app.use(morgan("dev"));
 
-    // 3. Configuración de la sesión (solo para rutas no OPTIONS)
+    // Configuración de la sesión
     const sessionMiddleware = session({
       secret: process.env.SESSION_SECRET || cookieKey,
       store: sessionStore,
@@ -136,7 +136,7 @@ async function setupServer() {
     app.use(passport.session());
     passportJwtSetup();
 
-    // COMBINAR TODAS LAS RUTAS
+
     app.use("/api", indexRoutes);
     
     // TUS RUTAS (pagos y chilexpress)
@@ -149,11 +149,7 @@ async function setupServer() {
     app.use("/api/valoraciones", valoracionesRoutes);
     app.use("/api/minio", minioRutes);
 
-    // TU CONFIGURACIÓN DE UPLOADS
-    const uploadPath = path.resolve("src/uploads");
-    app.use("/api/uploads", express.static(uploadPath));
 
-    // RUTA DE PRUEBA MINÍO DE TUS COMPAÑEROS
     app.get('/api/minio/test', (req, res) => {
       minioClient.listBuckets((err, buckets) => {
         if (err) {
@@ -163,18 +159,17 @@ async function setupServer() {
       });
     });
 
-    // TU RUTA DE PRUEBA
+   
     app.get("/", (req, res) => {
       res.send("Backend funcionando correctamente");
     });
 
-    // TU MANEJO DE ERRORES
     app.use((err, req, res, next) => {
       console.error('Error global:', err.stack);
       res.status(500).json({ error: 'Algo salió mal' });
     });
 
-    // USAR TUS VARIABLES DE CONFIGURACIÓN
+    // Configuración del puerto y host
     app.listen(DB_PORT, DB_HOST, () => {
       console.log(`=> Servidor corriendo en http://${DB_HOST}:${DB_PORT}/api`);
     });
