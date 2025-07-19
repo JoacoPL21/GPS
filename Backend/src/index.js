@@ -22,11 +22,9 @@ import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
-// MANTENER TUS IMPORTACIONES (pagos y chilexpress)
 import bodyParser from 'body-parser';
 import { handleWebhook } from './controller/payment.controller.js'; 
 import chilexpressRoutes from './routes/chilexpress.js'; 
-// MANTENER IMPORTACIONES (productos, minIO, etc.)
 import productosRoutes from "./routes/productos.routes.js";
 import categoriasRoutes from "./routes/categorias.routes.js";
 import minioRutes from "./routes/minio.routes.js";
