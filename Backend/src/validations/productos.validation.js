@@ -39,18 +39,61 @@ export const productoCreateValidation = Joi.object({
       "string.base": "La descripción debe ser una cadena de texto",
     }),
   estado: Joi.string()
-    .valid("disponible", "agotado")
+    .valid("activo", "inactivo")
     .required()
     .messages({
-      "any.only": 'El estado debe ser uno de los siguientes valores: "disponible", "agotado"',
+      "any.only": 'El estado debe ser uno de los siguientes valores: "activo", "inactivo"',
       "any.required": "El estado es obligatorio",
       "string.base": "El estado debe ser una cadena de texto",
     }),
+
+ image_url: Joi.string()
+    .optional()
+    .messages({
+      "string.uri": "La URL de la imagen no es válida",
+      "string.base": "La imagen debe ser una cadena de texto",
+  }),
   id_categoria: Joi.number()
     .required()
     .messages({
       "any.required": "La categoría es obligatoria",
       "number.base": "La categoría debe ser un número",
+    }),
+  peso: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El peso debe ser un número positivo",
+      "number.base": "El peso debe ser un número",
+      "number.precision": "El peso debe tener máximo 2 decimales",
+    }),
+  ancho: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El ancho debe ser un número positivo",
+      "number.base": "El ancho debe ser un número",
+      "number.precision": "El ancho debe tener máximo 2 decimales",
+    }),
+  alto: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El alto debe ser un número positivo",
+      "number.base": "El alto debe ser un número",
+      "number.precision": "El alto debe tener máximo 2 decimales",
+    }),
+  profundidad: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "La profundidad debe ser un número positivo",
+      "number.base": "La profundidad debe ser un número",
+      "number.precision": "La profundidad debe tener máximo 2 decimales",
     }),
 }).unknown(false).messages({
   "object.unknown": "Los campos adicionales no están permitidos",

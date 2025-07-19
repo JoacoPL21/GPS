@@ -64,14 +64,6 @@ export const registerValidation = Joi.object({
 
 
 export const direccionValidation = Joi.object({
-  id_usuario: Joi.number()
-    .positive()
-    .required()
-    .messages({
-      "number.base": "El ID de usuario debe ser un número",
-      "number.positive": "El ID de usuario debe ser un número positivo",
-      "any.required": "El ID de usuario es obligatorio",
-    }),
   calle: Joi.string()
     .min(3)
     .max(100)
@@ -117,7 +109,8 @@ export const direccionValidation = Joi.object({
       "string.base": "La región debe ser una cadena de texto",
     }),
   codigo_postal: Joi.string()
-    .pattern(/^\d{3}0000$/)
+  
+    .pattern(/^\d{7}$/)
     .required()
     .messages({
       "string.pattern.base": "El código postal debe tener el formato XXX0000",

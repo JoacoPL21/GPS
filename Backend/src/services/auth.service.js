@@ -29,20 +29,29 @@ export async function loginService(user) {
       return [null, createErrorMessage("password", "La contraseña es incorrecta")];
     }
 
-    
+
+    // Payload mínimo para el JWT - solo información esencial
     const payload = {
       id: userFound.id_usuario,
-      nombreCompleto: userFound.nombreCompleto,
       email: userFound.email,
       rol: userFound.rol,
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-      expiresIn: "0.5h", // 30 minutos
+      expiresIn: "1h", // Aumentado a 1 hora para mejor UX
     });
 
+    // Información completa del usuario para el frontend (sin contraseña)
+    const userInfo = {
+      id: userFound.id_usuario,
+      nombreCompleto: userFound.nombreCompleto,
+      email: userFound.email,
+      rol: userFound.rol,
+      telefono: userFound.telefono || "",
 
-    return [accessToken, null, payload];
+    };
+
+    return [accessToken, null, userInfo];
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     return [null, "Error interno del servidor"];
@@ -53,10 +62,13 @@ export async function loginService(user) {
 export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(Usuario);
-   
+
 
     const { nombreCompleto, telefono, email } = user;
-    
+
+    if ((rol === "cliente" || rol === "admin") && (!password || password.trim() === "")) {
+      return [null, { dataInfo: "password", message: "La contraseña es obligatoria" }];
+    }
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
@@ -68,7 +80,7 @@ export async function registerService(user) {
         email,
       },
     });
-    
+
     if (existingEmailUser) return [null, createErrorMessage("email", "Correo electrónico en uso")];
 
     if (!nombreCompleto || !email || !user.password) {

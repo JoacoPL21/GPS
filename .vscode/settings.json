@@ -7,5 +7,11 @@
         "**/Thumbs.db": true,
         "**Backend/node_modules": true,
         "**Frontend/node_modules": true,
-    }
+    },
+    "cSpell.words": [
+        "Decorativo",
+        "Escaño",
+        "Jardinera",
+        "Nuevo"
+    ]
 }

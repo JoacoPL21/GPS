@@ -1,23 +1,33 @@
 "use strict";
 import { Router } from "express";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
-import { authenticateJwt } from "../middlewares/authentication.middleware.js";
-import {
-  getAllUsers,
-  registerDireccion,
-  getDireccionByUserId,
-  deleteDireccionByUserId
-} from "../controller/user.controller.js";
+import { getAllUsers, getUserProfile, registerDireccion, getDireccionByUserId, deleteDireccionByUserId, getUserProfileDetailed, updateUserProfile } from "../controller/user.controller.js";
+import { getComprasUsuarioController, verificarCompraProductoController, getProductosCompradosConValoracionController } from "../controller/compras.controller.js";
+import { authenticateToken } from "../middlewares/authentication.middleware.js";
 
-const router = Router();
+// Router para rutas de usuario autenticado (no requiere permisos de admin)
+const userRouter = Router();
+userRouter.use(authenticateToken); // Middleware de autenticación
 
-router
-  .use(authenticateJwt)
-  .use(isAdmin);
+userRouter
+    .get("/profile", getUserProfile)
+    .get("/profile/detailed", getUserProfileDetailed)
+    .put("/profile", updateUserProfile)
+    .post("/direccion", registerDireccion)
+    .get("/direcciones", getDireccionByUserId)
+    .delete("/direccion/:id", deleteDireccionByUserId)
+    .get("/compras", getComprasUsuarioController)
+    .get("/compras/producto/:id_producto", verificarCompraProductoController)
+    .get("/productos-comprados", getProductosCompradosConValoracionController);
 
-router
-  .get("/", getAllUsers)
-  .post("/direccion", registerDireccion)
-  .get("/direccion/:id", getDireccionByUserId)
-  .delete("/direccion/:id",deleteDireccionByUserId);
-export default router;
+// Router para rutas de administración (requiere permisos de admin)
+const adminRouter = Router();
+adminRouter.use(authenticateToken); // Middleware de autenticación
+adminRouter.use(isAdmin); // Middleware de autorización
+
+adminRouter
+    .get("/", getAllUsers);
+
+// Exportar ambos routers
+export { userRouter };
+export default adminRouter;

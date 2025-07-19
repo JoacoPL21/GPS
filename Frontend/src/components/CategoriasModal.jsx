@@ -1,6 +1,6 @@
 "use client"
 import { Dialog, Transition } from "@headlessui/react"
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import Swal from "sweetalert2"
 
 const CategoriasModal = ({
@@ -12,7 +12,8 @@ const CategoriasModal = ({
   onDeleteCategoria,
   loading,
 }) => {
-  const [form, setForm] = useState({ nombre: "", descripcion: "" })
+  
+  const [form, setForm] = useState({ nombre: ""})
   const [editingId, setEditingId] = useState(null)
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -50,20 +51,25 @@ const CategoriasModal = ({
       }
 
       if (response.success) {
-        setForm({ nombre: "", descripcion: "" })
-        setEditingId(null)
-        setErrors({})
+        const wasEditing = editingId !== null;
+        
+        // Mostrar mensaje de éxito
         Swal.fire(
-          editingId ? "¡Actualizada!" : "¡Creada!",
-          `La categoría ha sido ${editingId ? "actualizada" : "creada"}.`,
+          wasEditing ? "¡Actualizada!" : "¡Creada!",
+          `La categoría ha sido ${wasEditing ? "actualizada" : "creada"}.`,
           "success",
         )
+        
+        // Resetear formulario inmediatamente para cerrar modal
+        setForm({ nombre: ""})
+        setEditingId(null)
+        setErrors({})
+        setSubmitting(false)
       } else {
         Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
       }
     } catch (error) {
       Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
-    } finally {
       setSubmitting(false)
     }
   }
@@ -71,7 +77,6 @@ const CategoriasModal = ({
   const handleEdit = (categoria) => {
     setForm({
       nombre: categoria.nombre,
-      descripcion: categoria.descripcion || "",
     })
     setEditingId(categoria.id_categoria)
   }
@@ -99,10 +104,21 @@ const CategoriasModal = ({
   }
 
   const resetForm = () => {
-    setForm({ nombre: "", descripcion: "" })
+    setForm({ nombre: ""})
     setEditingId(null)
     setErrors({})
   }
+
+  useEffect(() => {
+    // Solo actualizar el form si estamos editando y la categoría existe
+    if (editingId && categorias.length > 0) {
+      const cat = categorias.find((c) => c.id_categoria === editingId)
+      if (cat && cat.nombre !== form.nombre) {
+        setForm({ nombre: cat.nombre })
+      }
+    }
+  }, [categorias, editingId, form.nombre])
+
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -231,9 +247,6 @@ const CategoriasModal = ({
                               <div className="flex items-center justify-between">
                                 <div className="flex-1">
                                   <h4 className="font-semibold text-gray-800">{categoria.nombre}</h4>
-                                  {categoria.descripcion && (
-                                    <p className="text-sm text-gray-600 mt-1">{categoria.descripcion}</p>
-                                  )}
                                   <p className="text-xs text-gray-500 mt-1">
                                     {categoria.total_productos || 0} productos
                                   </p>
