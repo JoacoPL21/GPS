@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
 import { getAllUsers, getUserProfile, registerDireccion, getDireccionByUserId, deleteDireccionByUserId, getUserProfileDetailed, updateUserProfile } from "../controller/user.controller.js";
-import { getComprasUsuarioController, verificarCompraProductoController, getProductosCompradosConValoracionController } from "../controller/compras.controller.js";
+import { getComprasUsuarioController, verificarCompraProductoController, getProductosCompradosConValoracionController, getAllComprasController } from "../controller/compras.controller.js";
 import { authenticateToken } from "../middlewares/authentication.middleware.js";
 
 // Router para rutas de usuario autenticado (no requiere permisos de admin)
@@ -26,7 +26,8 @@ adminRouter.use(authenticateToken); // Middleware de autenticación
 adminRouter.use(isAdmin); // Middleware de autorización
 
 adminRouter
-    .get("/", getAllUsers);
+    .get("/", getAllUsers)
+    .get("/compras", getAllComprasController);
 
 // Exportar ambos routers
 export { userRouter };

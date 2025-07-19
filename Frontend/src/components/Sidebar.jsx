@@ -7,8 +7,6 @@ import { Link } from 'react-router-dom';
 export default function Sidebar({ isOpen, toggle }) {
   const { authUser } = useAuth(); // user.rol debe ser "admin" para mostrar el link
 
-  const { isAuthenticated } = useAuth();
-
   return (
     <>
       {/* Sidebar */}
@@ -31,6 +29,11 @@ export default function Sidebar({ isOpen, toggle }) {
           {authUser?.rol === "admin" && (
             <li>
               <Link to="/productos" onClick={toggle} className="sidebar_text hover:underline">Productos</Link>
+            </li>
+          )}
+          {authUser?.rol === "admin" && (
+            <li>
+              <Link to="/dashboard/admin-compras" onClick={toggle} className="sidebar_text hover:underline">Gestión de Compras</Link>
             </li>
           )}
         </ul>

@@ -143,3 +143,42 @@ export async function getProductosCompradosConValoracion(id_usuario) {
         return [null, "Error al obtener productos comprados con valoración"];
     }
 } 
+
+export async function getAllCompras() {
+    try {
+        const comprasRepository = AppDataSource.getRepository(Compras);
+        const usuarioRepository = AppDataSource.getRepository('Usuario');
+        const compras = await comprasRepository.find({
+            order: { id_compra: "DESC" },
+            relations: ["Usuarios"]
+        });
+        console.log('Compras encontradas:', compras);
+
+        // Mapear la info relevante para el admin
+        const comprasAdmin = await Promise.all(compras.map(async (compra) => {
+            const usuario = compra.Usuarios;
+            // Mapeo de estado para frontend
+            let estado = 'pendiente';
+            if (compra.estado_envio === 'entregado') {
+                estado = 'entregada';
+            } else if (compra.estado_envio === 'en_elaboracion' || compra.estado_envio === 'en_transito') {
+                estado = 'enviada';
+            }
+            return {
+                id_compra: compra.id_compra,
+                cliente: usuario?.nombreCompleto || 'Desconocido',
+                email: usuario?.email || '',
+                fecha: compra.createdAt,
+                total: compra.total,
+                estado,
+                estado_pago: compra.estado,
+                tracking: compra.tracking || '', // Si tienes un campo tracking
+            };
+        }));
+        console.log('Compras mapeadas para admin:', comprasAdmin);
+        return [comprasAdmin, null];
+    } catch (error) {
+        console.error("Error al obtener todas las compras para admin:", error);
+        return [null, "Error al obtener todas las compras para admin"];
+    }
+} 
