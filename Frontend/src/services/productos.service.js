@@ -71,7 +71,7 @@ export async function getProductoById(id_producto) {
   }
 }
 
-// ===== NUEVAS FUNCIONES QUE NECESITAS AGREGAR AL BACKEND =====
+// ===== FUNCION CREAR PRODUCTO =====
 
 export async function createProducto(productoData) {
   try {
