@@ -8,7 +8,7 @@ import passport from "passport";
 import express, { json, urlencoded } from "express";
 import { cookieKey, HOST, PORT } from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
-import { createProductos, createUser, createCategoria, createCompras, createCompra_Producto, createEnvios, createValoraciones,  } from "./config/initialSetup.js";
+import { createProductos, createUser, createCategoria, createCompras, createCompra_Producto, createEnvios, createValoraciones} from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
 import path from "path";
 import dotenv from 'dotenv';

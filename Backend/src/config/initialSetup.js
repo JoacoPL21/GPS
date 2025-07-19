@@ -151,7 +151,8 @@ async function createCompras() {
       ComprasRepository.save(ComprasRepository.create({
         id_usuario: 1,
         facturacion: "1234567890",
-        estado: "pendiente",
+        estado: "Aprobado",
+        estado_envio: "entregado",
         total: 12000,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -159,7 +160,8 @@ async function createCompras() {
       ComprasRepository.save(ComprasRepository.create({
         id_usuario: 1,
         facturacion: "1234567890",
-        estado: "pendiente",
+        estado: "Aprobado",
+        estado_envio: "en_elaboracion",
         total: 12000,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -167,8 +169,9 @@ async function createCompras() {
       ComprasRepository.save(ComprasRepository.create({
         id_usuario: 1,
         facturacion: "1234567890",
-        estado: "pendiente",
-          total: 12000,
+        estado: "Aprobado",
+        estado_envio: "en_transito",
+        total: 12000,
         createdAt: new Date(),
         updatedAt: new Date()
       })),
@@ -318,7 +321,5 @@ async function createValoraciones() {
     console.error(chalk.red("❌ Error al crear Valoraciones:", error));
   }
 }
-
-
 
 export { createUser,  createCategoria, createProductos, createCompras, createCompra_Producto, createEnvios, createValoraciones};

@@ -11,7 +11,7 @@ export async function getComprasUsuario(id_usuario) {
         const compras = await comprasRepository.find({
             where: { id_usuario: parseInt(id_usuario) },
             relations: ["Usuarios"],
-            order: { createdAt: "DESC" }
+            order: { id_compra: "DESC" }
         });
 
         // Para cada compra, obtener los productos asociados
@@ -87,7 +87,7 @@ export async function getProductosCompradosConValoracion(id_usuario) {
         const comprasRepository = AppDataSource.getRepository(Compras);
         const compras = await comprasRepository.find({
             where: { id_usuario: parseInt(id_usuario) },
-            order: { createdAt: "DESC" }
+            order: { id_compra: "DESC" }
         });
 
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);

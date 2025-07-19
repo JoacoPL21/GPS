@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getComprasUsuario } from '../../services/valoraciones.service';
-import { FaShoppingBag, FaCalendar, FaDollarSign, FaStar, FaStarHalfAlt, FaBox, FaTruck } from 'react-icons/fa';
+import { FaShoppingBag, FaCalendar, FaDollarSign, FaStar, FaStarHalfAlt, FaBox, FaTruck, FaShippingFast, FaCheckCircle } from 'react-icons/fa';
 import ValoracionForm from '../../components/ValoracionForm';
+import PurchaseDetailsModal from '../../components/PurchaseDetailsModal';
 
 const MisCompras = () => {
   const { authUser } = useAuth();
   const [compras, setCompras] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCompra, setSelectedCompra] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const cargarCompras = async () => {
@@ -60,9 +63,71 @@ const MisCompras = () => {
         return 'bg-yellow-100 text-yellow-800';
       case 'en_proceso':
         return 'bg-blue-100 text-blue-800';
+      case 'Aprobado':
+        return 'bg-green-100 text-green-800';
+      case 'rechazado':
+        return 'bg-red-100 text-red-800';
+      case 'procesando':
+        return 'bg-yellow-100 text-yellow-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const getEstadoEnvioColor = (estado) => {
+    switch (estado) {
+      case 'en_elaboracion':
+        return 'bg-blue-100 text-blue-800';
+      case 'en_transito':
+        return 'bg-orange-100 text-orange-800';
+      case 'entregado':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getEstadoEnvioIcon = (estado) => {
+    switch (estado) {
+      case 'en_elaboracion':
+        return <FaBox className="w-4 h-4" />;
+      case 'en_transito':
+        return <FaTruck className="w-4 h-4" />;
+      case 'entregado':
+        return <FaCheckCircle className="w-4 h-4" />;
+      default:
+        return <FaBox className="w-4 h-4" />;
+    }
+  };
+
+  const getEstadoEnvioText = (estado) => {
+    switch (estado) {
+      case 'en_elaboracion':
+        return 'En elaboración';
+      case 'en_transito':
+        return 'En tránsito';
+      case 'entregado':
+        return 'Entregado';
+      default:
+        return 'Pendiente';
+    }
+  };
+
+  const handleSeguirEnvio = (compra) => {
+    // Aquí puedes implementar la lógica para seguir el envío
+    // Por ejemplo, abrir una nueva página o modal con detalles del envío
+    console.log('Seguir envío de compra:', compra.id_compra);
+    // window.open(`/seguimiento-envio/${compra.id_compra}`, '_blank');
+  };
+
+  const handleVerDetalles = (compra) => {
+    setSelectedCompra(compra);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCompra(null);
   };
 
   if (loading) {
@@ -122,6 +187,13 @@ const MisCompras = () => {
                 <div className="flex items-center gap-3">
                   <span className="text-lg font-semibold text-gray-900">Compra #{compra.id_compra}</span>
                   <span className={`inline-block px-3 py-1 text-xs rounded border font-medium ${getEstadoColor(compra.estado)}`}>{compra.estado}</span>
+                  {/* Mostrar estado del envío solo si el pago está aprobado */}
+                  {compra.estado === 'Aprobado' && compra.estado_envio && (
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs rounded border font-medium ${getEstadoEnvioColor(compra.estado_envio)}`}>
+                      {getEstadoEnvioIcon(compra.estado_envio)}
+                      {getEstadoEnvioText(compra.estado_envio)}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <FaCalendar className="w-4 h-4 mr-1" />
@@ -149,19 +221,36 @@ const MisCompras = () => {
                   <div className="flex items-center text-xs text-gray-500 ml-2">+{compra.productos.length - 3} más</div>
                 )}
               </div>
-              {/* Botón de detalles */}
-              <div className="flex justify-end mt-2">
+              {/* Botones de acción */}
+              <div className="flex justify-end gap-3 mt-2">
                 <button
                   className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors"
-                  // onClick={() => navigate(`/profile/mis-compras/${compra.id_compra}`)}
+                  onClick={() => handleVerDetalles(compra)}
                 >
                   Ver más detalles
                 </button>
+                {/* Mostrar botón "Seguir envío" solo si el pago está aprobado y el envío no está entregado */}
+                {compra.estado === 'Aprobado' && compra.estado_envio && compra.estado_envio !== 'entregado' && (
+                  <button
+                    className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors flex items-center gap-2"
+                    onClick={() => handleSeguirEnvio(compra)}
+                  >
+                    <FaShippingFast className="w-4 h-4" />
+                    Seguir envío
+                  </button>
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Modal de detalles */}
+      <PurchaseDetailsModal
+        compra={selectedCompra}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

@@ -23,6 +23,12 @@ const Compras = new EntitySchema({
             length: 30,
             nullable: false,
         },
+        estado_envio: {
+            type: "varchar",
+            length: 30,
+            nullable: true,
+            default: null,
+        },
         total: {
             type: "int",
             nullable: false,
