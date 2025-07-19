@@ -19,13 +19,11 @@ const MenuCarrito = ({ open, setOpen }) => {
     removeItemFromCart,
     incrementItemQuantity,
     decrementItemQuantity,
-    // MANTENER COMPATIBILIDAD CON TUS FUNCIONES ORIGINALES
     dispatch,
     increaseQuantity,
     decreaseQuantity
   } = useCart();
 
-  // FUNCIONES OPTIMIZADAS DE TUS COMPAÑEROS (recomendadas)
   const handleIncrement = useCallback((e, id_producto) => {
     e.preventDefault();
     e.stopPropagation();
@@ -44,7 +42,6 @@ const MenuCarrito = ({ open, setOpen }) => {
     removeItemFromCart(item);
   }, [removeItemFromCart]);
 
-  // MANTENER TUS FUNCIONES ORIGINALES COMO FALLBACK
   const aumentarCantidad = useCallback((id) => {
     dispatch({ type: "INCREMENT_QUANTITY", payload: { id } });
   }, [dispatch]);
@@ -142,7 +139,6 @@ const MenuCarrito = ({ open, setOpen }) => {
 
                                     <div className="flex flex-1 items-end justify-between text-sm mt-2">
                                       <div className="flex items-center gap-2">
-                                        {/* USAR FUNCIONES OPTIMIZADAS CON PREVENCIÓN DE PROPAGACIÓN */}
                                         <button
                                           type="button"
                                           onClick={(e) => handleDecrement(e, item.id_producto)}
