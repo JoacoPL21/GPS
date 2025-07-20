@@ -11,8 +11,6 @@ initializeAuth();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {/* StrictMode habilitado para detectar problemas en desarrollo */}
-    {/* Si necesitas debugging específico, puedes comentar StrictMode temporalmente */}
     <CartProvider>  
       <AuthProvider>  
         <App />  

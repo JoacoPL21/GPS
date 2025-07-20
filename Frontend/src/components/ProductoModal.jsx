@@ -4,6 +4,8 @@ import { useCategorias } from "../hooks/productos/useCategorias";
 import { Fragment } from "react"
 
 const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEditing, submitting }) => {
+
+
   const { categorias } = useCategorias();
 
   const getFieldIcon = (field) => {
@@ -63,6 +65,16 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
           />
         </svg>
       ),
+      imagen: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 7h18M3 12h18m-9 5h9m-9 0a2 2 0 11-4 0 2 2 0 014 0zM3 7a2 2 0 11-4 0 2 2 0 014 0zM3 12a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+      ),
       peso: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -115,6 +127,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
       stock: "Cantidad en stock",
       categoria: "Categoría",
       estado: "Estado",
+      imagen: "Imagen del producto",
       peso: "Peso (kg)",
       ancho: "Ancho (cm)",
       alto: "Alto (cm)",
@@ -431,6 +444,28 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </div>
+                        </div>
+                      </div>
+                      {/* Imagen */}
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          {getFieldLabel("imagen")} *
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            {getFieldIcon("imagen")}
+                          </div>
+                          <input
+                            type="file"
+                            name="imagen"
+                            accept="image/*"
+                            onChange={onChange}
+                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                              errors.imagen
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300 focus:border-orange-500"
+                            }`}
+                          />
                         </div>
                       </div>
 
