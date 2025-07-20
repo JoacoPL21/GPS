@@ -60,7 +60,7 @@ export async function createProductoController(req, res) {
     descripcion: body.descripcion,
     estado: body.estado,
     id_categoria: Number(body.id_categoria),
-    image_url: imagen_nombre, 
+   ...(imagen_nombre && { image_url: imagen_nombre })
   };
 
     // Validar datos

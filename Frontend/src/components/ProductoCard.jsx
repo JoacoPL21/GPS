@@ -65,7 +65,10 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
           isSelected ? "from-blue-100 to-blue-200" : ""
         }`}
       >
-        <div className="text-6xl opacity-30">🪵</div>
+        <img
+          src={producto.imagen|| "/placeholder.png"}
+          className="object-cover w-full h-full"
+        />
 
         {/* Badge de estado en la esquina superior derecha */}
         <div className="absolute top-3 right-3">
@@ -160,13 +163,9 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
               </span>
             </div>
           </div>
-
-          {/* ID del producto */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-500">ID:</span>
-            <span className="text-sm font-mono text-gray-600">#{producto.id}</span>
-          </div>
         </div>
+
+
 
         {/* Botones de acción - Solo mostrar si no está en modo selección */}
         {!selectionMode && (

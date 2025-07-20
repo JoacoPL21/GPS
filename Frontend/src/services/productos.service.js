@@ -75,7 +75,20 @@ export async function getProductoById(id_producto) {
 
 export async function createProducto(productoData) {
   try {
-    const response = await axios.post("/productos/crear", productoData)
+    const formData = new FormData()
+    
+    for (const key in productoData) {
+      if (productoData[key] !== undefined && productoData[key] !== null) {
+        formData.append(key, productoData[key])
+      }
+    }
+
+    const response = await axios.post("/productos/crear", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
     return { data: response.data, error: null }
   } catch (error) {
     console.error("Error al crear producto:", error)

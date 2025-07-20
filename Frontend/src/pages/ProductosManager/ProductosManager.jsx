@@ -60,6 +60,7 @@ function ProductosManagerConnected() {
     stock: "",
     id_categoria: "",
     estado: "",
+    imagen: "",
     peso: "",
     ancho: "",
     alto: "",
@@ -221,6 +222,7 @@ function ProductosManagerConnected() {
       stock: "",
       id_categoria: "",
       estado: "activo",
+      imagen: "",
       peso: "",
       ancho: "",
       alto: "",
@@ -373,19 +375,19 @@ function ProductosManagerConnected() {
     window.URL.revokeObjectURL(url)
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const validationErrors = validate()
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault()
+  const validationErrors = validate()
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors)
+    return
+  }
 
-    setSubmitting(true)
+  setSubmitting(true)
 
-    try {
-      let response
-      if (editingId) {
+  try {
+    let response
+    if (editingId) {
         // Primero actualizar el producto y esperar a que termine COMPLETAMENTE
         response = await editProducto(editingId, form)
         if (response.success) {
@@ -411,28 +413,29 @@ function ProductosManagerConnected() {
           // Mostrar mensaje de éxito
           Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
         }
-      } else {
+    } else {
         // Primero crear el producto y esperar a que termine COMPLETAMENTE
         response = await addProducto(form)
-        if (response.success) {
+    if (response.success) {
           // Solo después de que la creación termine, recargar productos
-          await fetchProductos()
+      await fetchProductos()
           
           // Resetear formulario y cerrar modal
-          setForm({
-            nombre: "",
-            descripcion: "",
-            precio: "",
-            stock: "",
-            id_categoria: "",
-            estado: "activo",
-            peso: "",
-            ancho: "",
-            alto: "",
-            profundidad: "",
-          })
-          setEditingId(null)
-          setModalOpen(false)
+      setForm({
+        nombre: "",
+        descripcion: "",
+        precio: "",
+        stock: "",
+        id_categoria: "",
+        estado: "activo",
+        imagen: "",
+        peso: "",
+        ancho: "",
+        alto: "",
+        profundidad: "",
+      })
+      setEditingId(null)
+      setModalOpen(false)
           
           // Mostrar mensaje de éxito
           Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
@@ -440,14 +443,14 @@ function ProductosManagerConnected() {
       }
 
       if (!response.success) {
-        Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
-      }
-    } catch (error) {
-      Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
-    } finally {
-      setSubmitting(false)
+      Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
     }
+  } catch (error) {
+    Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
+  } finally {
+    setSubmitting(false)
   }
+}
 
   const categoriasManagement = {
     add: addCategoria,
