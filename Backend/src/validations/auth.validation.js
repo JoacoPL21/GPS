@@ -86,17 +86,6 @@ export const direccionValidation = Joi.object({
       "string.empty": "El número no puede estar vacío",
       "string.base": "El número debe ser una cadena de texto",
     }),
-  ciudad: Joi.string()
-    .min(2)
-    .max(50)
-    .required()
-    .messages({
-      "string.min": "La ciudad debe tener al menos 2 caracteres",
-      "any.required": "La ciudad es obligatoria",
-      "string.max": "La ciudad no puede tener más de 50 caracteres",
-      "string.empty": "La ciudad no puede estar vacía",
-      "string.base": "La ciudad debe ser una cadena de texto",
-    }),
   comuna: Joi.string()  // NUEVA VALIDACIÓN
     .min(2)
     .max(50)

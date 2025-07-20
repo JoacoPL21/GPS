@@ -305,7 +305,7 @@ const Profile = () => {
                     <div className="grid gap-4">
                       {direcciones.map((direccion) => (
                         <div
-                          key={direccion.id}
+                          key={direccion.id_direccion} // CAMBIO: era direccion.id
                           className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 hover:shadow-md transition-all duration-300 group border border-amber-200"
                         >
                           <div className="flex items-start justify-between mb-3">
@@ -362,8 +362,8 @@ const Profile = () => {
                               </p>
                             </div>
                             <div>
-                              <p className="text-amber-600 font-medium">Ciudad</p>
-                              <p className="text-amber-900">{direccion.ciudad}</p>
+                              <p className="text-amber-600 font-medium">Comuna</p> 
+                              <p className="text-amber-900">{direccion.comuna}</p>
                             </div>
                             <div>
                               <p className="text-amber-600 font-medium">Región</p>

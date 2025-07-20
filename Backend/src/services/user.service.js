@@ -19,13 +19,21 @@ export const getAllUsersService = async () => {
     }
 }
 
-export async function registerDireccionService(direccionData) {
+// ✅ CORRECTO - registerDireccionService
+export async function registerDireccionService(direccionData, userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
         
         console.log('Guardando dirección:', direccionData);
         
-        const newDireccion = direccionRepository.create(direccionData);
+        // Agregar el ID del usuario a los datos de la dirección
+        const direccionConUsuario = {
+            ...direccionData,
+            id_usuario: userId
+        };
+        
+        // Crear y guardar la nueva dirección
+        const newDireccion = direccionRepository.create(direccionConUsuario);
         const savedDireccion = await direccionRepository.save(newDireccion);
         
         return [savedDireccion, null];
@@ -35,10 +43,12 @@ export async function registerDireccionService(direccionData) {
     }
 }
 
+// ✅ CORRECTO - getDireccionByUserIdService
 export async function getDireccionByUserIdService(userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
         
+        // Buscar TODAS las direcciones del usuario por FK
         const direcciones = await direccionRepository.find({
             where: { id_usuario: userId }
         });
@@ -50,6 +60,7 @@ export async function getDireccionByUserIdService(userId) {
     }
 }
 
+// ✅ CORREGIDO - deleteDireccionByUserIdService
 export async function deleteDireccionByUserIdService(direccionId, userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
@@ -58,7 +69,7 @@ export async function deleteDireccionByUserIdService(direccionId, userId) {
         const direccion = await direccionRepository.findOne({
             where: { 
                 id_direccion: direccionId,
-                id_usuario: userId 
+                id_usuario: userId  // ✅ Verificar que la dirección pertenece al usuario
             }
         });
         
@@ -66,7 +77,9 @@ export async function deleteDireccionByUserIdService(direccionId, userId) {
             return [null, "Dirección no encontrada o no pertenece al usuario"];
         }
         
+        // Eliminar la dirección directamente
         await direccionRepository.remove(direccion);
+        
         return [direccion, null];
     } catch (error) {
         console.error("Error al eliminar dirección:", error);
@@ -74,6 +87,7 @@ export async function deleteDireccionByUserIdService(direccionId, userId) {
     }
 }
 
+// ✅ CORRECTO - getUserProfileService
 export const getUserProfileService = async (userId) => {
     try {
         const userRepository = AppDataSource.getRepository(Usuarios);
@@ -96,6 +110,7 @@ export const getUserProfileService = async (userId) => {
     }
 };
 
+// ✅ CORRECTO - updateUserProfileService
 export const updateUserProfileService = async (userId, updateData) => {
     try {
         const userRepository = AppDataSource.getRepository(Usuarios);

@@ -11,7 +11,6 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
   const [form, setForm] = useState({
     calle: "",
     numero: "",
-    ciudad: "",
     comuna: "",
     region: "",
     codigo_postal: "",
@@ -42,7 +41,6 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
       newError.numero = "El número debe ser un valor entero";
     }
     
-    // Solo validar comuna, no ciudad (o viceversa, según tu lógica de negocio)
     if (!form.comuna) newError.comuna = "La comuna es requerida";
     if (!form.region) newError.region = "La región es requerida";
     if (!form.codigo_postal) newError.codigo_postal = "El código postal es requerido";
@@ -76,7 +74,6 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
       ...prevForm,
       region: region,
       comuna: comuna,
-      ciudad: comuna // También llenar ciudad con el mismo valor si es necesario
     }))
     
     // Limpiar errores relacionados
@@ -84,7 +81,6 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
       ...prevError,
       region: "",
       comuna: "",
-      ciudad: ""
     }))
   }
 
@@ -116,7 +112,6 @@ const FormDireccionEnvio = ({ onDireccionAdded }) => {
         setForm({
           calle: "",
           numero: "",
-          ciudad: "",
           comuna: "",
           region: "",
           codigo_postal: "",

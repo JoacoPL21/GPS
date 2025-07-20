@@ -6,6 +6,9 @@ import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useCart } from "../context/CartContext";
 import { useChilexpressCoverage } from "../hooks/useChilexpressCoverage";
 import ChilexpressRegionComunaSelector from "../components/ChilexpressRegionComunaSelector";
+import { useShippingAddresses } from '../hooks/useShippingAddresses';
+import AddressSelector from './AddressSelector';
+import { useAuth } from "../context/AuthContext.jsx";
 
 import {
   Heart,
@@ -424,6 +427,30 @@ function MultiStepCheckout() {
     checkCobertura,
   } = useChilexpressCoverage();
 
+  
+  const { authUser, isAuthenticated } = useAuth();
+
+  // Hook de direcciones (YA TIENES LOS IMPORTS, PERO FALTAN LAS VARIABLES)
+  const {
+    addresses,
+    loading: loadingAddresses,
+    selectedAddressId,
+    setSelectedAddressId,
+    mapAddressToShippingData,
+    hasAddresses,
+  } = useShippingAddresses();
+
+  // Estado para mostrar formulario (AGREGAR ESTA LÍNEA)
+  const [showAddressForm, setShowAddressForm] = useState(false);
+
+  // Función para seleccionar dirección (AGREGAR ESTA FUNCIÓN)
+  const handleSelectAddress = (address) => {
+    setSelectedAddressId(address.id_direccion);
+    const mappedData = mapAddressToShippingData(address);
+    setShippingData(mappedData);
+    setShowAddressForm(false);
+  };
+
   // Consultar cobertura cada vez que cambian región o comuna (y ambos existen)
   useEffect(() => {
     if (shippingData.regionCode && shippingData.comunaCode) {
@@ -457,14 +484,15 @@ function MultiStepCheckout() {
   };
 
   const validateShippingData = () => {
+    // Si está autenticado y tiene dirección seleccionada, es válido
+    if (isAuthenticated && selectedAddressId) {
+      return true;
+    }
+    
+    // Si no está autenticado o no tiene dirección seleccionada, validar form normal
     const required = [
-      "nombres",
-      "apellidos",
-      "email",
-      "phone",
-      "address",
-      "regionCode",
-      "comunaCode",
+      "nombres", "apellidos", "email", "phone", 
+      "address", "regionCode", "comunaCode"
     ];
     return required.every(
       (field) => shippingData[field] && shippingData[field].trim() !== ""
@@ -612,15 +640,80 @@ function MultiStepCheckout() {
         );
 
       case 1:
-        return (
-          <ShippingForm
-            shippingData={shippingData}
-            setShippingData={setShippingData}
-            cobertura={cobertura}
-            loadingCobertura={loadingCobertura}
-            errorCobertura={errorCobertura}
-          />
-        );
+        // LÓGICA CONDICIONAL SIMPLE
+        if (!isAuthenticated) {
+          // Usuario no logueado -> formulario normal
+          return (
+            <ShippingForm
+              shippingData={shippingData}
+              setShippingData={setShippingData}
+              cobertura={cobertura}
+              loadingCobertura={loadingCobertura}
+              errorCobertura={errorCobertura}
+            />
+          );
+        }
+
+        if (isAuthenticated && !hasAddresses) {
+          // Usuario logueado sin direcciones -> formulario normal
+          return (
+            <div className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p className="text-amber-800 text-sm">
+                  No tienes direcciones guardadas. Completa el formulario para agregar una nueva.
+                </p>
+              </div>
+              <ShippingForm
+                shippingData={shippingData}
+                setShippingData={setShippingData}
+                cobertura={cobertura}
+                loadingCobertura={loadingCobertura}
+                errorCobertura={errorCobertura}
+              />
+            </div>
+          );
+        }
+
+        if (isAuthenticated && hasAddresses && !showAddressForm) {
+          // Usuario logueado con direcciones -> selector
+          return (
+            <AddressSelector
+              addresses={addresses}
+              selectedAddressId={selectedAddressId}
+              onSelectAddress={handleSelectAddress}
+              onShowForm={() => setShowAddressForm(true)}
+              loading={loadingAddresses}
+            />
+          );
+        }
+
+        if (showAddressForm) {
+          // Mostrar formulario para nueva dirección
+          return (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Nueva dirección de envío
+                </h3>
+                <button
+                  onClick={() => setShowAddressForm(false)}
+                  className="text-amber-600 hover:text-amber-700 text-sm font-medium"
+                >
+                  ← Volver a direcciones guardadas
+                </button>
+              </div>
+              <ShippingForm
+                shippingData={shippingData}
+                setShippingData={setShippingData}
+                cobertura={cobertura}
+                loadingCobertura={loadingCobertura}
+                errorCobertura={errorCobertura}
+              />
+            </div>
+          );
+        }
+
+        break;
 
       case 2:
         return (

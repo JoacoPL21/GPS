@@ -10,17 +10,17 @@ const Direccion = new EntitySchema({
             type: "int",
             generated: true,
         },
-        direccion: { 
+        calle: { 
             type: "varchar",
             length: 255,
             nullable: false,
         },
-        ciudad: {
+        numero: {  
             type: "varchar",
-            length: 100,
+            length: 10,
             nullable: false,
         },
-        comuna: {  // NUEVA COLUMNA
+        comuna: {
             type: "varchar",
             length: 100,
             nullable: false,
@@ -34,11 +34,6 @@ const Direccion = new EntitySchema({
             type: "varchar",
             length: 20,
             nullable: false,
-        },
-        pais: {
-            type: "varchar",
-            length: 100,
-            nullable: true,
         },
         tipo_de_direccion: {
             type: "enum",
@@ -55,6 +50,19 @@ const Direccion = new EntitySchema({
             default: () => "CURRENT_TIMESTAMP",
             onUpdate: "CURRENT_TIMESTAMP",
             nullable: false,
+        },
+        id_usuario: {
+            type: "int",
+            nullable: false,
+        },
+    },
+    relations: {
+        usuario: {
+            type: "many-to-one",
+            target: "Usuario",
+            joinColumn: {
+                name: "id_usuario",
+            },
         },
     },
 });
