@@ -19,7 +19,7 @@ import EstadoVacio from "../../components/ProductsManager/EstadoVacio"
 
 // Hooks refactorizados
 import { useGestorProductos } from "../../hooks/productos/useGestorProductos"
-import { useProductsFilters } from "../../hooks/productos/useProductsFilters"
+import { useFiltrosProductos } from "../../hooks/productos/useProductsFilters"
 import { useValidacionFormulario } from "../../hooks/productos/useValidacionFormulario"
 
 function ProductosManager() {
@@ -31,9 +31,20 @@ function ProductosManager() {
   const [modalCategoriaOpen, setModalCategoriaOpen] = useState(false);
   const [progresoSubida, setProgresoSubida] = useState(0);
   const [enviando, setEnviando] = useState(false);
-  const [advertenciaSincronizacion, setAdvertenciaSincronizacion] = useState(false);
-  const [productosSeleccionados, setProductosSeleccionados] = useState([]);
-  const [modoSeleccion, setModoSeleccion] = useState(false);
+  const [formulario, setFormulario] = useState({
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    stock: "",
+    id_categoria: "",
+    estado: "activo",
+    imagen: null,
+    imagen_url: "",
+    peso: "",
+    ancho: "",
+    alto: "",
+    profundidad: "",
+  });
 
   // Datos combinados de productos y categorías
   const productos = gestor.mostrarEliminados ? gestor.productosEliminados : gestor.productosActivos;
@@ -45,168 +56,95 @@ function ProductosManager() {
     filtros,
     actualizarFiltro,
     limpiarFiltros
-  } = useProductsFilters(productos);
+  } = useFiltrosProductos(productos);
 
   // Efectos
   useEffect(() => {
-    gestor.cargarProductos();
-    gestor.loadCategorias(); // Usar loadCategorias para cargar las categorías del hook useCategorias
+    gestor.cargarDatos();
   }, []);
 
-  // Efecto para recargar categorías cuando se abre el modal de productos
-  useEffect(() => {
-    if (gestor.modalAbierto) {
-      // Recargar categorías cuando se abre el modal de productos para asegurar sincronización
-      gestor.loadCategorias();
-    }
-  }, [gestor.modalAbierto]);
-
-  // Debug: monitorear cambios en categorías
-  useEffect(() => {
-    console.log("Categorías actualizadas:", gestor.categorias?.length || 0, gestor.categorias);
-  }, [gestor.categorias]);
-
-  // Debug adicional: monitorear cuando se pasan las categorías al ProductoModal
-  useEffect(() => {
-    if (gestor.modalAbierto) {
-      console.log("Modal abierto - Categorías enviadas al ProductoModal:", gestor.categorias?.length || 0, gestor.categorias);
-    }
-  }, [gestor.modalAbierto, gestor.categorias]);
-
-  // Estado para categorías - usar directamente las del gestor
+  // Estado para categorías
+  const [categoriasSet, setCategorias] = useState([]);
   const [loadingCategorias, setLoadingCategorias] = useState(false);
 
-  // Función auxiliar para sincronizar categorías después de operaciones CRUD
-  const sincronizarCategorias = async () => {
-    try {
-      // Esperar un poco para asegurar que el backend termine de procesar
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Recargar categorías
-      await gestor.loadCategorias();
-      // Hacer refresh de productos una sola vez (como el botón refresh)
-      manejarRefrescar();
-    } catch (error) {
-      console.error("Error al sincronizar categorías:", error);
+  // Cargar categorías para modales
+  useEffect(() => {
+    if (gestor.categorias?.length > 0) {
+      setCategorias(gestor.categorias);
     }
-  };
+  }, [gestor.categorias]);
+    alternarModoSeleccion,
+    manejarClickProducto,
+    estaSeleccionado,
+    setAdvertenciaSincronizacion,
+    addProducto,
+    editProducto,
+    removeProducto,
+    addCategoria,
+    editCategoria,
+    removeCategoria,
+  } = gestor;
 
-  // Funciones de manejo de categorías
-  const manejarAgregarCategoria = async (datosCategoria) => {
-    setLoadingCategorias(true);
-    try {
-      const respuesta = await gestor.addCategoria(datosCategoria);
-      if (respuesta.success) {
-        // Sincronizar categorías entre ambos modales
-        await sincronizarCategorias();
-      }
-      return respuesta;
-    } catch (error) {
-      return { success: false, error: "Ha ocurrido un error inesperado" };
-    } finally {
-      setLoadingCategorias(false);
-    }
-  };
+  // Hook de filtros
+  const filtros = useFiltrosProductos(productosActuales);
+  const {
+    searchTerm,
+    setSearchTerm,
+    filterCategory,
+    setFilterCategory,
+    filterStatus,
+    setFilterStatus,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    showFilters,
+    setShowFilters,
+    productosFiltradosYOrdenados,
+    categorias: categoriasFiltros,
+    clearFilters,
+  } = filtros;
 
-  const manejarEditarCategoria = async (idCategoria, datosCategoria) => {
-    setLoadingCategorias(true);
-    try {
-      const respuesta = await gestor.editCategoria(idCategoria, datosCategoria);
-      if (respuesta.success) {
-        // Sincronizar categorías entre ambos modales
-        await sincronizarCategorias();
-      }
-      return respuesta;
-    } catch (error) {
-      return { success: false, error: "Ha ocurrido un error inesperado" };
-    } finally {
-      setLoadingCategorias(false);
-    }
-  };
-
-  const manejarEliminarCategoria = async (idCategoria) => {
-    setLoadingCategorias(true);
-    try {
-      const respuesta = await gestor.removeCategoria(idCategoria);
-      if (respuesta.success) {
-        // Sincronizar categorías entre ambos modales
-        await sincronizarCategorias();
-      }
-      return respuesta;
-    } catch (error) {
-      return { success: false, error: "Ha ocurrido un error inesperado" };
-    } finally {
-      setLoadingCategorias(false);
-    }
-  };
-
-  // Funciones de manejo del formulario
-  const manejarEnvio = async (e) => {
-    e.preventDefault();
-    setEnviando(true);
-
-    try {
-      // Validar formulario
-      if (!validarFormulario(gestor.formulario)) {
-        setEnviando(false);
-        return;
-      }
-
-      // Determinar si es edición o creación
-      const esEdicion = Boolean(gestor.editandoId);
-      let respuesta;
-
-      if (esEdicion) {
-        respuesta = await gestor.editProducto(gestor.editandoId, gestor.formulario);
-      } else {
-        respuesta = await gestor.addProducto(gestor.formulario);
-      }
-
-      if (respuesta.success) {
-        // Recargar la lista de productos para mostrar los cambios
-        await gestor.cargarProductos();
-        
-        Swal.fire("¡Éxito!", `Producto ${esEdicion ? "actualizado" : "agregado"} correctamente.`, "success");
-        gestor.setModalAbierto(false);
-        limpiarErrores();
-        
-        setTimeout(() => {
-          gestor.resetearFormulario();
-        }, 100);
-      } else {
-        Swal.fire("Error", respuesta.error || "No se pudo procesar la solicitud", "error");
-      }
-    } catch (error) {
-      Swal.fire("Error", "Ha ocurrido un error inesperado", "error");
-    } finally {
-      setEnviando(false);
-      setProgresoSubida(0);
-    }
-  };
+  // Hook de validación
+  const validacion = useValidacionFormulario();
+  const { errores, setErrores, validarFormulario, validarArchivo, limpiarError } = validacion;
 
   // Funciones de manejo de inputs
   const manejarCambioInput = (e) => {
     const { name, value, type, files } = e.target;
     
     if (type === 'file') {
+      // Manejar archivos de imagen
       const file = files[0];
       
       if (file) {
         if (validarArchivo(file, name)) {
-          gestor.setFormulario((prev) => ({ 
+          console.log("📁 Archivo seleccionado:", {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            lastModified: file.lastModified
+          });
+
+          setFormulario((prev) => ({ 
             ...prev, 
             [name]: file,
-            imagen_url: ""
+            imagen_url: "" // Limpiar la imagen_url cuando se selecciona una nueva imagen
           }));
+          console.log("✅ Archivo válido y guardado");
         }
       } else {
-        gestor.setFormulario((prev) => ({ 
+        // Si no hay archivo (se canceló la selección)
+        setFormulario((prev) => ({ 
           ...prev, 
           [name]: null,
+          // En modo edición, restaurar la imagen_url original si existe
           ...(gestor.editandoId && prev.imagen_url && { imagen_url: prev.imagen_url })
         }));
       }
     } else {
-      gestor.setFormulario((prev) => ({ ...prev, [name]: value }));
+      // Manejar inputs normales
+      setFormulario((prev) => ({ ...prev, [name]: value }));
     }
     
     limpiarError(name);
@@ -228,57 +166,22 @@ function ProductosManager() {
     });
 
     if (result.isConfirmed) {
-      const response = await gestor.removeProducto(id);
+      const response = await removeProducto(id);
       
       if (response.success) {
         setProductosSeleccionados((prev) => prev.filter((selectedId) => selectedId !== id));
-        await gestor.cargarProductos();
+        await cargarProductos();
         Swal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success");
       } else {
         const errorMessage = handleApiError(response.error);
         
         if (errorMessage.includes("no encontrado") || errorMessage.includes("404")) {
           setAdvertenciaSincronizacion(true);
-          await gestor.cargarProductos();
+          await cargarProductos();
           Swal.fire("Producto no encontrado", "El producto ya fue eliminado o no existe. La lista ha sido actualizada.", "info");
         } else {
           Swal.fire("Error", errorMessage, "error");
         }
-      }
-    }
-  };
-
-  // Función de restaurar producto
-  const manejarRestaurar = async (id) => {
-    if (modoSeleccion) return;
-
-    const result = await Swal.fire({
-      title: "¿Restaurar producto?",
-      text: "El producto será restaurado como 'inactivo' para que puedas revisarlo y editarlo antes de publicarlo",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#10b981",
-      cancelButtonColor: "#6b7280",
-      confirmButtonText: "Sí, restaurar",
-      cancelButtonText: "Cancelar",
-    });
-
-    if (result.isConfirmed) {
-      const response = await gestor.restoreProductoHook(id);
-      
-      if (response.success) {
-        // Recargar ambas listas para reflejar el cambio
-        await gestor.cargarProductos();
-        await gestor.cargarProductosEliminados();
-        Swal.fire({
-          title: "¡Restaurado!",
-          text: "El producto ha sido restaurado como 'inactivo'. Puedes editarlo y luego activarlo cuando esté listo.",
-          icon: "success",
-          confirmButtonText: "Entendido"
-        });
-      } else {
-        const errorMessage = handleApiError(response.error);
-        Swal.fire("Error", errorMessage, "error");
       }
     }
   };
@@ -303,7 +206,7 @@ function ProductosManager() {
       let syncIssues = false;
 
       for (const id of productosSeleccionados) {
-        const response = await gestor.removeProducto(id);
+        const response = await removeProducto(id);
         if (response.success) {
           successCount++;
         } else {
@@ -316,8 +219,8 @@ function ProductosManager() {
       }
 
       setProductosSeleccionados([]);
-      setModoSeleccion(false);
-      await gestor.cargarProductos();
+      gestor.setModoSeleccion(false);
+      await cargarProductos();
 
       if (syncIssues) {
         setAdvertenciaSincronizacion(true);
@@ -338,14 +241,6 @@ function ProductosManager() {
     } else {
       setProductosSeleccionados(productosFiltradosYOrdenados.map((p) => p.id_producto));
     }
-  };
-
-  const manejarClickProducto = (productoId) => {
-    if (!modoSeleccion) return;
-
-    setProductosSeleccionados((prev) =>
-      prev.includes(productoId) ? prev.filter((id) => id !== productoId) : [...prev, productoId]
-    );
   };
 
   const manejarClickFilaTabla = (producto) => {
@@ -387,19 +282,122 @@ function ProductosManager() {
   // Función de refrescar
   const manejarRefrescar = () => {
     setAdvertenciaSincronizacion(false);
-    if (gestor.mostrarEliminados) {
-      gestor.cargarProductosEliminados();
+    if (mostrarEliminados) {
+      cargarProductosEliminados();
     } else {
-      gestor.cargarProductos();
+      cargarProductos();
     }
   };
 
+const handleSubmit = async (e) => {
+  e.preventDefault()
+  const validationErrors = validate()
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors)
+    return
+  }
+
+  setSubmitting(true)
+
+  try {
+    let response
+    const progressCallback = (progress) => {
+      setUploadProgress(progress);
+    };
+    
+    if (editingId) {
+        // Primero actualizar el producto y esperar a que termine COMPLETAMENTE
+        response = await editProducto(editingId, form, progressCallback)
+        if (response.success) {
+          // Solo después de que la actualización termine, recargar productos
+          await fetchProductos()
+          
+          // Mostrar mensaje de éxito primero
+          Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
+          
+          // Cerrar modal con delay para evitar errores de renderizado
+          setTimeout(() => {
+            setModalOpen(false)
+            setEditingId(null)
+            setUploadProgress(0)
+            
+            // Resetear formulario después de cerrar el modal
+            setForm({
+              nombre: "",
+              descripcion: "",
+              precio: "",
+              stock: "",
+              id_categoria: "",
+              estado: "activo",
+              imagen: null,
+              imagen_url: "",
+              peso: "",
+              ancho: "",
+              alto: "",
+              profundidad: "",
+            })
+          }, 100)
+        }
+    } else {
+        // Primero crear el producto y esperar a que termine COMPLETAMENTE
+        response = await addProducto(form, progressCallback)
+    if (response.success) {
+          // Solo después de que la creación termine, recargar productos
+      await fetchProductos()
+          
+          // Mostrar mensaje de éxito primero
+          Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
+          
+          // Cerrar modal con delay para evitar errores de renderizado
+          setTimeout(() => {
+            setModalOpen(false)
+            setEditingId(null)
+            setUploadProgress(0)
+            
+            // Resetear formulario después de cerrar el modal
+            setForm({
+              nombre: "",
+              descripcion: "",
+              precio: "",
+              stock: "",
+              id_categoria: "",
+              estado: "activo",
+              imagen: null,
+              imagen_url: "",
+              peso: "",
+              ancho: "",
+              alto: "",
+              profundidad: "",
+            })
+          }, 100)
+        }
+      }
+
+      if (!response.success) {
+      Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
+    }
+  } catch (error) {
+    Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
+  } finally {
+    setSubmitting(false)
+    setUploadProgress(0)
+  }
+}
+
+  const categoriasManagement = {
+    add: addCategoria,
+    edit: editCategoria,
+    delete: removeCategoria,
+  }
+
   // Mostrar loading
-  if (gestor.cargando) {
+  if (productosLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#fff8f0]">
+        {/* Spinner con animación y sombra */}
         <div className="relative flex items-center justify-center">
           <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-orange-500 shadow-lg"></div>
+          {/* Ícono dentro del spinner (puedes cambiar el SVG por uno que te guste) */}
           <svg
             className="absolute h-12 w-12 text-orange-500"
             xmlns="http://www.w3.org/2000/svg"
@@ -411,21 +409,22 @@ function ProductosManager() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
         </div>
+        {/* Texto con animación de opacidad pulsante */}
         <p className="mt-6 text-xl font-semibold text-orange-600 animate-pulse">
           Cargando productos...
         </p>
       </div>
-    );
+    )
   }
 
   // Mostrar error
-  if (gestor.error) {
+  if (productosError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar productos</h2>
-          <p className="text-gray-600 mb-4">{gestor.error}</p>
+          <p className="text-gray-600 mb-4">{productosError}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
@@ -434,7 +433,7 @@ function ProductosManager() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -443,29 +442,27 @@ function ProductosManager() {
       <PageHeader
         breadcrumbs={[
           { label: "Inicio", to: "/" },
-          { label: gestor.mostrarEliminados ? "Productos eliminados" : "Administración de productos" }
+          { label: showDeleted ? "Productos eliminados" : "Administración de productos" }
         ]}
-        title={gestor.mostrarEliminados ? "Productos eliminados" : "Administración de productos"}
-        subtitle={gestor.mostrarEliminados ? "Productos que han sido eliminados del inventario" : "Gestiona tu inventario de productos"}
+        title={showDeleted ? "Productos eliminados" : "Administración de productos"}
+        subtitle={showDeleted ? "Productos que han sido eliminados del inventario" : "Gestiona tu inventario de productos"}
       />
+      <div className="mt-4 lg:mt-0 flex items-center space-x-4 bg-[#fff8f0]">
+
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8 bg-[#fff8f0]">
-        {/* Estadísticas */}
-        <EstadisticasProductos 
-          productos={gestor.mostrarEliminados ? gestor.productosEliminados : gestor.productosActivos}
-        />
-
         {/* Banners de notificación */}
         <BannersNotificacion 
           advertenciaSincronizacion={advertenciaSincronizacion}
-          mostrarEliminados={gestor.mostrarEliminados}
+          mostrarEliminados={mostrarEliminados}
           onCerrarAdvertencia={() => setAdvertenciaSincronizacion(false)}
         />
 
         {/* Botones de acción */}
         <BotonesAccion 
-          mostrarEliminados={gestor.mostrarEliminados}
-          onAgregar={() => gestor.manejarAgregarClick()}
+          mostrarEliminados={mostrarEliminados}
+          onAgregar={() => gestor.setModalAbierto(true)}
           onAgregarCategoria={() => setModalCategoriaOpen(true)}
           onExportar={manejarExportar}
           onRefrescar={manejarRefrescar}
@@ -475,14 +472,12 @@ function ProductosManager() {
         {/* Barra de herramientas */}
         <BarraHerramientas 
           filtros={filtros}
-          categorias={categoriasExtraidas}
-          estadisticas={gestor.estadisticas}
-          mostrarEliminados={gestor.mostrarEliminados}
+          mostrarEliminados={mostrarEliminados}
           modoSeleccion={modoSeleccion}
           productosSeleccionados={productosSeleccionados}
-          productosFiltradosYOrdenados={productosFiltradosYOrdenados}
-          onToggleEliminados={gestor.alternarEliminados}
-          onToggleModoSeleccion={() => setModoSeleccion(!modoSeleccion)}
+          productosFiltrados={productosFiltradosYOrdenados}
+          onToggleEliminados={() => setMostrarEliminados(!mostrarEliminados)}
+          onToggleModoSeleccion={() => gestor.setModoSeleccion(!modoSeleccion)}
           onSeleccionarTodos={manejarSeleccionarTodos}
           onEliminarLote={manejarEliminarLote}
         />
@@ -495,38 +490,35 @@ function ProductosManager() {
         {/* Lista de productos */}
         {filtros.modoVista === "grid" ? (
           <VistaGrilla 
-            productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+            productos={productosFiltradosYOrdenados}
             modoSeleccion={modoSeleccion}
-            mostrarEliminados={gestor.mostrarEliminados}
-            manejarClickProducto={manejarClickProducto}
-            manejarEditar={(producto) => gestor.manejarEditar(producto)}
-            manejarEliminar={manejarEliminar}
-            manejarRestaurar={manejarRestaurar}
-            estaSeleccionado={(id) => productosSeleccionados.includes(id)}
+            productosSeleccionados={productosSeleccionados}
+            mostrarEliminados={mostrarEliminados}
+            onClickProducto={manejarClickProducto}
+            onEditar={(producto) => gestor.iniciarEdicion(producto)}
+            onEliminar={manejarEliminar}
           />
         ) : (
           <VistaTabla 
-            productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+            productos={productosFiltradosYOrdenados}
             modoSeleccion={modoSeleccion}
             productosSeleccionados={productosSeleccionados}
-            mostrarEliminados={gestor.mostrarEliminados}
-            manejarClickFilaTabla={manejarClickFilaTabla}
-            manejarClickProducto={manejarClickProducto}
-            manejarSeleccionarTodos={manejarSeleccionarTodos}
-            estaSeleccionado={(id) => productosSeleccionados.includes(id)}
-            manejarEditar={(producto) => gestor.manejarEditar(producto)}
-            manejarEliminar={manejarEliminar}
-            manejarRestaurar={manejarRestaurar}
+            mostrarEliminados={mostrarEliminados}
+            onClickFila={manejarClickFilaTabla}
+            onClickProducto={manejarClickProducto}
+            onSeleccionarTodos={manejarSeleccionarTodos}
+            onEditar={(producto) => gestor.iniciarEdicion(producto)}
+            onEliminar={manejarEliminar}
           />
         )}
 
         {/* Estado vacío */}
         {productosFiltradosYOrdenados.length === 0 && (
           <EstadoVacio 
-            mostrarEliminados={gestor.mostrarEliminados}
+            mostrarEliminados={mostrarEliminados}
             tieneProductos={gestor.productosActivos.length > 0}
             filtrosActivos={Boolean(filtros.busqueda || filtros.categoria || filtros.estado)}
-            onAgregar={() => gestor.manejarAgregarClick()}
+            onAgregar={() => gestor.setModalAbierto(true)}
           />
         )}
       </div>
@@ -540,18 +532,18 @@ function ProductosManager() {
           limpiarErrores();
         }}
         onSubmit={manejarEnvio}
-        form={gestor.formulario}
+        form={formulario}
         onChange={manejarCambioInput}
         errors={errores}
         isEditing={!!gestor.editandoId}
         submitting={enviando}
         uploadProgress={progresoSubida}
-        categorias={gestor.categorias}
-        categoriasLoading={gestor.categoriasLoading}
+        categorias={categorias}
+        categoriasLoading={categoriasLoading}
         onManageCategorias={{
-          add: gestor.addCategoria,
-          edit: gestor.editCategoria,
-          delete: gestor.removeCategoria,
+          add: addCategoria,
+          edit: editCategoria,
+          delete: removeCategoria,
         }}
       />
 
@@ -559,7 +551,7 @@ function ProductosManager() {
       <CategoriasModal
         isOpen={modalCategoriaOpen}
         onClose={() => setModalCategoriaOpen(false)}
-        categorias={gestor.categorias || []}
+        categorias={categoriasSet}
         onAddCategoria={manejarAgregarCategoria}
         onEditCategoria={manejarEditarCategoria}
         onDeleteCategoria={manejarEliminarCategoria}
@@ -567,6 +559,6 @@ function ProductosManager() {
       />
     </div>
   );
-}
+};
 
 export default ProductosManager;
