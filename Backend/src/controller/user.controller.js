@@ -1,6 +1,7 @@
 import { getAllUsersService,registerDireccionService,getDireccionByUserIdService,deleteDireccionByUserIdService, getUserProfileService, updateUserProfileService } from '../services/user.service.js';
 import { handleSuccess, handleErrorServer } from '../handlers/responseHandlers.js';
 import { direccionValidation } from '../validations/auth.validation.js';
+
 export async function getAllUsers(req, res) {
     try {
         const [users, error] = await getAllUsersService();
@@ -14,6 +15,7 @@ export async function getAllUsers(req, res) {
         handleErrorServer(res, 500, error.message);
     }
 }
+
 export const getUserProfile = (req, res) => {
     const user = req.user;
     if (!user) {
@@ -23,17 +25,13 @@ export const getUserProfile = (req, res) => {
     handleSuccess(res, 200, "Perfil de usuario obtenido correctamente", userProfile);
 };
 
-
 export async function registerDireccion(req, res) {
     try {
         const { body } = req;
         // Obtener el ID del usuario desde el token JWT (middleware de autenticación)
         const userId = req.user.id;
-        
-        console.log('Datos de dirección recibidos:', body);
-        console.log('ID de usuario desde token:', userId);
-        
-        // Validar solo los campos de la dirección (no el id_usuario)
+         
+        // Validar solo los campos de la dirección
         const { error } = direccionValidation.validate(body);
         if (error) {
             return res.status(400).json({ 
@@ -43,13 +41,8 @@ export async function registerDireccion(req, res) {
             });
         }
         
-        // Agregar el ID del usuario a los datos de la dirección
-        const direccionData = {
-            ...body,
-            id_usuario: userId // Asegurarse de que el usuario loggeado sea el propietario
-        };
-        
-        const [savedDireccion, errorService] = await registerDireccionService(direccionData);
+        // Pasar los datos de dirección y el userId por separado
+        const [savedDireccion, errorService] = await registerDireccionService(body, userId);
         
         if (errorService) {
             return res.status(500).json({ 
@@ -73,11 +66,13 @@ export async function getDireccionByUserId(req, res) {
         
         const [direcciones, error] = await getDireccionByUserIdService(userId);
         if (error) {
-            return res.status(500).json({ message: 'Error al obtener las direcciones', error });
+            return res.status(500).json({ 
+                status: 'Error',
+                message: 'Error al obtener las direcciones', 
+                error 
+            });
         }
-        if (direcciones.length === 0 || !direcciones) {
-            return res.status(404).json({ message: 'No se encontraron direcciones para este usuario' });
-        }
+        
         handleSuccess(res, 200, "Direcciones obtenidas correctamente", direcciones);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
@@ -93,11 +88,20 @@ export async function deleteDireccionByUserId(req, res) {
         
         const [deletedDireccion, error] = await deleteDireccionByUserIdService(direccionId, userId);
         if (error) {
-            return res.status(500).json({ message: 'Error al eliminar la dirección', error });
+            return res.status(500).json({ 
+                status: 'Error',
+                message: 'Error al eliminar la dirección', 
+                error 
+            });
         }
+        
         if (!deletedDireccion) {
-            return res.status(404).json({ message: 'Dirección no encontrada o no pertenece al usuario' });
+            return res.status(404).json({ 
+                status: 'Error',
+                message: 'Dirección no encontrada o no pertenece al usuario' 
+            });
         }
+        
         handleSuccess(res, 200, "Dirección eliminada correctamente", deletedDireccion);
     } catch (error) {
         handleErrorServer(res, 500, error.message);

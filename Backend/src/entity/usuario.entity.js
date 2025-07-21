@@ -29,17 +29,13 @@ const Usuarios = new EntitySchema({
         password: {
             type: "varchar",
             length: 120,
-            nullable: false,
+            nullable: true, // Puede ser null si el usuario es invitado la logica debe aplicarse en el registro para que lo usuarios normales no tengan el campo password como null
         },
         rol: {
             type: "enum",
-            enum: ["admin", "cliente"],
+            enum: ["admin", "cliente", "invitado"],
             default: "cliente",
             nullable: false,
-        },
-        id_direccion: {
-            type: "int",
-            nullable: true,
         },
         createdAt: {
             type: "timestamp",
@@ -54,12 +50,10 @@ const Usuarios = new EntitySchema({
         },
     },
     relations: {
-        Direcciones: {
-            type: "many-to-one",
+        direcciones: {
+            type: "one-to-many",
             target: "Direccion",
-            joinColumn: {
-                name: "id_direccion",
-            },
+            inverseSide: "usuario"
         },
     },
 });

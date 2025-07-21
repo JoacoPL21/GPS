@@ -10,6 +10,7 @@ const Register = () => {
     nombreCompleto: '',
     email: '',
     password: '',
+    confirmPassword: '', // ← NUEVO CAMPO
     telefono: '',
     direccion: {
       calle: '',
@@ -17,7 +18,7 @@ const Register = () => {
       ciudad: '',
       region: '',
       codigo_postal: '',
-      tipo_de_direccion: 'envio' // Valor por defecto
+      tipo_de_direccion: 'predeterminada' //
     }
 
   });
@@ -57,6 +58,7 @@ useEffect(() => {
       ...formData,
       [name]: value
     });
+    
     // Limpia el error del campo correspondiente al cambiar su valor
     if (errors[name]) {
       setErrors({
@@ -65,7 +67,31 @@ useEffect(() => {
       });
     }
 
-    
+    // ← VALIDACIÓN EN TIEMPO REAL PARA CONFIRMACIÓN DE CONTRASEÑA
+    if (name === 'confirmPassword' && value !== formData.password) {
+      setErrors({
+        ...errors,
+        confirmPassword: 'Las contraseñas no coinciden'
+      });
+    } else if (name === 'confirmPassword' && value === formData.password) {
+      setErrors({
+        ...errors,
+        confirmPassword: ''
+      });
+    }
+
+    // También validar cuando se cambie la contraseña principal
+    if (name === 'password' && formData.confirmPassword && value !== formData.confirmPassword) {
+      setErrors({
+        ...errors,
+        confirmPassword: 'Las contraseñas no coinciden'
+      });
+    } else if (name === 'password' && formData.confirmPassword && value === formData.confirmPassword) {
+      setErrors({
+        ...errors,
+        confirmPassword: ''
+      });
+    }
   };
 
   // Valida los campos del formulario y devuelve un objeto con los errores
@@ -84,6 +110,14 @@ useEffect(() => {
     if (!formData.email.trim()) newErrors.email = 'El correo es obligatorio';
     if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
     if (formData.password.length < 6) newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    
+    // ← NUEVAS VALIDACIONES PARA CONFIRMAR CONTRASEÑA
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Debes confirmar tu contraseña';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+    
     if (!formData.telefono) {
       newErrors.telefono = 'El teléfono es obligatorio';
     } else if (formData.telefono.toString().length !== 9) {
@@ -120,6 +154,7 @@ useEffect(() => {
           nombreCompleto: '',
           email: '',
           password: '',
+          confirmPassword: '', // ← LIMPIAR TAMBIÉN ESTE CAMPO
           telefono: '',
         
         });
@@ -219,6 +254,31 @@ useEffect(() => {
             </label>
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          {/* ← NUEVO CAMPO: Confirmar Contraseña */}
+          <div className="relative mb-6">
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              placeholder=""
+              required
+              className={`peer w-full border-2 rounded-md px-3 pt-2 pb-3 text-sm bg-white text-gray-900 focus:outline-none focus:border-orange-500 transition-all
+                ${errors.confirmPassword ? "border-red-500" : "border-gray-400"}`}
+            />
+            <label
+              htmlFor="confirmPassword"
+              className="absolute left-2 -top-2.5 px-1 text-xs bg-white text-gray-600 peer-placeholder-shown:top-2 peer-placeholder-shown:text-base 
+                peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-orange-500 transition-all duration-200 z-10"
+            >
+              Confirmar Contraseña
+            </label>
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
             )}
           </div>
 

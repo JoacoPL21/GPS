@@ -157,3 +157,30 @@ export async function updateUserProfile(userData) {
         };
     }
 }
+
+export async function getProductosCompradosConValoracion() {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No hay token de autenticación');
+        }
+        const response = await axios.get('/user/productos-comprados', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (response.status === 200) {
+            return {
+                status: 'Success',
+                data: response.data.data,
+                message: response.data.message
+            };
+        }
+    } catch (error) {
+        console.error('Error al obtener productos comprados:', error);
+        return {
+            status: 'Error',
+            message: error.response?.data?.message || error.message || 'Error al obtener productos comprados'
+        };
+    }
+}

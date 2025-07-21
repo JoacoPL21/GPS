@@ -10,7 +10,7 @@ const PageHeader = ({ breadcrumbs = [], title, subtitle }) => {
           {breadcrumbs.map((crumb, index) => (
             <span key={index}>
               {crumb.to ? (
-                <Link to={crumb.to} className="hover:underline">
+                <Link to={crumb.to} className="hover:underline !text-[#a47148] ">
                   {crumb.label}
                 </Link>
               ) : (

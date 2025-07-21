@@ -20,32 +20,17 @@ export async function getProductos() {
     const response = await axios.get("/productos/all");
     return {
       success: true,
-      data: response.data.data, // Suponiendo que usas handleSuccess que envuelve en `.data`
+      data: response.data.data, // Estructura consistente con el backend
     };
   } catch (error) {
     console.error("Error al obtener productos:", error);
     return {
       success: false,
-      error: error.response?.data || "Error desconocido al obtener productos",
+      data: null,
+      error: error.response?.data?.message || error.message || "Error al obtener productos",
     };
   }
 }
-
-const fetchProductos = async () => {
-  setLoading(true);
-  const response = await getProductos();
-
-  if (response?.data?.data && Array.isArray(response.data.data)) {
-    console.log("productosAll cargado:", response.data.data);
-    setProductosAll(response.data.data);
-  } else {
-    console.error("La respuesta no tiene un array válido");
-    setProductosAll([]);
-  }
-
-  setLoading(false);
-};
-
 
 export async function getProductosDestacados() {
   try {
@@ -86,11 +71,24 @@ export async function getProductoById(id_producto) {
   }
 }
 
-// ===== NUEVAS FUNCIONES QUE NECESITAS AGREGAR AL BACKEND =====
+// ===== FUNCION CREAR PRODUCTO =====
 
 export async function createProducto(productoData) {
   try {
-    const response = await axios.post("/productos/crear", productoData)
+    const formData = new FormData()
+    
+    for (const key in productoData) {
+      if (productoData[key] !== undefined && productoData[key] !== null) {
+        formData.append(key, productoData[key])
+      }
+    }
+
+    const response = await axios.post("/productos/crear", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
     return { data: response.data, error: null }
   } catch (error) {
     console.error("Error al crear producto:", error)
@@ -108,11 +106,7 @@ export async function updateProducto(id_producto, productoData) {
       throw new Error('No hay token de autenticación');
     }
 
-    // Formatear datos si es necesario
-    const formattedData = typeof productoData === 'object' ? 
-      formatProductoData(productoData) : productoData;
-
-    const response = await axios.put(`/productos/${id_producto}`, formattedData, {
+    const response = await axios.put(`/productos/${id_producto}`, productoData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -159,39 +153,51 @@ export async function getCategorias() {
 
 export async function createCategoria(categoriaData) {
   try {
-    const response = await axios.post("/categorias/crear", categoriaData)
-    return { success:true, data: response.data }
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    
+    const response = await axios.post("/categorias/crear", categoriaData, { headers })
+    return { success: true, data: response.data }
   } catch (error) {
     console.error("Error al crear categoría:", error)
     return {
+      success: false,
       data: null,
-      error: error.response ? error.response.data : "Error al crear categoría",
+      error: error.response?.data?.message || error.message || "Error al crear categoría",
     }
   }
 }
 
 export async function updateCategoria(id, categoriaData) {
   try {
-    const response = await axios.put(`/categorias/${id}`, categoriaData)
-    return { success:true, data: response.data }
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    
+    const response = await axios.put(`/categorias/${id}`, categoriaData, { headers })
+    return { success: true, data: response.data }
   } catch (error) {
     console.error("Error al actualizar categoría:", error)
     return {
+      success: false,
       data: null,
-      error: error.response ? error.response.data : "Error al actualizar categoría",
+      error: error.response?.data?.message || error.message || "Error al actualizar categoría",
     }
   }
 }
 
 export async function deleteCategoria(id) {
   try {
-    const response = await axios.delete(`/categorias/${id}`)
-    return { success:true, data: response.data }
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    
+    const response = await axios.delete(`/categorias/${id}`, { headers })
+    return { success: true, data: response.data }
   } catch (error) {
     console.error("Error al eliminar categoría:", error)
     return {
+      success: false,
       data: null,
-      error: error.response ? error.response.data : "Error al eliminar categoría",
+      error: error.response?.data?.message || error.message || "Error al eliminar categoría",
     }
   }
 }
@@ -219,7 +225,7 @@ export const formatProductoData = (formData, categorias = []) => {
     return null; // O lanzar un error
   }
 
-  return {
+  const data = {
     nombre: formData.nombre?.trim(),
     descripcion: formData.descripcion?.trim(),
     precio: Number.parseFloat(formData.precio),
@@ -228,6 +234,22 @@ export const formatProductoData = (formData, categorias = []) => {
     estado: formData.estado || "activo", // Mantener "activo"
     image_url: formData.image_url || null,
   };
+
+  // Añadir campos de dimensiones y peso si están presentes
+  if (formData.peso !== undefined && formData.peso !== "" && formData.peso !== null) {
+    data.peso = Number.parseFloat(formData.peso);
+  }
+  if (formData.ancho !== undefined && formData.ancho !== "" && formData.ancho !== null) {
+    data.ancho = Number.parseFloat(formData.ancho);
+  }
+  if (formData.alto !== undefined && formData.alto !== "" && formData.alto !== null) {
+    data.alto = Number.parseFloat(formData.alto);
+  }
+  if (formData.profundidad !== undefined && formData.profundidad !== "" && formData.profundidad !== null) {
+    data.profundidad = Number.parseFloat(formData.profundidad);
+  }
+
+  return data;
 }
 
 export async function getConteoProductosDestacados() {

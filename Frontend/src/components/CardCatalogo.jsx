@@ -1,5 +1,6 @@
 "use client"
 import { Link } from "react-router-dom"
+import { FaShoppingCart } from "react-icons/fa"
 const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
   const getStockStatus = (stock) => {
     if (stock === 0) return { color: "bg-red-100 text-red-800", text: "Agotado", available: false }
@@ -85,14 +86,7 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
                     : "bg-gray-200 text-gray-500 cursor-not-allowed"
                 }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z"
-                  />
-                </svg>
+                <FaShoppingCart className="w-5 h-5" />
                 <span>{stockStatus.available ? "Agregar al carrito" : "No disponible"}</span>
               </button>
             </div>
@@ -169,14 +163,7 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
                 : "bg-gray-200 text-gray-500 cursor-not-allowed"
             }`}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z"
-              />
-            </svg>
+          <FaShoppingCart className="w-5 h-5" />
             <span className="hidden sm:inline">{stockStatus.available ? "Agregar" : "Agotado"}</span>
           </button>
         </div>

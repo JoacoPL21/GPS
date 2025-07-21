@@ -1,7 +1,7 @@
 import { Sling as Hamburger } from "hamburger-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { FaUserCircle, FaChevronUp, FaChevronDown, FaShoppingCart } from "react-icons/fa";
+import { FaBus,FaUserCircle, FaChevronUp, FaChevronDown, FaShoppingCart, FaShoppingBag, FaUser, FaSignOutAlt, FaStar, FaRegUser, FaSignInAlt, FaUserPlus, FaUserAlt, FaUserTie } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import MenuCarrito from "../pages/Carrito/CarritoFunction";
 
@@ -30,67 +30,91 @@ function Navbar({ isOpen, setOpen }) {
         <h1 className="text-xl font-bold">Maderas Lemaco</h1>
 
         <nav className="hidden md:flex absolute right-4 gap-4 items-center">
-          {/* Perfil con dropdown */}
+          {/* Perfil con dropdown moderno */}
           <div className="relative" ref={dropdownRef}>
-            <button
+            <div
+              className="relative cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition border border-gray-200"
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="button_login flex items-center gap-2 px-4 py-2 text-black rounded-lg hover:bg-gray-200 transition"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) =>
+                (e.key === "Enter" || e.key === " ") && setDropdownOpen(!dropdownOpen)
+              }
             >
-              <FaUserCircle className="text-orange-400 text-xl" />
-              <span className="font-medium">Perfil</span>
-              {dropdownOpen ? (
-                <FaChevronUp className="text-orange-400 text-sm" />
-              ) : (
-                <FaChevronDown className="text-orange-400 text-sm" />
-              )}
-            </button>
+              <FaUser className="text-orange-400 text-2xl" />
+            </div>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white text-black border border-orange-400 rounded-lg shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-56 bg-white text-black border border-orange-400 rounded-lg shadow-lg z-50 py-2">
                 {!isAuthenticated ? (
                   <>
+                    <div className="px-4 py-2 text-xs text-gray-500 font-semibold">Cuenta</div>
+                    <div className="border-t border-gray-100 my-1" />
                     <Link
                       to="/login"
-                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-t-lg transition"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      Iniciar Sesión
+                      <FaSignInAlt className="text-orange-400" /> Iniciar Sesión
                     </Link>
                     <Link
                       to="/register"
-                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded-b-lg transition"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      Registrarse
+                      <FaUserPlus className="text-orange-400" /> Registrarse
                     </Link>
                   </>
                 ) : (
                   <>
-                    <Link
-                      to="/logout"
-                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      Cerrar Sesión
-                    </Link>
+                    <div className="px-4 py-2 text-xs text-gray-500 font-semibold">Mi cuenta</div>
+                    <div className="border-t border-gray-100 my-1" />
                     <Link
                       to="/profile"
-                      className="navbar_text block px-4 py-2 hover:bg-gray-100 rounded transition"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      Mi perfil
+                      <FaRegUser className="text-orange-400" /> Mi perfil
+                    </Link>
+                    <Link
+                      to="/profile/mis-compras"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <FaShoppingBag className="text-orange-400" /> Mis Compras
+                    </Link>
+                    <Link
+                      to="/profile/valoraciones"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <FaStar className="text-orange-400" /> Mis Valoraciones
+                    </Link>
+                    <Link
+                      to="/profile/mis-pedidos"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <FaBus className="text-orange-400" /> Mis Pedidos
+                    </Link>
+                    <div className="border-t border-gray-100 my-1" />
+                    <Link
+                      to="/logout"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <FaSignOutAlt className="text-orange-400" /> Cerrar Sesión
                     </Link>
                   </>
                 )}
               </div>
             )}
           </div>
-            <div className="h-6 border-l border-orange-300 mx-2"></div>
-
+          <div className="h-6 border-l border-orange-300 mx-2"></div>
 
           {/* Botón carrito */}
           <div
-            className="relative cursor-pointer p-2 text-orange-400 hover:text-orange-500 transition-colors"
+            className="relative cursor-pointer flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition border border-gray-200"
             onClick={() => setOpenCarrito(true)}
             role="button"
             tabIndex={0}
@@ -98,7 +122,7 @@ function Navbar({ isOpen, setOpen }) {
               (e.key === "Enter" || e.key === " ") && setOpenCarrito(true)
             }
           >
-            <FaShoppingCart className="text-2xl" />
+            <FaShoppingCart className="text-orange-400 text-2xl" />
           </div>
 
           {/* Menú del carrito */}

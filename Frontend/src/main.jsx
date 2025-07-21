@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './../src/styles/index.css';
 import App from './pages/App.jsx';
@@ -9,11 +10,11 @@ import { initializeAuth } from './services/auth.service.js';
 initializeAuth();
 
 createRoot(document.getElementById('root')).render(
-  // Temporalmente quitar StrictMode para debugging
-  <CartProvider>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </CartProvider>
+  <StrictMode>
+    <CartProvider>  
+      <AuthProvider>  
+        <App />  
+      </AuthProvider>
+    </CartProvider>
+  </StrictMode>
 );
-

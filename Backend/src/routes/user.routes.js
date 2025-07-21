@@ -2,11 +2,12 @@
 import { Router } from "express";
 import { isAdmin } from "../middlewares/authorization.middleware.js";
 import { getAllUsers, getUserProfile, registerDireccion, getDireccionByUserId, deleteDireccionByUserId, getUserProfileDetailed, updateUserProfile } from "../controller/user.controller.js";
-import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import { getComprasUsuarioController, verificarCompraProductoController, getProductosCompradosConValoracionController } from "../controller/compras.controller.js";
+import { authenticateToken } from "../middlewares/authentication.middleware.js";
 
 // Router para rutas de usuario autenticado (no requiere permisos de admin)
 const userRouter = Router();
-userRouter.use(authenticateJwt); // Middleware de autenticación
+userRouter.use(authenticateToken); // Middleware de autenticación
 
 userRouter
     .get("/profile", getUserProfile)
@@ -14,11 +15,14 @@ userRouter
     .put("/profile", updateUserProfile)
     .post("/direccion", registerDireccion)
     .get("/direcciones", getDireccionByUserId)
-    .delete("/direccion/:id", deleteDireccionByUserId);
+    .delete("/direccion/:id", deleteDireccionByUserId)
+    .get("/compras", getComprasUsuarioController)
+    .get("/compras/producto/:id_producto", verificarCompraProductoController)
+    .get("/productos-comprados", getProductosCompradosConValoracionController); // Lista todos los pedidos del usuario
 
 // Router para rutas de administración (requiere permisos de admin)
 const adminRouter = Router();
-adminRouter.use(authenticateJwt); // Middleware de autenticación
+adminRouter.use(authenticateToken); // Middleware de autenticación
 adminRouter.use(isAdmin); // Middleware de autorización
 
 adminRouter

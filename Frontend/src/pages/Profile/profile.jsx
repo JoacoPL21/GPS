@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext.jsx"
 import { getUserDirecciones, deleteDireccion, updateUserProfile } from "../../services/user.service.js"
 import swal from "sweetalert2"
 import { useEffect, useState, useCallback } from "react"
+import { Link } from "react-router-dom"
 import FormDireccionEnvio from "./DirectionForm.jsx"
 import EditProfileModal from "../../components/EditProfileModal.jsx"
 
@@ -91,8 +92,6 @@ const Profile = () => {
       })
     }
   }
-
-
 
   // Función para actualizar perfil
   const handleProfileUpdate = async (updateData) => {
@@ -215,28 +214,10 @@ const Profile = () => {
                       <p className="text-amber-900">{authUser?.telefono || "No disponible"}</p>
                     </div>
                   </div>
-
-                  {/* Rol */}
-                  <div className="flex items-center space-x-3 p-3 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors border border-amber-100">
-                    <div className="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-amber-600">Rol</p>
-                      <p className="text-amber-900 capitalize">{authUser?.rol || "No disponible"}</p>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Botón para editar perfil */}
-                <div className="mt-6">
+                {/* Botones de perfil */}
+                <div className="mt-6 space-y-3">
                   <button
                     onClick={() => setIsEditModalOpen(true)}
                     className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white px-4 py-3 rounded-xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
@@ -251,9 +232,23 @@ const Profile = () => {
                     </svg>
                     <span>Editar Perfil</span>
                   </button>
+                  
+                  {/* Enlace a Mis Compras */}
+                  <Link
+                    to="/mis-compras"
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
+                    </svg>
+                    <span>Mis Compras</span>
+                  </Link>
                 </div>
-
-               
               </div>
             </div>
           </div>
@@ -268,9 +263,7 @@ const Profile = () => {
                     <h2 className="text-2xl font-bold text-white mb-1">Direcciones de Envío</h2>
                     <p className="text-amber-100">Gestiona tus direcciones de entrega</p>
                   </div>
-                  <div className="bg-white bg-opacity-20 rounded-xl p-3 backdrop-blur-sm">
-                    <span className="text-white font-bold text-lg">{direcciones.length}</span>
-                  </div>
+              
                 </div>
               </div>
 
@@ -292,7 +285,7 @@ const Profile = () => {
                     <div className="grid gap-4">
                       {direcciones.map((direccion) => (
                         <div
-                          key={direccion.id}
+                          key={direccion.id_direccion} // CAMBIO: era direccion.id
                           className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 hover:shadow-md transition-all duration-300 group border border-amber-200"
                         >
                           <div className="flex items-start justify-between mb-3">
@@ -349,8 +342,8 @@ const Profile = () => {
                               </p>
                             </div>
                             <div>
-                              <p className="text-amber-600 font-medium">Ciudad</p>
-                              <p className="text-amber-900">{direccion.ciudad}</p>
+                              <p className="text-amber-600 font-medium">Comuna</p> 
+                              <p className="text-amber-900">{direccion.comuna}</p>
                             </div>
                             <div>
                               <p className="text-amber-600 font-medium">Región</p>
