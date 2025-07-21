@@ -45,7 +45,6 @@ export const useProductos = () => {
     try {
       const formattedData = formatProductoData(productoData)
       const response = await createProducto(formattedData)
-
       if (response.data && !response.error) {
         await loadProductos()
         return { success: true, data: response.data }

@@ -50,7 +50,6 @@ export const productoCreateValidation = Joi.object({
  image_url: Joi.string()
     .optional()
     .messages({
-      "string.uri": "La URL de la imagen no es válida",
       "string.base": "La imagen debe ser una cadena de texto",
   }),
   id_categoria: Joi.number()

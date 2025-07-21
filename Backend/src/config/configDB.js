@@ -5,15 +5,15 @@ import {
   DB_USERNAME, 
   DB_HOST, 
   DB_PASSWORD 
-} from "./configENV.js"; // Importa las variables con prefijo DB_
+} from "./configENV.js"; 
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: DB_HOST, // Usa DB_HOST directamente
+  host: DB_HOST, 
   port: 5432,
-  username: DB_USERNAME, // Usa DB_USERNAME
-  password: DB_PASSWORD, // Usa DB_PASSWORD
-  database: DB_DATABASE, // Usa DB_DATABASE
+  username: DB_USERNAME, 
+  password: DB_PASSWORD, 
+  database: DB_DATABASE, 
   entities: ["src/entity/**/*.js"],
   synchronize: true,
   logging: false,
