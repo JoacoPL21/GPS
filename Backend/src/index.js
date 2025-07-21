@@ -167,14 +167,12 @@ async function setupServer() {
       res.status(500).json({ error: 'Algo salió mal' });
     });
 
-    // Configuración del puerto y host
-    app.listen(DB_PORT, DB_HOST, () => {
-      console.log(`=> Servidor corriendo en http://${DB_HOST}:${DB_PORT}/api`);
+    const WEB_PORT = process.env.WEB_PORT || 1214;
+    const WEB_HOST = process.env.WEB_HOST || '0.0.0.0';
+
+    app.listen(WEB_PORT, WEB_HOST, () => {
+    console.log(`Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
     });
-  } catch (error) {
-    console.log("Error en index.js -> setupServer(), el error es: ", error);
-  }
-}
 
 async function setupAPI() {
   try {
