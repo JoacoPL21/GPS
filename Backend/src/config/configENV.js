@@ -19,7 +19,7 @@ export const DB_DATABASE = process.env.DB_DATABASE;
 
 // Secrets y otras configuraciones
 export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-export const cookieKey = process.env.CookieKey; 
+export const cookieKey = process.env.cookieKey; 
 
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 
