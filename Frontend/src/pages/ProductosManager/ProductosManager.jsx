@@ -61,18 +61,6 @@ function ProductosManager() {
     }
   }, [gestor.modalAbierto]);
 
-  // Debug: monitorear cambios en categorías
-  useEffect(() => {
-    console.log("Categorías actualizadas:", gestor.categorias?.length || 0, gestor.categorias);
-  }, [gestor.categorias]);
-
-  // Debug adicional: monitorear cuando se pasan las categorías al ProductoModal
-  useEffect(() => {
-    if (gestor.modalAbierto) {
-      console.log("Modal abierto - Categorías enviadas al ProductoModal:", gestor.categorias?.length || 0, gestor.categorias);
-    }
-  }, [gestor.modalAbierto, gestor.categorias]);
-
   // Estado para categorías - usar directamente las del gestor
   const [loadingCategorias, setLoadingCategorias] = useState(false);
 
