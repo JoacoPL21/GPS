@@ -214,24 +214,6 @@ const Profile = () => {
                       <p className="text-amber-900">{authUser?.telefono || "No disponible"}</p>
                     </div>
                   </div>
-
-                  {/* Rol */}
-                  <div className="flex items-center space-x-3 p-3 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors border border-amber-100">
-                    <div className="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-amber-600">Rol</p>
-                      <p className="text-amber-900 capitalize">{authUser?.rol || "No disponible"}</p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Botones de perfil */}
@@ -281,9 +263,7 @@ const Profile = () => {
                     <h2 className="text-2xl font-bold text-white mb-1">Direcciones de Envío</h2>
                     <p className="text-amber-100">Gestiona tus direcciones de entrega</p>
                   </div>
-                  <div className="bg-white bg-opacity-20 rounded-xl p-3 backdrop-blur-sm">
-                    <span className="text-white font-bold text-lg">{direcciones.length}</span>
-                  </div>
+              
                 </div>
               </div>
 
