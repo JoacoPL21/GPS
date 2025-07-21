@@ -56,7 +56,13 @@ async function setupServer() {
 
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
-
+    
+    app.use(
+      cors({
+        credentials: true,
+        origin: true, // Permitir todos los orígenes (puedes especificar uno específico aquí)
+      }),
+    );
 
     // Middlewares globales para procesar JSON y URL-encoded
     app.use(urlencoded({ extended: true, limit: "1mb" }));
