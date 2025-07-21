@@ -56,7 +56,6 @@ jobs:
             ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
             set -euo pipefail
             cd GPS-Deploy/GPS/
-
             echo "Actualizando código fuente..."
             git fetch origin main
             git reset --hard origin/main

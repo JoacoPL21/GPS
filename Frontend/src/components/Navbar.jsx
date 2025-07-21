@@ -1,7 +1,7 @@
 import { Sling as Hamburger } from "hamburger-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { FaUserCircle, FaChevronUp, FaChevronDown, FaShoppingCart, FaShoppingBag, FaUser, FaSignOutAlt, FaStar, FaRegUser, FaSignInAlt, FaUserPlus, FaUserAlt, FaUserTie } from "react-icons/fa";
+import { FaBus,FaUserCircle, FaChevronUp, FaChevronDown, FaShoppingCart, FaShoppingBag, FaUser, FaSignOutAlt, FaStar, FaRegUser, FaSignInAlt, FaUserPlus, FaUserAlt, FaUserTie } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import MenuCarrito from "../pages/Carrito/CarritoFunction";
 
@@ -89,6 +89,13 @@ function Navbar({ isOpen, setOpen }) {
                       onClick={() => setDropdownOpen(false)}
                     >
                       <FaStar className="text-orange-400" /> Mis Valoraciones
+                    </Link>
+                    <Link
+                      to="/profile/mis-pedidos"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <FaBus className="text-orange-400" /> Mis Pedidos
                     </Link>
                     <div className="border-t border-gray-100 my-1" />
                     <Link

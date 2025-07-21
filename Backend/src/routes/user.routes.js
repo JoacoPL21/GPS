@@ -18,7 +18,7 @@ userRouter
     .delete("/direccion/:id", deleteDireccionByUserId)
     .get("/compras", getComprasUsuarioController)
     .get("/compras/producto/:id_producto", verificarCompraProductoController)
-    .get("/productos-comprados", getProductosCompradosConValoracionController);
+    .get("/productos-comprados", getProductosCompradosConValoracionController); // Lista todos los pedidos del usuario
 
 // Router para rutas de administración (requiere permisos de admin)
 const adminRouter = Router();

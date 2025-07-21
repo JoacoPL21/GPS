@@ -63,10 +63,10 @@ export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(Usuario);
 
+    const { nombreCompleto, telefono, email, password } = user; // ← Agregué password aquí
 
-    const { nombreCompleto, telefono, email } = user;
-
-    if ((rol === "cliente" || rol === "admin") && (!password || password.trim() === "")) {
+    
+    if ((!password || password.trim() === "")) {
       return [null, { dataInfo: "password", message: "La contraseña es obligatoria" }];
     }
 
@@ -83,21 +83,23 @@ export async function registerService(user) {
 
     if (existingEmailUser) return [null, createErrorMessage("email", "Correo electrónico en uso")];
 
-    if (!nombreCompleto || !email || !user.password) {
+    if (!nombreCompleto || !email || !password) { // ← Cambié user.password por password
       return [null, createErrorMessage("fields", "Todos los campos son obligatorios")
       ];
     }
+
     const newUser = userRepository.create({
       nombreCompleto,
       email,
       telefono,
-      password: await encryptPassword(user.password),
-      rol: "cliente",
+      password: await encryptPassword(password), // ← Cambié user.password por password
+      rol: "cliente", // ← Este valor por defecto ya está en la entidad, pero es buena práctica ser explícito
     });
 
     await userRepository.save(newUser);
-    //mostrar solo los datos del usuario sin la contraseña
-    const { password, ...dataUser } = newUser;
+    
+    // Mostrar solo los datos del usuario sin la contraseña
+    const { password: _, ...dataUser } = newUser; // ← Mejoré la destructuración
 
     return [dataUser, null];
   } catch (error) {
