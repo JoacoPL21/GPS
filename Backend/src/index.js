@@ -169,10 +169,14 @@ async function setupServer() {
 
     const WEB_PORT = process.env.WEB_PORT || 1214;
     const WEB_HOST = process.env.WEB_HOST || '0.0.0.0';
-
+    // Configuración del puerto y host
     app.listen(WEB_PORT, WEB_HOST, () => {
-    console.log(`Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
+      console.log(`=> Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
     });
+  } catch (error) {
+    console.log("Error en index.js -> setupServer(), el error es: ", error);
+  }
+}
 
 async function setupAPI() {
   try {
