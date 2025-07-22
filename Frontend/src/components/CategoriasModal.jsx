@@ -110,14 +110,15 @@ const CategoriasModal = ({
   }
 
   useEffect(() => {
-    // Solo actualizar el form si estamos editando y la categoría existe
+    // Solo actualizar el form cuando se empieza a editar una categoría (no durante la edición)
     if (editingId && categorias.length > 0) {
       const cat = categorias.find((c) => c.id_categoria === editingId)
-      if (cat && cat.nombre !== form.nombre) {
+      if (cat) {
+        // Solo establecer el valor inicial una vez, no durante la edición
         setForm({ nombre: cat.nombre })
       }
     }
-  }, [categorias, editingId, form.nombre])
+  }, [editingId, categorias]) // Removido form.nombre de las dependencias
 
 
   return (

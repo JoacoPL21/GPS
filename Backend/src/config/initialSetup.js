@@ -67,9 +67,19 @@ async function createProductos() {
     const count = await ProductosRepository.count();
     if (count > 0) {
       console.log(chalk.yellow("ℹ️  Productos ya existen. Se omite creación."));
+      
+      // Log de productos existentes para debug
+      console.log('🔍 [createProductos] Listando productos existentes para debug:');
+      const productosExistentes = await ProductosRepository.find();
+      productosExistentes.forEach(producto => {
+        console.log(`🔍 [createProductos] Producto ID: ${producto.id_producto}, Nombre: ${producto.nombre}, Estado: ${producto.estado}`);
+      });
+      
       return;
     }
-    await Promise.all([
+    
+    console.log('🔧 [createProductos] Creando productos iniciales...');
+    const productosCreados = await Promise.all([
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Jardinera",
         precio: 79990,
@@ -120,6 +130,12 @@ async function createProductos() {
         id_categoria:2
       })),
     ]);
+    
+    console.log('🔧 [createProductos] Productos creados con IDs:');
+    productosCreados.forEach(producto => {
+      console.log(`🔧 [createProductos] Producto creado - ID: ${producto.id_producto}, Nombre: ${producto.nombre}`);
+    });
+    
     console.log(chalk.green("✅ Productos creados exitosamente."));
   } catch (error) {
     console.error(chalk.red("❌ Error al crear productos:", error));
