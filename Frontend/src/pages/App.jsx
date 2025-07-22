@@ -112,13 +112,6 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  const API_URL = import.meta.env.VITE_BASE_URL;
-  useEffect(() => {
-    fetch(`${API_URL}`)
-      .then(response => response.json())
-      .then(data => console.log('Conexión exitosa:', data))
-      .catch(error => console.error('Error de conexión:', error));
-  }, []);
 
   return (
     <RouterProvider router={router} />
