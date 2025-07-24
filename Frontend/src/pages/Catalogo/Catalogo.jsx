@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useCart } from "../../context/CartContext.jsx"
 import { useProductos } from "../../hooks/productos/useProductos"
-import CardCatalogo from "../../components/CardCatalogo.jsx"
+import CardCatalogo from "../../components/ProductoClientes/CardCatalogo.jsx"
 import PageHeader from "../../components/PageHeader"
 
 const CatalogoConnected = () => {
@@ -60,7 +60,6 @@ const CatalogoConnected = () => {
       imagen: producto.imagen,
       categoria: producto.categoria,
       stock: producto.stock,
-      // No incluir cantidad aquí, el reducer la manejará
     }
 
     addItemToCart(itemToAdd)
@@ -105,7 +104,7 @@ const CatalogoConnected = () => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-amber-50 to-orange-50 min-h-screen">
+    <div >
       {/* Header del Catálogo */}
       <PageHeader
         breadcrumbs={[
@@ -113,10 +112,9 @@ const CatalogoConnected = () => {
           { label: "Catálogo" }
         ]}
         title="Nuestro Catálogo"
-        subtitle="Descubre todas nuestras artesanías únicas en madera"
       />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div>
         {/* Barra de herramientas */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -334,30 +332,26 @@ const CatalogoConnected = () => {
 
         {/* Estadísticas del catálogo */}
         {!loading && productos && productos.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">{productos.length}</div>
-                <div className="text-sm text-gray-600">Total productos</div>
+      <div className="bg-white rounded-2xl shadow-lg p-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center place-items-center">
+         <div>
+            <div className="text-2xl font-bold text-[#a47148]">{productos.length}</div>
+            <div className="text-sm text-gray-600">Total productos</div>
+         </div>
+            <div>
+              <div className="text-2xl font-bold text-[#a47148]">
+                ${Math.min(...productos.map((p) => p.precio)).toLocaleString()}
               </div>
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">{filteredAndSortedProducts.length}</div>
-                <div className="text-sm text-gray-600">Mostrando</div>
+              <div className="text-sm text-gray-600">Precio mínimo</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-[#a47148]">
+                ${Math.max(...productos.map((p) => p.precio)).toLocaleString()}
               </div>
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">
-                  ${Math.min(...productos.map((p) => p.precio)).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">Precio mínimo</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">
-                  ${Math.max(...productos.map((p) => p.precio)).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">Precio máximo</div>
-              </div>
+              <div className="text-sm text-gray-600">Precio máximo</div>
             </div>
           </div>
+        </div>  
         )}
       </div>
     </div>
