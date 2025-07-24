@@ -1,14 +1,13 @@
-
 import { Link } from "react-router-dom"
 
 const PageHeader = ({ breadcrumbs = [], title, subtitle }) => {
   return (
-    <div className="bg-white shadow-sm border-b">
+    <div className="bg-gradient-to-r from-white/90 to-white/80 backdrop-blur-sm shadow-lg rounded-2xl border-white/30 mb-8">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Breadcrumbs */}
-        <nav className="text-sm text-gray-500 mb-4">
-          {breadcrumbs.map((crumb, index) => (
-            <span key={index}>
+        <nav className="text-sm mb-6">
+          <div className="flex items-center space-x-2">
+            {breadcrumbs.map((crumb, index) => (
+               <span key={index}>
               {crumb.to ? (
                 <Link to={crumb.to} className="hover:underline !text-[#a47148] ">
                   {crumb.label}
@@ -18,13 +17,14 @@ const PageHeader = ({ breadcrumbs = [], title, subtitle }) => {
               )}
               {index < breadcrumbs.length - 1 && <span className="mx-2">/</span>}
             </span>
-          ))}
+            ))}
+          </div>
         </nav>
 
+        {/* Header Contenido/Título */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">{title}</h1>
-            <p className="text-gray-600">{subtitle}</p>
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-lg md:text-2xl font-bold text-gray-800  leading-tight">{title}</h1>
           </div>
         </div>
       </div>
@@ -33,3 +33,4 @@ const PageHeader = ({ breadcrumbs = [], title, subtitle }) => {
 }
 
 export default PageHeader
+
