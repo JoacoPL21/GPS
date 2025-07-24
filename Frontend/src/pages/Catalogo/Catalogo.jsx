@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext.jsx"
 import { useProductos } from "../../hooks/productos/useProductos"
 import CardCatalogo from "../../components/ProductoClientes/CardCatalogo.jsx"
 import PageHeader from "../../components/PageHeader"
+import ErrorProductos from "../../components/ProductoClientes/ErrorProductos.jsx"
 
 const CatalogoConnected = () => {
   const { productos, loading, error } = useProductos()
@@ -87,18 +88,8 @@ const CatalogoConnected = () => {
   // Mostrar error
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar productos</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
+      <div>
+        <ErrorProductos message={error} onRetry={() => window.location.reload()} />
       </div>
     )
   }
@@ -320,7 +311,7 @@ const CatalogoConnected = () => {
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-full hover:from-amber-600 hover:to-orange-600 transition-all"
+                    className="bg-gradient-to-r from-[#a47148] to-[#8c5d3d] hover:from-[#946746] hover:to-[#7e5137] text-white hover:scale-105 hover:shadow-lg"
                   >
                     Limpiar búsqueda
                   </button>
