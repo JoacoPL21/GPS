@@ -4,17 +4,14 @@ import { AppDataSource } from "../config/configDB.js";
 import Valoraciones from "../entity/valoraciones.entity.js";
 import { getUrlImage } from "../services/minio.service.js";
 
-// Obtener todas las compras de un usuario con sus productos
 export async function getComprasUsuario(id_usuario) {
     try {
         const comprasRepository = AppDataSource.getRepository(Compras);
         const compras = await comprasRepository.find({
             where: { id_usuario: parseInt(id_usuario) },
-            relations: ["Usuarios"],
-            order: { createdAt: "DESC" }
+            order: { id_compra: "DESC" }
         });
 
-        // Para cada compra, obtener los productos asociados
         const comprasConProductos = await Promise.all(
             compras.map(async (compra) => {
                 const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
@@ -23,7 +20,6 @@ export async function getComprasUsuario(id_usuario) {
                     relations: ["Productos"]
                 });
 
-                // Obtener la URL firmada de la imagen para cada producto
                 const productos = await Promise.all(productosCompra.map(async cp => {
                   let imagen = null;
                   if (cp.Productos?.image_url) {
@@ -38,8 +34,14 @@ export async function getComprasUsuario(id_usuario) {
                   };
                 }));
 
+                // Mapear campos de la compra con nuevos nombres
                 return {
-                    ...compra,
+                    id: compra.id_compra,
+                    fecha: compra.createdAt,
+                    total: compra.payment_amount,
+                    estado: compra.payment_status,
+                    estado_envio: compra.estado_envio,
+                    metodo_pago: compra.payment_type,
                     productos
                 };
             })
@@ -87,7 +89,7 @@ export async function getProductosCompradosConValoracion(id_usuario) {
         const comprasRepository = AppDataSource.getRepository(Compras);
         const compras = await comprasRepository.find({
             where: { id_usuario: parseInt(id_usuario) },
-            order: { createdAt: "DESC" }
+            order: { id_compra: "DESC" }
         });
 
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
@@ -141,5 +143,48 @@ export async function getProductosCompradosConValoracion(id_usuario) {
     } catch (error) {
         console.error("Error al obtener productos comprados con valoración:", error);
         return [null, "Error al obtener productos comprados con valoración"];
+    }
+} 
+
+export async function getAllCompras() {
+    try {
+        const comprasRepository = AppDataSource.getRepository(Compras);
+        const usuarioRepository = AppDataSource.getRepository('Usuario');
+        const compras = await comprasRepository.find({
+            order: { id_compra: "DESC" },
+            relations: ["Usuarios"]
+        });
+        console.log('Compras encontradas:', compras);
+
+        // Mapear la info relevante para el admin
+        const comprasAdmin = await Promise.all(compras.map(async (compra) => {
+            const usuario = compra.Usuarios;
+            // Mapeo de estado para frontend
+            let estado = 'pendiente';
+            if (compra.estado_envio === 'entregado') {
+                estado = 'entregada';
+            } else if (compra.estado_envio === 'en_elaboracion' || compra.estado_envio === 'en_transito') {
+                estado = 'enviada';
+            }
+            return {
+                id_compra: compra.id_compra,
+                cliente: usuario?.nombreCompleto || 'Desconocido',
+                email: usuario?.email || '',
+                telefono: usuario?.telefono || 'No registra',
+                direccion: compra.direccion,
+                fecha: compra.createdAt,
+                total: compra.payment_amount,
+                estado: compra.estado_envio,
+                estado_pago: compra.payment_status,
+                metodo_pago: compra.payment_type,
+                tracking: compra.tracking || '', 
+                id_pago: compra.payment_id || 'Pendiente',
+            };
+        }));
+        console.log('Compras mapeadas para admin:', comprasAdmin);
+        return [comprasAdmin, null];
+    } catch (error) {
+        console.error("Error al obtener todas las compras para admin:", error);
+        return [null, "Error al obtener todas las compras para admin"];
     }
 } 

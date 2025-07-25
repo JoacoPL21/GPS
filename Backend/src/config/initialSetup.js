@@ -25,6 +25,15 @@ async function createUser() {
         telefono: "966433091",
         password: await encryptPassword("admin123"),
         rol: "admin",
+        
+      })),
+      UserRepository.save(UserRepository.create({
+        nombreCompleto: "Benjamin Ortiz",
+        email: "benjamin@gmail.com",
+        telefono: "966433091",
+        password: await encryptPassword("benja123"),
+        rol: "cliente",
+        
       }))
     ]);
     console.log(chalk.green("✅ Usuarios creados exitosamente."));
@@ -164,10 +173,20 @@ async function createCompras() {
         direccion: "Dirección Test",
         region: "Región Test",
         ciudad: "Ciudad Test",
-        codigo_postal: "12345"
+        codigo_postal: "12345",
+        facturacion: "1234567890",
+        estado_envio: "entregado",
+        total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
       })),
       ComprasRepository.save(ComprasRepository.create({
         id_usuario: 1,
+        facturacion: "1234567890",
+        estado_envio: "en_elaboracion",
+        total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         payment_status: "approved",
         payment_amount: 15000,
         nombre: "Usuario Test 2",
@@ -190,7 +209,12 @@ async function createCompras() {
         direccion: "Dirección Test 3",
         region: "Región Test 3",
         ciudad: "Ciudad Test 3",
-        codigo_postal: "11111"
+        codigo_postal: "11111",
+        facturacion: "1234567890",
+        estado_envio: "en_transito",
+        total: 12000,
+        createdAt: new Date(),
+        updatedAt: new Date()
       })),
     ]);
 

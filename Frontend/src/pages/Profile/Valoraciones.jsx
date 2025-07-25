@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import { useProductosCompradosConValoracion } from '../../hooks/valoraciones/useProductosComprados.js';
 import { useNavigate } from 'react-router-dom';
 import { FaStar, FaCalendarAlt, FaClock, FaCheckCircle } from 'react-icons/fa';
+import ValoracionModal from '../../components/ValoracionModal';
+import { createOrUpdateValoracion } from '../../services/valoraciones.service';
+import Swal from 'sweetalert2';
 
 const Valoraciones = () => {
   const { pendientes, realizados, loading, error } = useProductosCompradosConValoracion();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('pending');
+  const [selectedProducto, setSelectedProducto] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -23,6 +29,55 @@ const Valoraciones = () => {
       month: 'long',
       day: 'numeric',
     });
+  };
+
+  const handleOpenModal = (producto, valoracionExistente = null) => {
+    setSelectedProducto({
+      ...producto,
+      valoracionExistente
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProducto(null);
+  };
+
+  const handleSubmitValoracion = async (data) => {
+    setSubmitting(true);
+    try {
+      const res = await createOrUpdateValoracion({
+        ...data,
+        id_producto: Number(selectedProducto.id_producto)
+      });
+      
+      if (res.data && !res.error) {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Valoración guardada!',
+          showConfirmButton: false,
+          timer: 1200
+        });
+        handleCloseModal();
+        // Recargar los datos
+        window.location.reload();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: res.error || 'No se pudo guardar la valoración'
+        });
+      }
+    } catch {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo guardar la valoración'
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -124,7 +179,7 @@ const Valoraciones = () => {
                     <div className="flex gap-2">
                       <button
                         className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors"
-                        onClick={() => navigate(`/profile/valoraciones/valorar/${item.id_producto}`)}
+                        onClick={() => handleOpenModal(item)}
                       >Escribir valoración</button>
                       <button
                         className="px-4 py-2 border border-[#A47048] text-[#A47048] rounded hover:bg-[#FFF8F0] font-medium transition-colors"
@@ -170,7 +225,7 @@ const Valoraciones = () => {
                     <div className="flex gap-2">
                       <button
                         className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors"
-                        onClick={() => navigate(`/profile/valoraciones/valorar/${review.id_producto}`)}
+                        onClick={() => handleOpenModal(review, review.valoracion)}
                       >Editar reseña</button>
                       <button
                         className="px-4 py-2 border border-[#A47048] text-[#A47048] rounded hover:bg-[#FFF8F0] font-medium transition-colors"
@@ -197,6 +252,16 @@ const Valoraciones = () => {
           )}
         </div>
       )}
+
+      {/* Modal de valoración */}
+      <ValoracionModal
+        producto={selectedProducto}
+        valoracionExistente={selectedProducto?.valoracionExistente}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitValoracion}
+        submitting={submitting}
+      />
     </div>
   );
 };

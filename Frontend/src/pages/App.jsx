@@ -24,6 +24,9 @@ import MisPedidos from "./Profile/MisPedidos.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
 import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
+import AdminCompras from "./Dashboard/AdminCompras.jsx";
+
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -44,6 +47,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
             <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/admin-compras",
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminCompras />
           </ProtectedRoute>
         ),
       },
