@@ -38,15 +38,28 @@ const MisCompras = () => {
     cargarCompras();
   }, [authUser]);
 
-  const formatearFecha = (fecha) => {
-    return new Date(fecha).toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const formatearFecha = (fechaString) => {
+    try {
+      const fecha = new Date(fechaString);
+      
+      // Verificar si la fecha es válida
+      if (isNaN(fecha.getTime())) {
+        throw new Error('Fecha inválida');
+      }
+      
+      return fecha.toLocaleDateString('es-CL', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error al formatear fecha:', error);
+      return 'Fecha no disponible';
+    }
   };
+  
 
   const formatearPrecio = (precio) => {
     return new Intl.NumberFormat('es-CL', {
@@ -55,24 +68,6 @@ const MisCompras = () => {
     }).format(precio);
   };
 
-  const getEstadoColor = (estado) => {
-    switch (estado) {
-      case 'completada':
-        return 'bg-green-100 text-green-800';
-      case 'pendiente':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'en_proceso':
-        return 'bg-blue-100 text-blue-800';
-      case 'Aprobado':
-        return 'bg-green-100 text-green-800';
-      case 'rechazado':
-        return 'bg-red-100 text-red-800';
-      case 'procesando':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const getEstadoEnvioColor = (estado) => {
     switch (estado) {
@@ -100,8 +95,8 @@ const MisCompras = () => {
     }
   };
 
-  const getEstadoEnvioText = (estado) => {
-    switch (estado) {
+  const getEstadoEnvioText = (estado_envio) => {
+    switch (estado_envio) {
       case 'en_elaboracion':
         return 'En elaboración';
       case 'en_transito':
@@ -181,14 +176,13 @@ const MisCompras = () => {
       ) : (
         <div className="space-y-8">
           {compras.map((compra) => (
-            <div key={compra.id_compra} className="bg-white rounded-lg shadow-sm border-gray-400 p-6 flex flex-col gap-4">
+            <div key={compra.id} className="bg-white rounded-lg shadow-sm border-gray-400 p-6 flex flex-col gap-4">
               {/* Header de la compra */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg font-semibold text-gray-900">Compra #{compra.id_compra}</span>
-                  <span className={`inline-block px-3 py-1 text-xs rounded border font-medium ${getEstadoColor(compra.estado)}`}>{compra.estado}</span>
+                  <span className="text-lg font-semibold text-gray-900">Compra #{compra.id}</span>
                   {/* Mostrar estado del envío solo si el pago está aprobado */}
-                  {compra.estado === 'Aprobado' && compra.estado_envio && (
+                  {compra.estado === 'approved' && compra.estado_envio && (
                     <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs rounded border font-medium ${getEstadoEnvioColor(compra.estado_envio)}`}>
                       {getEstadoEnvioIcon(compra.estado_envio)}
                       {getEstadoEnvioText(compra.estado_envio)}
@@ -197,7 +191,7 @@ const MisCompras = () => {
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <FaCalendar className="w-4 h-4 mr-1" />
-                  {formatearFecha(compra.createdAt)}
+                  {formatearFecha(compra.fecha)}  
                   <FaDollarSign className="w-4 h-4 ml-4 mr-1" />
                   {formatearPrecio(compra.total)}
                 </div>
@@ -230,7 +224,7 @@ const MisCompras = () => {
                   Ver más detalles
                 </button>
                 {/* Mostrar botón "Seguir envío" solo si el pago está aprobado y el envío no está entregado */}
-                {compra.estado === 'Aprobado' && compra.estado_envio && compra.estado_envio !== 'entregado' && (
+                {compra.estado === 'approved' && compra.estado_envio && compra.estado_envio !== 'entregado' && (
                   <button
                     className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors flex items-center gap-2"
                     onClick={() => handleSeguirEnvio(compra)}

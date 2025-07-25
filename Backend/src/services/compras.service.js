@@ -4,17 +4,14 @@ import { AppDataSource } from "../config/configDB.js";
 import Valoraciones from "../entity/valoraciones.entity.js";
 import { getUrlImage } from "../services/minio.service.js";
 
-// Obtener todas las compras de un usuario con sus productos
 export async function getComprasUsuario(id_usuario) {
     try {
         const comprasRepository = AppDataSource.getRepository(Compras);
         const compras = await comprasRepository.find({
             where: { id_usuario: parseInt(id_usuario) },
-            relations: ["Usuarios"],
             order: { id_compra: "DESC" }
         });
 
-        // Para cada compra, obtener los productos asociados
         const comprasConProductos = await Promise.all(
             compras.map(async (compra) => {
                 const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
@@ -23,7 +20,6 @@ export async function getComprasUsuario(id_usuario) {
                     relations: ["Productos"]
                 });
 
-                // Obtener la URL firmada de la imagen para cada producto
                 const productos = await Promise.all(productosCompra.map(async cp => {
                   let imagen = null;
                   if (cp.Productos?.image_url) {
@@ -38,8 +34,14 @@ export async function getComprasUsuario(id_usuario) {
                   };
                 }));
 
+                // Mapear campos de la compra con nuevos nombres
                 return {
-                    ...compra,
+                    id: compra.id_compra,
+                    fecha: compra.createdAt,
+                    total: compra.payment_amount,
+                    estado: compra.payment_status,
+                    estado_envio: compra.estado_envio,
+                    metodo_pago: compra.payment_type,
                     productos
                 };
             })
@@ -168,11 +170,15 @@ export async function getAllCompras() {
                 id_compra: compra.id_compra,
                 cliente: usuario?.nombreCompleto || 'Desconocido',
                 email: usuario?.email || '',
+                telefono: usuario?.telefono || 'No registra',
+                direccion: compra.direccion,
                 fecha: compra.createdAt,
-                total: compra.total,
-                estado,
-                estado_pago: compra.estado,
-                tracking: compra.tracking || '', // Si tienes un campo tracking
+                total: compra.payment_amount,
+                estado: compra.estado_envio,
+                estado_pago: compra.payment_status,
+                metodo_pago: compra.payment_type,
+                tracking: compra.tracking || '', 
+                id_pago: compra.payment_id || 'Pendiente',
             };
         }));
         console.log('Compras mapeadas para admin:', comprasAdmin);

@@ -115,7 +115,7 @@ const Compra = new EntitySchema({
         },
     },
     relations: {
-        Usuario: {
+        Usuarios: {
             type: "many-to-one",
             target: "Usuario",
             joinColumn: {

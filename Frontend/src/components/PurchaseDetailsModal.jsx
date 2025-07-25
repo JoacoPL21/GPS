@@ -12,6 +12,17 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
     });
   };
 
+  const getEstado = (estado) => {
+    switch (estado) {
+      case 'pending':
+        return 'Pendiente';
+      case 'approved':
+        return 'Aprobado';
+      default:
+        return 'Pendiente';
+    }
+  };
+
   const formatearPrecio = (precio) => {
     return new Intl.NumberFormat('es-CL', {
       style: 'currency',
@@ -66,16 +77,13 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Detalles de Compra #{compra.id_compra}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Detalles de Compra #{compra.id}</h2>
             <div className="flex items-center mt-2 space-x-4">
               <div className="flex items-center text-sm text-gray-500">
                 <FaCalendar className="w-4 h-4 mr-2" />
-                {formatearFecha(compra.createdAt)}
+                {formatearFecha(compra.fecha)}
               </div>
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getEstadoColor(compra.estado)}`}>
-                {compra.estado}
-              </span>
-              {compra.estado === 'Aprobado' && compra.estado_envio && (
+              {compra.estado === 'approved' && compra.estado_envio && (
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getEstadoEnvioColor(compra.estado_envio)}`}>
                   <FaTruck className="w-4 h-4 mr-1" />
                   {getEstadoEnvioText(compra.estado_envio)}
@@ -195,7 +203,7 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
                 Método de Pago
               </h3>
               <div className="text-sm text-gray-600">
-                <p className="font-medium">Tarjeta de crédito</p>
+                <span className="font-medium">{compra.metodo_pago}</span>
               </div>
             </div>
           </div>
