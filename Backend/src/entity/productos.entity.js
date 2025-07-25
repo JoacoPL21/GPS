@@ -38,6 +38,34 @@ const Productos = new EntitySchema({
         type: "boolean",
         default: false,
         },
+        peso: {
+        type: "decimal",
+        precision: 8,
+        scale: 2,
+        nullable: true,
+        comment: "Peso del producto en kilogramos"
+        },
+        ancho: {
+        type: "decimal",
+        precision: 8,
+        scale: 2,
+        nullable: true,
+        comment: "Ancho del producto en centímetros"
+        },
+        alto: {
+        type: "decimal",
+        precision: 8,
+        scale: 2,
+        nullable: true,
+        comment: "Alto del producto en centímetros"
+        },
+        profundidad: {
+        type: "decimal",
+        precision: 8,
+        scale: 2,
+        nullable: true,
+        comment: "Profundidad del producto en centímetros"
+        },
         id_categoria: {
         type: "int",
         nullable: false,
@@ -66,6 +94,12 @@ const Productos = new EntitySchema({
                 name: "id_categoria",
             },
             onDelete: "CASCADE"
+        },
+        imagenes: {
+            type: "one-to-many",
+            target: "ProductoImagenes",
+            mappedBy: "producto",
+            cascade: true, // Al guardar el producto, guardar las imágenes
         }
     }
 });

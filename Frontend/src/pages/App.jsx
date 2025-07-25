@@ -1,4 +1,6 @@
+import './../styles/App.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { useState, useEffect } from 'react'; 
 import Root from "./Root.jsx";
 import Homepage from "./Homepage/Homepage.jsx";
 import Cart from "./Carrito/shopping_cart.jsx";
@@ -12,7 +14,13 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
+import Sidebar from '../components/Sidebar'; 
+import ContactSection from './Contact/contact_us';   
+import SuccessPage from './Carrito/success.jsx';
+import FailurePage from './Carrito/failure.jsx';
+import MultiStepCart from './Carrito/multi-step-cart.jsx';
 import MisCompras from "./Profile/MisCompras.jsx";
+import MisPedidos from "./Profile/MisPedidos.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
 import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
@@ -26,12 +34,14 @@ const router = createBrowserRouter([
     errorElement: <Error404 />,
     children: [
       { path: "", element: <Homepage /> },
-      { path: "cart", element: <Cart /> },
+      { path: "cart", element: <MultiStepCart /> },
       { path: "catalogo", element: <Catalogo /> },
       { path: "producto/:id_producto", element: <Producto /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "logout", element: <Logout /> },
+      { path: "success", element: <SuccessPage /> },
+      { path: "failure", element: <FailurePage /> },
       {
         path: "dashboard",
         element: (
@@ -65,9 +75,6 @@ const router = createBrowserRouter([
         ),
       },
       {
-
-
-
         path: "profile",
         element: (
           <ProtectedRoute>
@@ -99,6 +106,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "profile/mis-pedidos",
+        element: (
+          <ProtectedRoute>
+            <MisPedidos />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   {
@@ -108,6 +123,7 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
+
   return (
     <RouterProvider router={router} />
   );

@@ -51,20 +51,25 @@ const CategoriasModal = ({
       }
 
       if (response.success) {
+        const wasEditing = editingId !== null;
+        
+        // Mostrar mensaje de éxito
+        Swal.fire(
+          wasEditing ? "¡Actualizada!" : "¡Creada!",
+          `La categoría ha sido ${wasEditing ? "actualizada" : "creada"}.`,
+          "success",
+        )
+        
+        // Resetear formulario inmediatamente para cerrar modal
         setForm({ nombre: ""})
         setEditingId(null)
         setErrors({})
-        Swal.fire(
-          editingId ? "¡Actualizada!" : "¡Creada!",
-          `La categoría ha sido ${editingId ? "actualizada" : "creada"}.`,
-          "success",
-        )
+        setSubmitting(false)
       } else {
         Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
       }
     } catch (error) {
       Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
-    } finally {
       setSubmitting(false)
     }
   }
@@ -105,13 +110,15 @@ const CategoriasModal = ({
   }
 
   useEffect(() => {
-  if (editingId) {
-    const cat = categorias.find((c) => c.id_categoria === editingId)
-    if (cat) {
-      setForm({ nombre: cat.nombre }) // actualizar el form si el nombre cambió
+    // Solo actualizar el form cuando se empieza a editar una categoría (no durante la edición)
+    if (editingId && categorias.length > 0) {
+      const cat = categorias.find((c) => c.id_categoria === editingId)
+      if (cat) {
+        // Solo establecer el valor inicial una vez, no durante la edición
+        setForm({ nombre: cat.nombre })
+      }
     }
-  }
-}, [categorias, editingId])
+  }, [editingId, categorias]) // Removido form.nombre de las dependencias
 
 
   return (

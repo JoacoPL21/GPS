@@ -1,7 +1,7 @@
 "use strict";
 import { EntitySchema } from "typeorm";
 
-const Direcciones = new EntitySchema({
+const Direccion = new EntitySchema({
     name: "Direccion",
     tableName: "direcciones",
     columns: {
@@ -10,16 +10,17 @@ const Direcciones = new EntitySchema({
             type: "int",
             generated: true,
         },
-        calle: {
+        calle: { 
             type: "varchar",
             length: 255,
             nullable: false,
         },
-        numero: {
-            type: "int",
+        numero: {  
+            type: "varchar",
+            length: 10,
             nullable: false,
         },
-        ciudad: {
+        comuna: {
             type: "varchar",
             length: 100,
             nullable: false,
@@ -31,19 +32,13 @@ const Direcciones = new EntitySchema({
         },
         codigo_postal: {
             type: "varchar",
-            length: 7,
+            length: 20,
             nullable: false,
-        },
-        pais: {
-            type: "varchar",
-            length: 100,
-            nullable: true,
         },
         tipo_de_direccion: {
             type: "enum",
             enum: ["predeterminada","opcional"],
             nullable: false,
-
         },
         createdAt: {
             type: "timestamp",
@@ -56,8 +51,20 @@ const Direcciones = new EntitySchema({
             onUpdate: "CURRENT_TIMESTAMP",
             nullable: false,
         },
-
+        id_usuario: {
+            type: "int",
+            nullable: false,
+        },
+    },
+    relations: {
+        usuario: {
+            type: "many-to-one",
+            target: "Usuario",
+            joinColumn: {
+                name: "id_usuario",
+            },
+        },
     },
 });
 
-export default Direcciones;
+export default Direccion;

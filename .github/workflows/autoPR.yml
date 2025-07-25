@@ -1,0 +1,38 @@
+name: Auto Pull Request from Test to Main
+
+on:
+  schedule:
+    - cron: '0 16 * * 1'  # Lunes a las 12:00 CLT (UTC-4 -> UTC+4 = 16:00 UTC)
+  workflow_dispatch:  
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: Test  
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Create pull request from Test to main
+        id: cpr  # ID para capturar el número del PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main       
+          title: "Auto PR: merge 'Test' into 'main'"
+          body: "Este pull request fue creado automáticamente cada lunes a las 12:00 (hora Chile) para integrar cambios de `Test` a `main`."
+          branch: auto-pr-test-to-main-${{ steps.date.outputs.date }}
+          delete-branch: true
+
+      - name: Enable auto-merge for pull request
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash 

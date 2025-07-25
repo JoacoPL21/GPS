@@ -1,213 +1,208 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
-import ProductoCard from "../../components/ProductoCard"
 import ProductoModal from "../../components/ProductoModal"
 import CategoriasModal from "../../components/CategoriasModal"
-import {
-  getCategorias,
-  createCategoria,
-  updateCategoria,
-  deleteCategoria,
-} from "../../services/productos.service.js"
-import { useProductos } from "../../hooks/productos/useProductos"
-import { useCategorias } from "../../hooks/productos/useCategorias"
 import PageHeader from "../../components/PageHeader"
-import { getProductos } from '../../services/productos.service';
+import { handleApiError } from "../../services/productos.service.js"
 
-function ProductosManagerConnected() {
+// Componentes refactorizados
+import EstadisticasProductos from "../../components/ProductsManager/EstadisticasProductos"
+import BannersNotificacion from "../../components/ProductsManager/BannersNotificacion"
+import BotonesAccion from "../../components/ProductsManager/BotonesAccion"
+import BarraHerramientas from "../../components/ProductsManager/BarraHerramientas"
+import InstruccionesModoSeleccion from "../../components/ProductsManager/InstruccionesModoSeleccion"
+import VistaGrilla from "../../components/ProductsManager/VistaGrilla"
+import VistaTabla from "../../components/ProductsManager/VistaTabla"
+import EstadoVacio from "../../components/ProductsManager/EstadoVacio"
+
+// Hooks refactorizados
+import { useGestorProductos } from "../../hooks/productos/useGestorProductos"
+import { useProductsFilters } from "../../hooks/productos/useProductsFilters"
+import { useValidacionFormulario } from "../../hooks/productos/useValidacionFormulario"
+
+function ProductosManager() {
+  // Hooks principales
+  const gestor = useGestorProductos();
+  const { errores, validarFormulario, validarArchivo, limpiarError, limpiarErrores } = useValidacionFormulario();
+  
+  // Estado local adicional
+  const [modalCategoriaOpen, setModalCategoriaOpen] = useState(false);
+  const [progresoSubida, setProgresoSubida] = useState(0);
+  const [enviando, setEnviando] = useState(false);
+  const [advertenciaSincronizacion, setAdvertenciaSincronizacion] = useState(false);
+  const [productosSeleccionados, setProductosSeleccionados] = useState([]);
+  const [modoSeleccion, setModoSeleccion] = useState(false);
+
+  // Datos combinados de productos y categorías
+  const productos = gestor.mostrarEliminados ? gestor.productosEliminados : gestor.productosActivos;
+  
+  // Hook de filtros
   const {
-    productos,
-    loading: productosLoading,
-    error: productosError,
-    addProducto,
-    editProducto,
-    removeProducto,
-  } = useProductos()
+    productosFiltradosYOrdenados,
+    categorias: categoriasExtraidas,
+    filtros,
+    actualizarFiltro,
+    limpiarFiltros
+  } = useProductsFilters(productos);
 
-  const [productosAll, setProductosAll] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchProductos = async () => {
-    setLoading(true);
-    const response = await getProductos();
-    console.log("productosAll antes de la carga:", response.data);
-    if (response.success) {
-      setProductosAll(response.data);
-    }
-    setLoading(false);
-  };
-
+  // Efectos
   useEffect(() => {
-    fetchProductos();
+    gestor.cargarProductos();
+    gestor.loadCategorias(); // Usar loadCategorias para cargar las categorías del hook useCategorias
   }, []);
 
-  console.log("produtosAll antes del render:", productosAll)
-
-  const { categorias, loading: categoriasLoading, addCategoria, editCategoria, removeCategoria } = useCategorias()
-
-  const [form, setForm] = useState({
-    nombre: "",
-    descripcion: "",
-    precio: "",
-    stock: "",
-    id_categoria: "",
-    estado: "",
-  })
-  const [formCategoria, setFormCategoria] = useState({
-    nombre: "",
-  })
-  const [errors, setErrors] = useState({})
-  const [editingId, setEditingId] = useState(null)
-  const [modalOpen, setModalOpen] = useState(false)
-  const [modalCategoriaOpen, setModalCategoriaOpen] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [categoriasSet, setCategorias] = useState([])
-  const [loadingCategorias, setLoadingCategorias] = useState(false)
-
+  // Efecto para recargar categorías cuando se abre el modal de productos
   useEffect(() => {
-    fetchCategorias()
-  }, [])
-
-  const fetchCategorias = async () => {
-    setLoadingCategorias(true)
-    const response = await getCategorias()
-    if (response.success) {
-      setCategorias(response.data.data[0])
+    if (gestor.modalAbierto) {
+      // Recargar categorías cuando se abre el modal de productos para asegurar sincronización
+      gestor.loadCategorias();
     }
-    setLoadingCategorias(false)
-  }
+  }, [gestor.modalAbierto]);
 
-  const handleAddCategoria = async (data) => {
-    const response = await createCategoria(data)
-    if (response.success) {
-      fetchCategorias()
+  // Estado para categorías - usar directamente las del gestor
+  const [loadingCategorias, setLoadingCategorias] = useState(false);
+
+  // Función auxiliar para sincronizar categorías después de operaciones CRUD
+  const sincronizarCategorias = async () => {
+    try {
+      // Esperar un poco para asegurar que el backend termine de procesar
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Recargar categorías
+      await gestor.loadCategorias();
+      // Hacer refresh de productos una sola vez (como el botón refresh)
+      manejarRefrescar();
+    } catch (error) {
+      console.error("Error al sincronizar categorías:", error);
     }
-    return response
-  }
+  };
 
-  const handleEditCategoria = async (id, data) => {
-    const response = await updateCategoria(id, data)
-    if (response.success) {
-      fetchCategorias()
+  // Funciones de manejo de categorías
+  const manejarAgregarCategoria = async (datosCategoria) => {
+    setLoadingCategorias(true);
+    try {
+      const respuesta = await gestor.addCategoria(datosCategoria);
+      if (respuesta.success) {
+        // Sincronizar categorías entre ambos modales
+        await sincronizarCategorias();
+      }
+      return respuesta;
+    } catch (error) {
+      return { success: false, error: "Ha ocurrido un error inesperado" };
+    } finally {
+      setLoadingCategorias(false);
     }
-    return response
-  }
+  };
 
-  const handleDeleteCategoria = async (id) => {
-    const response = await deleteCategoria(id)
-    if (response.success) {
-      fetchCategorias()
+  const manejarEditarCategoria = async (idCategoria, datosCategoria) => {
+    setLoadingCategorias(true);
+    try {
+      const respuesta = await gestor.editCategoria(idCategoria, datosCategoria);
+      if (respuesta.success) {
+        // Sincronizar categorías entre ambos modales
+        await sincronizarCategorias();
+      }
+      return respuesta;
+    } catch (error) {
+      return { success: false, error: "Ha ocurrido un error inesperado" };
+    } finally {
+      setLoadingCategorias(false);
     }
-    return response
-  }
+  };
 
-  // Estados para filtros y búsqueda
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterCategory, setFilterCategory] = useState("")
-  const [filterStatus, setFilterStatus] = useState("")
-  const [sortBy, setSortBy] = useState("nombre")
-  const [sortOrder, setSortOrder] = useState("asc")
-  const [viewMode, setViewMode] = useState("grid")
-  const [selectedProducts, setSelectedProducts] = useState([])
-  const [showFilters, setShowFilters] = useState(false)
-  const [selectionMode, setSelectionMode] = useState(false)
+  const manejarEliminarCategoria = async (idCategoria) => {
+    setLoadingCategorias(true);
+    try {
+      const respuesta = await gestor.removeCategoria(idCategoria);
+      if (respuesta.success) {
+        // Sincronizar categorías entre ambos modales
+        await sincronizarCategorias();
+      }
+      return respuesta;
+    } catch (error) {
+      return { success: false, error: "Ha ocurrido un error inesperado" };
+    } finally {
+      setLoadingCategorias(false);
+    }
+  };
 
-  // Estadísticas calculadas
-  const stats = useMemo(() => {
-    const total = productosAll.length;
-    const active = productosAll.filter((p) => p.estado === "activo").length;
-    const lowStock = productosAll.filter((p) => p.stock <= 5).length;
-    const totalValue = productosAll.reduce((sum, p) => sum + p.precio * p.stock, 0);
+  // Funciones de manejo del formulario
+  const manejarEnvio = async (e) => {
+    e.preventDefault();
+    setEnviando(true);
 
-    return { total, active, lowStock, totalValue };
-  }, [productosAll]);
-
-  // Productos filtrados y ordenados
-  const filteredAndSortedProducts = useMemo(() => {
-    const filtered = productosAll.filter((producto) => {
-      const matchesSearch =
-        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesCategory = !filterCategory || producto.categoria === filterCategory
-      const matchesStatus = !filterStatus || producto.estado === filterStatus
-
-      return matchesSearch && matchesCategory && matchesStatus
-    })
-
-    // Ordenar
-    filtered.sort((a, b) => {
-      let aValue = a[sortBy]
-      let bValue = b[sortBy]
-
-      if (sortBy === "precio" || sortBy === "stock") {
-        aValue = Number(aValue)
-        bValue = Number(bValue)
+    try {
+      // Validar formulario
+      if (!validarFormulario(gestor.formulario)) {
+        setEnviando(false);
+        return;
       }
 
-      if (sortOrder === "asc") {
-        return aValue > bValue ? 1 : -1
+      // Determinar si es edición o creación
+      const esEdicion = Boolean(gestor.editandoId);
+      let respuesta;
+
+      if (esEdicion) {
+        respuesta = await gestor.editProducto(gestor.editandoId, gestor.formulario);
       } else {
-        return aValue < bValue ? 1 : -1
+        respuesta = await gestor.addProducto(gestor.formulario);
       }
-    })
 
-    return filtered
-  }, [productosAll, searchTerm, filterCategory, filterStatus, sortBy, sortOrder])
+      if (respuesta.success) {
+        // Recargar la lista de productos para mostrar los cambios
+        await gestor.cargarProductos();
+        
+        Swal.fire("¡Éxito!", `Producto ${esEdicion ? "actualizado" : "agregado"} correctamente.`, "success");
+        gestor.setModalAbierto(false);
+        limpiarErrores();
+        
+        setTimeout(() => {
+          gestor.resetearFormulario();
+        }, 100);
+      } else {
+        Swal.fire("Error", respuesta.error || "No se pudo procesar la solicitud", "error");
+      }
+    } catch (error) {
+      Swal.fire("Error", "Ha ocurrido un error inesperado", "error");
+    } finally {
+      setEnviando(false);
+      setProgresoSubida(0);
+    }
+  };
 
-  // Categorías únicas para el filtro
-  const categories = [...new Set(productosAll.map((p) => p.categoria))]
+  // Funciones de manejo de inputs
+  const manejarCambioInput = (e) => {
+    const { name, value, type, files } = e.target;
+    
+    if (type === 'file') {
+      const file = files[0];
+      
+      if (file) {
+        if (validarArchivo(file, name)) {
+          gestor.setFormulario((prev) => ({ 
+            ...prev, 
+            [name]: file,
+            imagen_url: ""
+          }));
+        }
+      } else {
+        gestor.setFormulario((prev) => ({ 
+          ...prev, 
+          [name]: null,
+          ...(gestor.editandoId && prev.imagen_url && { imagen_url: prev.imagen_url })
+        }));
+      }
+    } else {
+      gestor.setFormulario((prev) => ({ ...prev, [name]: value }));
+    }
+    
+    limpiarError(name);
+  };
 
-  const validate = () => {
-    const newErrors = {}
-    if (!form.nombre.trim()) newErrors.nombre = "El nombre es obligatorio"
-    if (form.nombre.trim().length < 3) newErrors.nombre = "Debe tener al menos 3 caracteres"
-    if (form.nombre.trim().length > 50) newErrors.nombre = "No puede tener más de 50 caracteres"
-    if (!form.precio) newErrors.precio = "El precio es obligatorio"
-    if (isNaN(form.precio) || Number(form.precio) < 0) newErrors.precio = "Precio inválido"
-    if (!form.stock) newErrors.stock = "El stock es obligatorio"
-    if (isNaN(form.stock) || Number(form.stock) < 0) newErrors.stock = "Stock inválido"
-    if (!form.categoria.trim()) newErrors.categoria = "La categoría es obligatoria"
-    return newErrors
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }))
-  }
-
-  const handleAddClick = () => {
-    setEditingId(null)
-    setForm({
-      nombre: "",
-      descripcion: "",
-      precio: "",
-      stock: "",
-      id_categoria: "",
-      estado: "",
-    })
-    setModalOpen(true)
-  }
-
-  const handleEdit = (producto) => {
-    if (selectionMode) return
-
-    setForm({
-      nombre: producto.nombre,
-      descripcion: producto.descripcion,
-      precio: producto.precio,
-      stock: producto.stock,
-      id_categoria: producto.id_categoria,
-      estado: producto.estado,
-    })
-    setEditingId(producto.id_producto)
-    setModalOpen(true)
-  }
-
-  const handleDelete = async (id) => {
-    if (selectionMode) return
+  // Funciones de eliminación
+  const manejarEliminar = async (id) => {
+    if (modoSeleccion) return;
 
     const result = await Swal.fire({
       title: "¿Estás seguro?",
@@ -218,24 +213,69 @@ function ProductosManagerConnected() {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
-    })
+    });
 
     if (result.isConfirmed) {
-      const response = await removeProducto(id)
+      const response = await gestor.removeProducto(id);
+      
       if (response.success) {
-        setSelectedProducts((prev) => prev.filter((selectedId) => selectedId !== id))
-        Swal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success")
+        setProductosSeleccionados((prev) => prev.filter((selectedId) => selectedId !== id));
+        await gestor.cargarProductos();
+        Swal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success");
       } else {
-        Swal.fire("Error", response.error || "No se pudo eliminar el producto", "error")
+        const errorMessage = handleApiError(response.error);
+        
+        if (errorMessage.includes("no encontrado") || errorMessage.includes("404")) {
+          setAdvertenciaSincronizacion(true);
+          await gestor.cargarProductos();
+          Swal.fire("Producto no encontrado", "El producto ya fue eliminado o no existe. La lista ha sido actualizada.", "info");
+        } else {
+          Swal.fire("Error", errorMessage, "error");
+        }
       }
     }
-  }
+  };
 
-  const handleBulkDelete = async () => {
-    if (selectedProducts.length === 0) return
+  // Función de restaurar producto
+  const manejarRestaurar = async (id) => {
+    if (modoSeleccion) return;
 
     const result = await Swal.fire({
-      title: `¿Eliminar ${selectedProducts.length} productos?`,
+      title: "¿Restaurar producto?",
+      text: "El producto será restaurado como 'inactivo' para que puedas revisarlo y editarlo antes de publicarlo",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#10b981",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sí, restaurar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      const response = await gestor.restoreProductoHook(id);
+      
+      if (response.success) {
+        // Recargar ambas listas para reflejar el cambio
+        await gestor.cargarProductos();
+        await gestor.cargarProductosEliminados();
+        Swal.fire({
+          title: "¡Restaurado!",
+          text: "El producto ha sido restaurado como 'inactivo'. Puedes editarlo y luego activarlo cuando esté listo.",
+          icon: "success",
+          confirmButtonText: "Entendido"
+        });
+      } else {
+        const errorMessage = handleApiError(response.error);
+        Swal.fire("Error", errorMessage, "error");
+      }
+    }
+  };
+
+  const manejarEliminarLote = async () => {
+    if (productosSeleccionados.length === 0) return;
+
+    const result = await Swal.fire({
+      title: `¿Eliminar ${productosSeleccionados.length} productos?`,
       text: "No podrás revertir esta acción",
       icon: "warning",
       showCancelButton: true,
@@ -243,144 +283,111 @@ function ProductosManagerConnected() {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, eliminar todos",
       cancelButtonText: "Cancelar",
-    })
+    });
 
     if (result.isConfirmed) {
-      let successCount = 0
-      let errorCount = 0
+      let successCount = 0;
+      let errorCount = 0;
+      let syncIssues = false;
 
-      for (const id of selectedProducts) {
-        const response = await removeProducto(id)
+      for (const id of productosSeleccionados) {
+        const response = await gestor.removeProducto(id);
         if (response.success) {
-          successCount++
+          successCount++;
         } else {
-          errorCount++
+          errorCount++;
+          const errorMessage = handleApiError(response.error);
+          if (errorMessage.includes("no encontrado") || errorMessage.includes("404")) {
+            syncIssues = true;
+          }
         }
       }
 
-      setSelectedProducts([])
-      setSelectionMode(false)
+      setProductosSeleccionados([]);
+      setModoSeleccion(false);
+      await gestor.cargarProductos();
+
+      if (syncIssues) {
+        setAdvertenciaSincronizacion(true);
+      }
 
       if (errorCount === 0) {
-        Swal.fire("¡Eliminados!", `${successCount} productos han sido eliminados.`, "success")
+        Swal.fire("¡Eliminados!", `${successCount} productos han sido eliminados.`, "success");
       } else {
-        Swal.fire("Parcialmente completado", `${successCount} productos eliminados, ${errorCount} errores.`, "warning")
+        Swal.fire("Parcialmente completado", `${successCount} productos eliminados, ${errorCount} errores.`, "warning");
       }
     }
-  }
+  };
 
-  const handleCardClick = (productoId) => {
-    if (!selectionMode) return
-
-    setSelectedProducts((prev) =>
-      prev.includes(productoId) ? prev.filter((id) => id !== productoId) : [...prev, productoId],
-    )
-  }
-
-  const isProductSelected = (productoId) => {
-    return selectedProducts.includes(productoId)
-  }
-
-  const handleSelectAll = () => {
-    if (selectedProducts.length === filteredAndSortedProducts.length) {
-      setSelectedProducts([])
+  // Funciones de selección
+  const manejarSeleccionarTodos = () => {
+    if (productosSeleccionados.length === productosFiltradosYOrdenados.length) {
+      setProductosSeleccionados([]);
     } else {
-      setSelectedProducts(filteredAndSortedProducts.map((p) => p.id_producto))
+      setProductosSeleccionados(productosFiltradosYOrdenados.map((p) => p.id_producto));
     }
-  }
+  };
 
-  const toggleSelectionMode = () => {
-    setSelectionMode(!selectionMode)
-    if (selectionMode) {
-      setSelectedProducts([])
+  const manejarClickProducto = (productoId) => {
+    if (!modoSeleccion) return;
+
+    setProductosSeleccionados((prev) =>
+      prev.includes(productoId) ? prev.filter((id) => id !== productoId) : [...prev, productoId]
+    );
+  };
+
+  const manejarClickFilaTabla = (producto) => {
+    if (modoSeleccion) {
+      manejarClickProducto(producto.id_producto);
     }
-  }
+  };
 
-  const handleTableRowClick = (producto) => {
-    if (selectionMode) {
-      handleCardClick(producto.id_producto)
-    }
-  }
-
-  const handleExport = () => {
+  // Función de exportación
+  const manejarExportar = () => {
     const csvContent = [
-      ["ID", "Nombre", "Descripción", "Precio", "Stock", "Categoría", "Estado"],
-      ...productosAll.map((p) => [p.id_producto, p.nombre, p.descripcion, p.precio, p.stock, p.categoria, p.estado]),
+      ["ID", "Nombre", "Descripción", "Precio", "Stock", "Categoría", "Estado", "Peso (kg)", "Ancho (cm)", "Alto (cm)", "Profundidad (cm)"],
+      ...gestor.productosActivos.map((p) => [
+        p.id_producto, 
+        p.nombre, 
+        p.descripcion, 
+        p.precio, 
+        p.stock, 
+        p.categoria, 
+        p.estado,
+        p.peso || '',
+        p.ancho || '',
+        p.alto || '',
+        p.profundidad || ''
+      ]),
     ]
       .map((row) => row.join(","))
-      .join("\n")
+      .join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "productos.csv"
-    a.click()
-    window.URL.revokeObjectURL(url)
-  }
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "productos.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const validationErrors = validate()
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
+  // Función de refrescar
+  const manejarRefrescar = () => {
+    setAdvertenciaSincronizacion(false);
+    if (gestor.mostrarEliminados) {
+      gestor.cargarProductosEliminados();
+    } else {
+      gestor.cargarProductos();
     }
-
-    setSubmitting(true)
-
-    try {
-      let response
-      if (editingId) {
-        response = await editProducto(editingId, form)
-        if (response.success) {
-          Swal.fire("¡Actualizado!", "El producto ha sido actualizado.", "success")
-          await fetchProductos()
-        }
-      } else {
-        response = await addProducto(form)
-        if (response.success) {
-          Swal.fire("¡Agregado!", "El producto ha sido agregado.", "success")
-          await fetchProductos()
-        }
-      }
-
-      if (response.success) {
-        setForm({
-          nombre: "",
-          descripcion: "",
-          precio: "",
-          stock: "",
-          id_categoria: "",
-          estado: "",
-        })
-        setEditingId(null)
-        setModalOpen(false)
-      } else {
-        Swal.fire("Error", response.error || "No se pudo procesar la solicitud", "error")
-      }
-    } catch (error) {
-      console.log("Error al procesar la solicitud:", error)
-      Swal.fire("Error", "Ha ocurrido un error inesperado", "error")
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const categoriasManagement = {
-    add: addCategoria,
-    edit: editCategoria,
-    delete: removeCategoria,
-  }
+  };
 
   // Mostrar loading
-  if (productosLoading) {
+  if (gestor.cargando) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#fff8f0]">
-        {/* Spinner con animación y sombra */}
         <div className="relative flex items-center justify-center">
           <div className="animate-spin rounded-full h-24 w-24 border-4 border-t-transparent border-orange-500 shadow-lg"></div>
-          {/* Ícono dentro del spinner (puedes cambiar el SVG por uno que te guste) */}
           <svg
             className="absolute h-12 w-12 text-orange-500"
             xmlns="http://www.w3.org/2000/svg"
@@ -392,22 +399,21 @@ function ProductosManagerConnected() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
         </div>
-        {/* Texto con animación de opacidad pulsante */}
         <p className="mt-6 text-xl font-semibold text-orange-600 animate-pulse">
           Cargando productos...
         </p>
       </div>
-    )
+    );
   }
 
   // Mostrar error
-  if (productosError) {
+  if (gestor.error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar productos</h2>
-          <p className="text-gray-600 mb-4">{productosError}</p>
+          <p className="text-gray-600 mb-4">{gestor.error}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
@@ -416,9 +422,8 @@ function ProductosManagerConnected() {
           </button>
         </div>
       </div>
-    )
+    );
   }
-  console.log("categoriasSet antes del render:", categoriasSet)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -426,569 +431,130 @@ function ProductosManagerConnected() {
       <PageHeader
         breadcrumbs={[
           { label: "Inicio", to: "/" },
-          { label: "Administración de productos" }
+          { label: gestor.mostrarEliminados ? "Productos eliminados" : "Administración de productos" }
         ]}
-        title="Administración de productos"
-        subtitle="Gestiona tu inventario de productos"
+        title={gestor.mostrarEliminados ? "Productos eliminados" : "Administración de productos"}
+        subtitle={gestor.mostrarEliminados ? "Productos que han sido eliminados del inventario" : "Gestiona tu inventario de productos"}
       />
-      <div className="mt-4 lg:mt-0 flex items-center space-x-4 bg-[#fff8f0]">
-
-      </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8 bg-[#fff8f0]">
-        {/* Botones de acción */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <button
-            onClick={handleAddClick}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            <span>Agregar Producto</span>
-          </button>
-          <button
-            onClick={() => setModalCategoriaOpen(true)}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 0v4m0-4h4m-4 0H8"
-              />
-            </svg>
-            <span>Agregar Categoría</span>
-          </button>
-          <button
-            onClick={handleExport}
-            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-lime-500 to-green-500 text-white rounded-xl hover:from-lime-600 hover:to-green-600 transition-all shadow-lg hover:shadow-xl"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <span>Exportar</span>
-          </button>
-        </div>
-        
         {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Productos</p>
-                <p className="text-3xl font-bold text-gray-800">{stats.total}</p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
+        <EstadisticasProductos 
+          productos={gestor.mostrarEliminados ? gestor.productosEliminados : gestor.productosActivos}
+        />
 
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Productos Activos</p>
-                <p className="text-3xl font-bold text-green-600">{stats.active}</p>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
+        {/* Banners de notificación */}
+        <BannersNotificacion 
+          advertenciaSincronizacion={advertenciaSincronizacion}
+          mostrarEliminados={gestor.mostrarEliminados}
+          onCerrarAdvertencia={() => setAdvertenciaSincronizacion(false)}
+        />
 
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Stock Bajo</p>
-                <p className="text-3xl font-bold text-yellow-600">{stats.lowStock}</p>
-              </div>
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Valor Total</p>
-                <p className="text-3xl font-bold text-purple-600">${stats.totalValue.toLocaleString()}</p>
-              </div>
-              <div className="bg-purple-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Botones de acción */}
+        <BotonesAccion 
+          mostrarEliminados={gestor.mostrarEliminados}
+          onAgregar={() => gestor.manejarAgregarClick()}
+          onAgregarCategoria={() => setModalCategoriaOpen(true)}
+          onExportar={manejarExportar}
+          onRefrescar={manejarRefrescar}
+          cargando={gestor.cargando}
+        />
 
         {/* Barra de herramientas */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            {/* Búsqueda */}
-            <div className="relative flex-1 max-w-md">
-              <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="Buscar productos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-              />
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {/* Modo selección y acciones en lote */}
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={toggleSelectionMode}
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-colors ${
-                    selectionMode
-                      ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span>{selectionMode ? "Salir de selección" : "Seleccionar"}</span>
-                </button>
-
-                {selectionMode && (
-                  <>
-                    <button
-                      onClick={handleSelectAll}
-                      className="px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
-                    >
-                      {selectedProducts.length === filteredAndSortedProducts.length
-                        ? "Deseleccionar todo"
-                        : "Seleccionar todo"}
-                    </button>
-
-                    {selectedProducts.length > 0 && (
-                      <div className="flex items-center space-x-2 bg-red-50 px-4 py-2 rounded-xl">
-                        <span className="text-sm text-red-700">{selectedProducts.length} seleccionados</span>
-                        <button
-                          onClick={handleBulkDelete}
-                          className="text-red-600 hover:text-red-800 transition-colors"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Filtros */}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center space-x-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
-                  />
-                </svg>
-                <span>Filtros</span>
-              </button>
-
-              {/* Ordenamiento */}
-              <select
-                value={`${sortBy}-${sortOrder}`}
-                onChange={(e) => {
-                  const [field, order] = e.target.value.split("-")
-                  setSortBy(field)
-                  setSortOrder(order)
-                }}
-                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-              >
-                <option value="nombre-asc">Nombre A-Z</option>
-                <option value="nombre-desc">Nombre Z-A</option>
-                <option value="precio-asc">Precio: Menor a Mayor</option>
-                <option value="precio-desc">Precio: Mayor a Menor</option>
-                <option value="stock-asc">Stock: Menor a Mayor</option>
-                <option value="stock-desc">Stock: Mayor a Menor</option>
-              </select>
-
-              {/* Vista */}
-              <div className="flex bg-gray-100 rounded-xl p-1">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setViewMode("table")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === "table" ? "bg-white shadow-sm" : "hover:bg-gray-200"
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Panel de Filtros */}
-          {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
-                  <select
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  >
-                    <option value="">Todas las categorías</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  >
-                    <option value="">Todos los estados</option>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                  </select>
-                </div>
-                <div className="flex items-end">
-                  <button
-                    onClick={() => {
-                      setSearchTerm("")
-                      setFilterCategory("")
-                      setFilterStatus("")
-                      setSortBy("nombre")
-                      setSortOrder("asc")
-                    }}
-                    className="px-4 py-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                  >
-                    Limpiar filtros
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        <BarraHerramientas 
+          filtros={filtros}
+          categorias={categoriasExtraidas}
+          estadisticas={gestor.estadisticas}
+          mostrarEliminados={gestor.mostrarEliminados}
+          modoSeleccion={modoSeleccion}
+          productosSeleccionados={productosSeleccionados}
+          productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+          onToggleEliminados={gestor.alternarEliminados}
+          onToggleModoSeleccion={() => setModoSeleccion(!modoSeleccion)}
+          onSeleccionarTodos={manejarSeleccionarTodos}
+          onEliminarLote={manejarEliminarLote}
+        />
 
         {/* Instrucciones para modo selección */}
-        {selectionMode && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-            <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p className="text-blue-800 text-sm">
-                <strong>Modo selección activado:</strong> Haz clic en las tarjetas para seleccionarlas. Los botones de
-                editar y eliminar están deshabilitados.
-              </p>
-            </div>
-          </div>
+        {modoSeleccion && (
+          <InstruccionesModoSeleccion />
         )}
 
         {/* Lista de productos */}
-        {viewMode === "grid" ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredAndSortedProducts.map((producto) => (
-              <div
-                key={producto.id_producto}
-                onClick={() => handleCardClick(producto.id_producto)}
-                className={`${selectionMode ? "cursor-pointer" : ""}`}
-              >
-                <ProductoCard
-                  producto={producto}
-                  onEditar={handleEdit}
-                  onEliminar={handleDelete}
-                  isSelected={isProductSelected(producto.id_producto)}
-                  selectionMode={selectionMode}
-                />
-              </div>
-            ))}
-          </div>
+        {filtros.modoVista === "grid" ? (
+          <VistaGrilla 
+            productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+            modoSeleccion={modoSeleccion}
+            mostrarEliminados={gestor.mostrarEliminados}
+            manejarClickProducto={manejarClickProducto}
+            manejarEditar={(producto) => gestor.manejarEditar(producto)}
+            manejarEliminar={manejarEliminar}
+            manejarRestaurar={manejarRestaurar}
+            estaSeleccionado={(id) => productosSeleccionados.includes(id)}
+          />
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    {selectionMode && (
-                      <th className="px-6 py-3 text-left">
-                        <input
-                          type="checkbox"
-                          checked={
-                            selectedProducts.length === filteredAndSortedProducts.length &&
-                            filteredAndSortedProducts.length > 0
-                          }
-                          onChange={handleSelectAll}
-                          className="w-5 h-5 text-orange-600 bg-white border-gray-300 rounded focus:ring-orange-500"
-                        />
-                      </th>
-                    )}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Producto
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Categoría
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Precio
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Stock
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
-                    </th>
-                    {!selectionMode && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Acciones
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredAndSortedProducts.map((producto) => (
-                    <tr
-                      key={producto.id_producto}
-                      className={`hover:bg-gray-50 transition-colors ${selectionMode ? "cursor-pointer" : ""} ${
-                        isProductSelected(producto.id_producto) ? "bg-blue-50 border-l-4 border-blue-500" : ""
-                      }`}
-                      onClick={() => handleTableRowClick(producto)}
-                    >
-                      {selectionMode && (
-                        <td className="px-6 py-4">
-                          <input
-                            type="checkbox"
-                            checked={isProductSelected(producto.id_producto)}
-                            onChange={() => handleCardClick(producto.id_producto)}
-                            className="w-5 h-5 text-orange-600 bg-white border-gray-300 rounded focus:ring-orange-500"
-                          />
-                        </td>
-                      )}
-                      <td className="px-6 py-4">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{producto.nombre}</div>
-                          <div className="text-sm text-gray-500">{producto.descripcion}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{producto.categoria}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">${producto.precio.toLocaleString()}</td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            producto.stock <= 5 ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          {producto.stock}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            producto.estado === "activo"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {producto.estado}
-                        </span>
-                      </td>
-                      {!selectionMode && (
-                        <td className="px-6 py-4 text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleEdit(producto)
-                              }}
-                              className="text-orange-600 hover:text-orange-900 transition-colors"
-                            >
-                              Editar
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleDelete(producto.id_producto)
-                              }}
-                              className="text-red-600 hover:text-red-900 transition-colors"
-                            >
-                              Eliminar
-                            </button>
-                          </div>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <VistaTabla 
+            productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+            modoSeleccion={modoSeleccion}
+            productosSeleccionados={productosSeleccionados}
+            mostrarEliminados={gestor.mostrarEliminados}
+            manejarClickFilaTabla={manejarClickFilaTabla}
+            manejarClickProducto={manejarClickProducto}
+            manejarSeleccionarTodos={manejarSeleccionarTodos}
+            estaSeleccionado={(id) => productosSeleccionados.includes(id)}
+            manejarEditar={(producto) => gestor.manejarEditar(producto)}
+            manejarEliminar={manejarEliminar}
+            manejarRestaurar={manejarRestaurar}
+          />
         )}
 
-        {filteredAndSortedProducts.length === 0 && (
-          <div className="text-center py-16">
-            <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
-              <svg
-                className="w-16 h-16 text-gray-300 mx-auto mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v1M7 8h10l-1 8H8L7 8z"
-                />
-              </svg>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">No se encontraron productos</h3>
-              <p className="text-gray-600 mb-6">
-                {searchTerm || filterCategory || filterStatus
-                  ? "Intenta ajustar los filtros de búsqueda"
-                  : "Comienza agregando tu primer producto"}
-              </p>
-              <button
-                onClick={handleAddClick}
-                className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-full hover:from-orange-600 hover:to-red-600 transition-all"
-              >
-                Agregar Producto
-              </button>
-            </div>
-          </div>
+        {/* Estado vacío */}
+        {productosFiltradosYOrdenados.length === 0 && (
+          <EstadoVacio 
+            mostrarEliminados={gestor.mostrarEliminados}
+            tieneProductos={gestor.productosActivos.length > 0}
+            filtrosActivos={Boolean(filtros.busqueda || filtros.categoria || filtros.estado)}
+            onAgregar={() => gestor.manejarAgregarClick()}
+          />
         )}
       </div>
 
       {/* Modal de producto */}
       <ProductoModal
-        isOpen={modalOpen}
+        isOpen={gestor.modalAbierto}
         onClose={() => {
-          setModalOpen(false)
-          setForm({
-            nombre: "",
-            descripcion: "",
-            precio: "",
-            stock: "",
-            id_categoria: "",
-            estado: "",
-          })
-          setEditingId(null)
-          setErrors({})
+          gestor.setModalAbierto(false);
+          setProgresoSubida(0);
+          limpiarErrores();
         }}
-        onSubmit={handleSubmit}
-        form={form}
-        onChange={handleInputChange}
-        errors={errors}
-        isEditing={!!editingId}
-        submitting={submitting}
-        categorias={categorias}
-        categoriasLoading={categoriasLoading}
-        onManageCategorias={categoriasManagement}
+        onSubmit={manejarEnvio}
+        form={gestor.formulario}
+        onChange={manejarCambioInput}
+        errors={errores}
+        isEditing={!!gestor.editandoId}
+        submitting={enviando}
+        uploadProgress={progresoSubida}
+        categorias={gestor.categorias}
+        categoriasLoading={gestor.categoriasLoading}
+        onManageCategorias={{
+          add: gestor.addCategoria,
+          edit: gestor.editCategoria,
+          delete: gestor.removeCategoria,
+        }}
       />
 
       {/* Modal de categorías */}
       <CategoriasModal
         isOpen={modalCategoriaOpen}
         onClose={() => setModalCategoriaOpen(false)}
-        categorias={categoriasSet}
-        onAdd={handleAddCategoria}
-        onEdit={handleEditCategoria}
-        onDelete={handleDeleteCategoria}
+        categorias={gestor.categorias || []}
+        onAddCategoria={manejarAgregarCategoria}
+        onEditCategoria={manejarEditarCategoria}
+        onDeleteCategoria={manejarEliminarCategoria}
         loading={loadingCategorias}
       />
     </div>
-  )
+  );
 }
 
-export default ProductosManagerConnected
+export default ProductosManager;

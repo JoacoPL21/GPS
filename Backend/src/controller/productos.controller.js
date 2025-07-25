@@ -1,7 +1,9 @@
 "use strict";
-import { getProductos, getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados, updateProductoStock } from "../services/productos.service.js";
+import { getProductos, getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, restoreProductoService, getProductosEliminados, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados, updateProductoStock } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 import { productoCreateValidation } from "../validations/productos.validation.js";
+import { postImagen } from "./minio.controller.js";
+
 
 export async function getProductosDisponiblesController(req, res) {
   try {
@@ -40,33 +42,85 @@ export async function getProductoByIdController(req, res) {
 
 export async function createProductoController(req, res) {
   try {
-    const productoData = req.body;
-    delete productoData.image_url;
+    console.log("🎯 === CREAR PRODUCTO ===");
+    console.log("📥 Body recibido:", req.body);
+    console.log("📁 Archivo recibido:", req.file ? {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      buffer: req.file.buffer ? "Buffer presente" : "No buffer"
+    } : "Sin archivo");
 
-    console.log("Datos del producto a crear controller:", productoData);
+    const { body, file } = req;
+    let imagen_nombre = null;
 
+    if (file) {
+    const validMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validMimeTypes.includes(file.mimetype)) {
+    return handleErrorClient(res, 400, "Formato de imagen no válido (solo JPG, PNG o WEBP)");
+  }
+
+    console.log("📸 Procesando imagen con MinIO...");
+    imagen_nombre = await postImagen(file.buffer, body.nombre);
+    console.log("✅ Imagen subida a MinIO:", imagen_nombre);
+  }
+    const productoData = {
+    nombre: body.nombre,
+    precio: Number(body.precio),
+    stock: Number(body.stock),
+    descripcion: body.descripcion,
+    estado: body.estado,
+    id_categoria: Number(body.id_categoria),
+   ...(imagen_nombre && { image_url: imagen_nombre })
+  };
+
+    console.log("💾 Datos que se guardarán en BD:", productoData);
+
+    // Validar datos
     const { error } = productoCreateValidation.validate(productoData);
-
     if (error) {
+      console.log("❌ Error de validación:", error.message);
       return handleErrorClient(res, 400, "Datos inválidos", error.message);
     }
-
-    const [nuevoProducto] = await createProducto(productoData);
-
-    if (!nuevoProducto) {
-      return handleErrorClient(res, 400, "No se pudo crear el producto. Verifica los datos proporcionados.");
+    
+    console.log("📊 Guardando en base de datos...");
+    const [nuevoProducto, err] = await createProducto(productoData);
+    if (err || !nuevoProducto) {
+      console.log("❌ Error al guardar en BD:", err);
+      return handleErrorClient(res, 400, "No se pudo crear el producto.");
     }
+    
+    console.log("✅ Producto creado exitosamente:", nuevoProducto);
     return handleSuccess(res, 201, "Producto creado exitosamente", nuevoProducto);
   } catch (error) {
-
+    console.error("💥 Error en createProductoController:", error);
     return handleErrorServer(res, 500, "Error interno del servidor al crear producto");
   }
 }
 
+
+
 export const updateProductoController = async (req, res) => {
   try {
+    console.log("🎯 === ACTUALIZAR PRODUCTO ===");
+    console.log("🆔 ID del producto:", req.params.id_producto);
+    console.log("📥 Body recibido:", req.body);
+    console.log("📁 Headers de Content-Type:", req.headers['content-type']);
+    console.log("📋 Todas las headers:", {
+      'content-type': req.headers['content-type'],
+      'content-length': req.headers['content-length'],
+      'authorization': req.headers.authorization ? 'Bearer [TOKEN]' : 'Sin auth'
+    });
+    console.log("📁 Archivo recibido:", req.file ? {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      buffer: req.file.buffer ? "Buffer presente" : "No buffer"
+    } : "Sin archivo");
+
     const { id_producto } = req.params;
-    const productoData = req.body;
+    const { body, file } = req;
+    let imagen_nombre = null;
 
     // Validar que el ID sea válido
     if (!id_producto || isNaN(id_producto)) {
@@ -75,6 +129,44 @@ export const updateProductoController = async (req, res) => {
         data: null
       });
     }
+
+    // Procesar imagen si se proporciona
+    if (file) {
+      const validMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!validMimeTypes.includes(file.mimetype)) {
+        return res.status(400).json({
+          message: "Formato de imagen no válido (solo JPG, PNG o WEBP)",
+          data: null
+        });
+      }
+      console.log("📸 Procesando nueva imagen con MinIO...");
+      imagen_nombre = await postImagen(file.buffer, body.nombre || `producto_${id_producto}`);
+      console.log("✅ Nueva imagen subida a MinIO:", imagen_nombre);
+    }
+
+    // Construir datos del producto
+    const productoData = {
+      nombre: body.nombre,
+      precio: body.precio ? Number(body.precio) : undefined,
+      stock: body.stock ? Number(body.stock) : undefined,
+      descripcion: body.descripcion,
+      estado: body.estado,
+      id_categoria: body.id_categoria ? Number(body.id_categoria) : undefined,
+      peso: body.peso ? Number(body.peso) : undefined,
+      ancho: body.ancho ? Number(body.ancho) : undefined,
+      alto: body.alto ? Number(body.alto) : undefined,
+      profundidad: body.profundidad ? Number(body.profundidad) : undefined,
+      ...(imagen_nombre && { image_url: imagen_nombre })
+    };
+
+    // Remover campos undefined para no sobrescribir con undefined
+    Object.keys(productoData).forEach(key => {
+      if (productoData[key] === undefined) {
+        delete productoData[key];
+      }
+    });
+
+    console.log("💾 Datos que se actualizarán en BD:", productoData);
 
     // Validar datos requeridos
     const { nombre, precio, stock, id_categoria } = productoData;
@@ -85,21 +177,35 @@ export const updateProductoController = async (req, res) => {
       });
     }
 
+    // Validar campos numéricos opcionales (dimensiones y peso)
+    const camposNumericos = ['peso', 'ancho', 'alto', 'profundidad'];
+    for (const campo of camposNumericos) {
+      if (productoData[campo] !== undefined && (isNaN(productoData[campo]) || productoData[campo] < 0)) {
+        return res.status(400).json({
+          message: `El campo ${campo} debe ser un número positivo`,
+          data: null
+        });
+      }
+    }
+
+    console.log("📊 Actualizando en base de datos...");
     const resultado = await updateProductoService(id_producto, productoData);
 
     if (resultado.success) {
+      console.log("✅ Producto actualizado exitosamente:", resultado.data);
       res.status(200).json({
         message: "Producto actualizado exitosamente",
         data: resultado.data
       });
     } else {
+      console.log("❌ Error al actualizar en BD:", resultado.message);
       res.status(404).json({
         message: resultado.message || "Producto no encontrado",
         data: null
       });
     }
   } catch (error) {
-    console.error("Error en updateProductoController:", error);
+    console.error("💥 Error en updateProductoController:", error);
     res.status(500).json({
       message: "Error interno del servidor",
       data: null
@@ -111,8 +217,53 @@ export const updateProductoController = async (req, res) => {
 export const deleteProductoController = async (req, res) => {
   try {
     const { id_producto } = req.params;
+    
+    console.log('🟠 [deleteProductoController] === ELIMINAR PRODUCTO ===');
+    console.log('🟠 [deleteProductoController] ID recibido:', id_producto);
+    console.log('🟠 [deleteProductoController] Tipo de ID:', typeof id_producto);
+    console.log('🟠 [deleteProductoController] req.params completo:', req.params);
 
     // Validar que el ID sea válido
+    if (!id_producto || isNaN(id_producto)) {
+      console.log('🔴 [deleteProductoController] ID inválido');
+      return res.status(400).json({
+        message: "ID de producto inválido",
+        data: null
+      });
+    }
+
+    console.log('🟠 [deleteProductoController] Llamando a deleteProductoService...');
+    const resultado = await deleteProductoService(id_producto);
+    
+    console.log('🟠 [deleteProductoController] Resultado del servicio:', resultado);
+
+    if (resultado.success) {
+      console.log('🟢 [deleteProductoController] Eliminación exitosa');
+      res.status(200).json({
+        message: "Producto eliminado exitosamente",
+        data: { id_producto: parseInt(id_producto) }
+      });
+    } else {
+      console.log('🔴 [deleteProductoController] Error en eliminación:', resultado.message);
+      res.status(404).json({
+        message: resultado.message || "Producto no encontrado",
+        data: null
+      });
+    }
+  } catch (error) {
+    console.error("🔴 [deleteProductoController] Error en deleteProductoController:", error);
+    res.status(500).json({
+      message: "Error interno del servidor",
+      data: null
+    });
+  }
+};
+
+// Restaurar un producto eliminado
+export const restoreProductoController = async (req, res) => {
+  try {
+    const { id_producto } = req.params;
+
     if (!id_producto || isNaN(id_producto)) {
       return res.status(400).json({
         message: "ID de producto inválido",
@@ -120,24 +271,49 @@ export const deleteProductoController = async (req, res) => {
       });
     }
 
-    const resultado = await deleteProductoService(id_producto);
+    const resultado = await restoreProductoService(id_producto);
 
     if (resultado.success) {
       res.status(200).json({
-        message: "Producto eliminado exitosamente",
-        data: { id_producto: parseInt(id_producto) }
+        message: resultado.message,
+        data: resultado.data
       });
     } else {
       res.status(404).json({
-        message: resultado.message || "Producto no encontrado",
+        message: resultado.message,
         data: null
       });
     }
   } catch (error) {
-    console.error("Error en deleteProductoController:", error);
+    console.error("Error en restoreProductoController:", error);
     res.status(500).json({
       message: "Error interno del servidor",
       data: null
+    });
+  }
+};
+
+// Obtener productos eliminados
+export const getProductosEliminadosController = async (req, res) => {
+  try {
+    const resultado = await getProductosEliminados();
+
+    if (resultado.success) {
+      res.status(200).json({
+        message: resultado.message,
+        data: resultado.data
+      });
+    } else {
+      res.status(500).json({
+        message: resultado.message,
+        data: []
+      });
+    }
+  } catch (error) {
+    console.error("Error en getProductosEliminadosController:", error);
+    res.status(500).json({
+      message: "Error interno del servidor",
+      data: []
     });
   }
 };

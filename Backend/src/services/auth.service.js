@@ -29,7 +29,7 @@ export async function loginService(user) {
       return [null, createErrorMessage("password", "La contraseña es incorrecta")];
     }
 
-    
+
     // Payload mínimo para el JWT - solo información esencial
     const payload = {
       id: userFound.id_usuario,
@@ -48,7 +48,7 @@ export async function loginService(user) {
       email: userFound.email,
       rol: userFound.rol,
       telefono: userFound.telefono || "",
-      
+
     };
 
     return [accessToken, null, userInfo];
@@ -62,10 +62,13 @@ export async function loginService(user) {
 export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(Usuario);
-   
 
-    const { nombreCompleto, telefono, email } = user;
+    const { nombreCompleto, telefono, email, password } = user; // ← Agregué password aquí
+
     
+    if ((!password || password.trim() === "")) {
+      return [null, { dataInfo: "password", message: "La contraseña es obligatoria" }];
+    }
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
@@ -77,24 +80,26 @@ export async function registerService(user) {
         email,
       },
     });
-    
+
     if (existingEmailUser) return [null, createErrorMessage("email", "Correo electrónico en uso")];
 
-    if (!nombreCompleto || !email || !user.password) {
+    if (!nombreCompleto || !email || !password) { // ← Cambié user.password por password
       return [null, createErrorMessage("fields", "Todos los campos son obligatorios")
       ];
     }
+
     const newUser = userRepository.create({
       nombreCompleto,
       email,
       telefono,
-      password: await encryptPassword(user.password),
-      rol: "cliente",
+      password: await encryptPassword(password), // ← Cambié user.password por password
+      rol: "cliente", // ← Este valor por defecto ya está en la entidad, pero es buena práctica ser explícito
     });
 
     await userRepository.save(newUser);
-    //mostrar solo los datos del usuario sin la contraseña
-    const { password, ...dataUser } = newUser;
+    
+    // Mostrar solo los datos del usuario sin la contraseña
+    const { password: _, ...dataUser } = newUser; // ← Mejoré la destructuración
 
     return [dataUser, null];
   } catch (error) {

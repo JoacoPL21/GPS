@@ -1,6 +1,14 @@
 "use client"
 
-const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, selectionMode = false }) => {
+const ProductoCard = ({ 
+  producto, 
+  onEditar, 
+  onEliminar, 
+  onRestaurar,
+  isSelected = false, 
+  selectionMode = false, 
+  showDeleted = false 
+}) => {
   const getStockStatus = (stock) => {
     if (stock === 0) return { color: "bg-red-100 text-red-800", text: "Sin stock" }
     if (stock <= 5) return { color: "bg-yellow-100 text-yellow-800", text: "Stock bajo" }
@@ -38,7 +46,20 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
   const handleDeleteClick = (e) => {
     e.stopPropagation() // Evitar que se active la selección
     if (!selectionMode) {
+      console.log('🔷 [ProductoCard] handleDeleteClick - Producto completo:', producto);
+      console.log('🔷 [ProductoCard] handleDeleteClick - ID del producto:', producto.id_producto);
+      console.log('🔷 [ProductoCard] handleDeleteClick - Tipo de ID:', typeof producto.id_producto);
       onEliminar(producto.id_producto)
+    }
+  }
+
+  const handleRestoreClick = (e) => {
+    e.stopPropagation() // Evitar que se active la selección
+    if (!selectionMode && onRestaurar) {
+      console.log('🔄 [ProductoCard] handleRestoreClick - Producto completo:', producto);
+      console.log('🔄 [ProductoCard] handleRestoreClick - ID del producto:', producto.id_producto);
+      console.log('🔄 [ProductoCard] handleRestoreClick - Tipo de ID:', typeof producto.id_producto);
+      onRestaurar(producto.id_producto)
     }
   }
 
@@ -65,7 +86,10 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
           isSelected ? "from-blue-100 to-blue-200" : ""
         }`}
       >
-        <div className="text-6xl opacity-30">🪵</div>
+        <img
+          src={producto.imagen|| "/placeholder.png"}
+          className="object-cover w-full h-full"
+        />
 
         {/* Badge de estado en la esquina superior derecha */}
         <div className="absolute top-3 right-3">
@@ -160,46 +184,63 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
               </span>
             </div>
           </div>
-
-          {/* ID del producto */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-500">ID:</span>
-            <span className="text-sm font-mono text-gray-600">#{producto.id}</span>
-          </div>
         </div>
+
+
 
         {/* Botones de acción - Solo mostrar si no está en modo selección */}
         {!selectionMode && (
           <div className="flex space-x-3">
-            <button
-              onClick={handleEditClick}
-              className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              <span>Editar</span>
-            </button>
+            {showDeleted ? (
+              // Botón de restaurar para productos eliminados
+              <button
+                onClick={handleRestoreClick}
+                className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span>Restaurar</span>
+              </button>
+            ) : (
+              // Botones normales para productos activos
+              <>
+                <button
+                  onClick={handleEditClick}
+                  className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  <span>Editar</span>
+                </button>
 
-            <button
-              onClick={handleDeleteClick}
-              className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              <span>Eliminar</span>
-            </button>
+                <button
+                  onClick={handleDeleteClick}
+                  className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  <span>Eliminar</span>
+                </button>
+              </>
+            )}
           </div>
         )}
 
