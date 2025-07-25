@@ -1,7 +1,6 @@
 import './../styles/App.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useState, useEffect } from 'react'; 
-import { API_URL } from '../config.js'; 
 import Root from "./Root.jsx";
 import Homepage from "./Homepage/Homepage.jsx";
 import Cart from "./Carrito/shopping_cart.jsx";
@@ -25,7 +24,6 @@ import MisPedidos from "./Profile/MisPedidos.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
 import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -114,12 +112,6 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  useEffect(() => {
-    fetch(`${API_URL}/test`)
-      .then(response => response.json())
-      .then(data => console.log('Conexión exitosa:', data))
-      .catch(error => console.error('Error de conexión:', error));
-  }, []);
 
   return (
     <RouterProvider router={router} />

@@ -4,22 +4,14 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import indexRoutes from "./routes/routes.js";
 import session from "express-session";
-import pgSession from "connect-pg-simple";
 import passport from "passport";
 import express, { json, urlencoded } from "express";
 import {
-  cookieKey,
-  DB_HOST,
-  DB_PORT,
-  DB_USERNAME,
-  DB_PASSWORD,
-  DB_DATABASE
+  cookieKey, WEB_HOST, WEB_PORT
 } from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
-// COMBINAR AMBAS IMPORTACIONES
 import { createProductos, createUser, createCategoria, createValoraciones, createCompra_Producto, createEnvios, createCompras} from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
-import path from "path";
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/payment.routes.js';
 import bodyParser from 'body-parser';
@@ -35,17 +27,6 @@ async function setupServer() {
   try {
     dotenv.config();
     const app = express();
-
-    
-    const PgStore = pgSession(session);
-    const sessionStore = new PgStore({
-      conObject: {
-        connectionString: `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}`,
-        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-      },
-      createTableIfMissing: true,
-      tableName: 'session',
-    });
 
     // 2. Webhook de Mercado Pago
     app.post(
@@ -76,33 +57,13 @@ async function setupServer() {
 
     // Deshabilita el encabezado "x-powered-by" por seguridad
     app.disable("x-powered-by");
-
-   
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'https://eccomerce-tyrf1ngs-projects.vercel.app',
-      'https://eccomerce-frontend.vercel.app',
-      'https://eccomerce-cf7q5i33e-tyrf1ngs-projects.vercel.app'
-    ];
-    const vercelPreviewPattern = /^https:\/\/eccomerce-[a-z0-9]+-tyrf1ngs-projects\.vercel\.app$/;
-    const corsMiddleware = cors({
-      credentials: true,
-      origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
-        if (vercelPreviewPattern.test(origin)) return callback(null, true);
-        console.warn('Origen bloqueado por CORS:', origin);
-        callback(null, false);
-      },
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization']
-    });
-    app.use(corsMiddleware);
-    app.options('*', corsMiddleware);
-    app.use((req, res, next) => {
-      if (req.method === 'OPTIONS') return next();
-      next();
-    });
+    
+    app.use(
+      cors({
+        credentials: true,
+        origin: true, // Permitir todos los orígenes (puedes especificar uno específico aquí)
+      }),
+    );
 
     // Middlewares globales para procesar JSON y URL-encoded
     app.use(urlencoded({ extended: true, limit: "1mb" }));
@@ -112,23 +73,18 @@ async function setupServer() {
     app.use(morgan("dev"));
 
     // Configuración de la sesión
-    const sessionMiddleware = session({
-      secret: process.env.SESSION_SECRET || cookieKey,
-      store: sessionStore,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000
-      }
-    });
-    app.use((req, res, next) => {
-      if (req.method === 'OPTIONS') return next();
-      sessionMiddleware(req, res, next);
-    });
-
+    app.use(
+      session({
+        secret: cookieKey,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          secure: false,
+          httpOnly: true,
+          sameSite: "strict",
+        },
+      }),
+    );
     // Passport
     app.use(passport.initialize());
     app.use(passport.session());
@@ -137,11 +93,11 @@ async function setupServer() {
 
     app.use("/api", indexRoutes);
     
-    // TUS RUTAS (pagos y chilexpress)
+
     app.use('/api/payments', paymentRoutes);
     app.use('/api/chilexpress', chilexpressRoutes);
     
-    // RUTAS DE TUS COMPAÑEROS (productos, categorías, etc.)
+ 
     app.use("/api/productos", productosRoutes);
     app.use("/api/categorias", categoriasRoutes);
     app.use("/api/valoraciones", valoracionesRoutes);
@@ -167,9 +123,11 @@ async function setupServer() {
       res.status(500).json({ error: 'Algo salió mal' });
     });
 
+    
+  
     // Configuración del puerto y host
-    app.listen(DB_PORT, DB_HOST, () => {
-      console.log(`=> Servidor corriendo en http://${DB_HOST}:${DB_PORT}/api`);
+    app.listen(WEB_PORT, WEB_HOST, () => {
+      console.log(`=> Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
     });
   } catch (error) {
     console.log("Error en index.js -> setupServer(), el error es: ", error);

@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview --port 443",
-    "start": "vite preview --port 443"
+    "preview": "vite preview --port 443 --host",
+    "start": "vite preview --port 443 --host"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
