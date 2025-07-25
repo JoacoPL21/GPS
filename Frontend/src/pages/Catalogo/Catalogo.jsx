@@ -3,8 +3,9 @@
 import { useState, useMemo } from "react"
 import { useCart } from "../../context/CartContext.jsx"
 import { useProductos } from "../../hooks/productos/useProductos"
-import CardCatalogo from "../../components/CardCatalogo.jsx"
+import CardCatalogo from "../../components/ProductoClientes/CardCatalogo.jsx"
 import PageHeader from "../../components/PageHeader"
+import ErrorProductos from "../../components/ProductoClientes/ErrorProductos.jsx"
 
 const CatalogoConnected = () => {
   const { productos, loading, error } = useProductos()
@@ -60,7 +61,6 @@ const CatalogoConnected = () => {
       imagen: producto.imagen,
       categoria: producto.categoria,
       stock: producto.stock,
-      // No incluir cantidad aquí, el reducer la manejará
     }
 
     addItemToCart(itemToAdd)
@@ -88,24 +88,14 @@ const CatalogoConnected = () => {
   // Mostrar error
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar productos</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
+      <div>
+        <ErrorProductos message={error} onRetry={() => window.location.reload()} />
       </div>
     )
   }
 
   return (
-    <div className="bg-gradient-to-br from-amber-50 to-orange-50 min-h-screen">
+    <div >
       {/* Header del Catálogo */}
       <PageHeader
         breadcrumbs={[
@@ -113,10 +103,9 @@ const CatalogoConnected = () => {
           { label: "Catálogo" }
         ]}
         title="Nuestro Catálogo"
-        subtitle="Descubre todas nuestras artesanías únicas en madera"
       />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div>
         {/* Barra de herramientas */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -322,7 +311,7 @@ const CatalogoConnected = () => {
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-full hover:from-amber-600 hover:to-orange-600 transition-all"
+                    className="bg-gradient-to-r from-[#a47148] to-[#8c5d3d] hover:from-[#946746] hover:to-[#7e5137] text-white hover:scale-105 hover:shadow-lg"
                   >
                     Limpiar búsqueda
                   </button>
@@ -334,30 +323,26 @@ const CatalogoConnected = () => {
 
         {/* Estadísticas del catálogo */}
         {!loading && productos && productos.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">{productos.length}</div>
-                <div className="text-sm text-gray-600">Total productos</div>
+      <div className="bg-white rounded-2xl shadow-lg p-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center place-items-center">
+         <div>
+            <div className="text-2xl font-bold text-[#a47148]">{productos.length}</div>
+            <div className="text-sm text-gray-600">Total productos</div>
+         </div>
+            <div>
+              <div className="text-2xl font-bold text-[#a47148]">
+                ${Math.min(...productos.map((p) => p.precio)).toLocaleString()}
               </div>
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">{filteredAndSortedProducts.length}</div>
-                <div className="text-sm text-gray-600">Mostrando</div>
+              <div className="text-sm text-gray-600">Precio mínimo</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-[#a47148]">
+                ${Math.max(...productos.map((p) => p.precio)).toLocaleString()}
               </div>
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">
-                  ${Math.min(...productos.map((p) => p.precio)).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">Precio mínimo</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-[#a47148]">
-                  ${Math.max(...productos.map((p) => p.precio)).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">Precio máximo</div>
-              </div>
+              <div className="text-sm text-gray-600">Precio máximo</div>
             </div>
           </div>
+        </div>  
         )}
       </div>
     </div>

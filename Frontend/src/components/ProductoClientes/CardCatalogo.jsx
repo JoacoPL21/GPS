@@ -8,16 +8,16 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
     return { color: "bg-green-100 text-green-800", text: "Disponible", available: true }
   }
 
-  const getCategoryColor = (categoria) => {
-    const colors = {
-      Artesanía: "bg-blue-100 text-blue-800",
-      Juguetes: "bg-purple-100 text-purple-800",
-      Decoración: "bg-pink-100 text-pink-800",
-      Muebles: "bg-indigo-100 text-indigo-800",
-      Accesorios: "bg-teal-100 text-teal-800",
-    }
-    return colors[categoria] || "bg-gray-100 text-gray-800"
+const getCategoryColor = (categoria) => {
+  const colors = {
+    Artesanía: "bg-amber-100 text-amber-800",     
+    Juguetes: "bg-orange-100 text-orange-900",     
+    Decoración: "bg-yellow-100 text-yellow-900",    
+    Muebles: "bg-stone-200 text-stone-800",         
+    Accesorios: "bg-amber-200 text-amber-900",      
   }
+  return colors[categoria] || "bg-stone-100 text-stone-800"  // Por defecto, tono café claro
+}
 
   const stockStatus = getStockStatus(producto.stock)
   const categoryColor = getCategoryColor(producto.categoria)
@@ -166,13 +166,6 @@ const CardCatalogo = ({ producto, onAddToCart, viewMode = "grid" }) => {
           <FaShoppingCart className="w-5 h-5" />
             <span className="hidden sm:inline">{stockStatus.available ? "Agregar" : "Agotado"}</span>
           </button>
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Envío gratis desde $50.000</span>
-            <span>Hecho a mano</span>
-          </div>
         </div>
       </div>
     </div>
