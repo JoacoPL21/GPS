@@ -24,6 +24,8 @@ import MisPedidos from "./Profile/MisPedidos.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
 import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
+import ForgotPassword from "./User/ForgotPassword.jsx";
+import ResetPassword from "./User/ResetPassword.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -36,6 +38,8 @@ const router = createBrowserRouter([
       { path: "producto/:id_producto", element: <Producto /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password", element: <ResetPassword /> },
       { path: "logout", element: <Logout /> },
       { path: "success", element: <SuccessPage /> },
       { path: "failure", element: <FailurePage /> },
