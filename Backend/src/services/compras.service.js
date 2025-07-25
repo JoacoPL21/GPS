@@ -149,16 +149,26 @@ export async function getProductosCompradosConValoracion(id_usuario) {
 export async function getAllCompras() {
     try {
         const comprasRepository = AppDataSource.getRepository(Compras);
-        const usuarioRepository = AppDataSource.getRepository('Usuario');
+        const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
         const compras = await comprasRepository.find({
             order: { id_compra: "DESC" },
             relations: ["Usuarios"]
         });
-        console.log('Compras encontradas:', compras);
-
         // Mapear la info relevante para el admin
         const comprasAdmin = await Promise.all(compras.map(async (compra) => {
             const usuario = compra.Usuarios;
+            // Obtener productos de la compra
+            const productosCompra = await compraProductoRepository.find({
+                where: { id_compra: compra.id_compra },
+                relations: ["Productos"]
+            });
+            const productos = productosCompra.map(cp => ({
+                id_producto: cp.id_producto,
+                cantidad: cp.cantidad,
+                precio: cp.precio_unitario,
+                nombre: cp.Productos?.nombre || 'Producto no disponible',
+                imagen: cp.Productos?.image_url || null
+            }));
             // Mapeo de estado para frontend
             let estado = 'pendiente';
             if (compra.estado_envio === 'entregado') {
@@ -179,6 +189,7 @@ export async function getAllCompras() {
                 metodo_pago: compra.payment_type,
                 tracking: compra.tracking || '', 
                 id_pago: compra.payment_id || 'Pendiente',
+                productos // <-- Agrega los productos aquí
             };
         }));
         console.log('Compras mapeadas para admin:', comprasAdmin);

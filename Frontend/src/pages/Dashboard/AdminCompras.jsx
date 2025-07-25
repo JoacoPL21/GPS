@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { FaShoppingBag, FaCalendar, FaClock, FaDollarSign, FaUser, FaBox, FaTruck, FaSearch, FaDownload, FaChevronLeft, FaChevronRight, FaCheckCircle } from "react-icons/fa";
+import { FaShoppingBag, FaCalendar, FaClock, FaDollarSign, FaUser, FaBox, FaTruck, FaSearch, FaDownload, FaChevronLeft, FaChevronRight, FaCheckCircle, FaEye, FaPrint, FaBarcode } from "react-icons/fa";
 import { getAllComprasAdmin } from "../../services/compras.service";
+import { procesarEnvio, getEnvioPorCompra, reimprimirEtiqueta } from "../../services/envios.service";
+import axios from '../../services/root.service.js';
 
 export default function AdminCompras() {
   const [orders, setOrders] = useState([]);
@@ -8,6 +10,122 @@ export default function AdminCompras() {
   const [filter, setFilter] = useState("todas");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [enviosData, setEnviosData] = useState({});
+  const [processingShipment, setProcessingShipment] = useState(null);
+  const [modalEtiqueta, setModalEtiqueta] = useState({ open: false, url: null, mimeType: null, etiquetaData: null });
+
+  // Cargar información de envío para una compra
+  const cargarEnvioCompra = async (id_compra, forzarRecarga = false) => {
+    if (enviosData[id_compra] && !forzarRecarga) return;
+    try {
+      const { data } = await getEnvioPorCompra(id_compra);
+      if (data?.data) {
+        setEnviosData(prev => ({ ...prev, [id_compra]: data.data }));
+      }
+    } catch {
+      // Silenciar error
+    }
+  };
+
+  // Procesar envío (crear orden de transporte)
+  const handleProcesarEnvio = async (order) => {
+    setProcessingShipment(order.id_compra);
+    try {
+      const serviceCode = "3";
+      const destinationCoverage = "STGO";
+      const { error } = await procesarEnvio(order.id_compra, serviceCode, destinationCoverage);
+      if (error) {
+        alert(error?.response?.data?.message || error);
+      } else {
+        alert('Orden de transporte creada exitosamente');
+        await cargarEnvioCompra(order.id_compra, true);
+      }
+    } catch (error) {
+      alert(error?.response?.data?.message || 'Error interno al procesar el envío');
+    } finally {
+      setProcessingShipment(null);
+    }
+  };
+
+  // Ver etiqueta (ahora en modal)
+  const handleVerEtiqueta = async (transportOrderNumber) => {
+    try {
+      const response = await reimprimirEtiqueta(transportOrderNumber);
+      if (response.error) {
+        alert(`Error al obtener etiqueta: ${response.error}`);
+      } else {
+        const etiquetaData = response.data?.data || response.data;
+        if (etiquetaData?.labelData) {
+          const labelData = etiquetaData.labelData;
+          let mimeType = 'image/jpeg';
+          if (labelData.startsWith('/9j/')) mimeType = 'image/jpeg';
+          else if (labelData.startsWith('iVBORw0KGgo')) mimeType = 'image/png';
+          else if (labelData.startsWith('JVBERi0x')) mimeType = 'application/pdf';
+          const byteCharacters = atob(labelData);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: mimeType });
+          const url = window.URL.createObjectURL(blob);
+          setModalEtiqueta({ open: true, url, mimeType, etiquetaData });
+        } else {
+          alert('No se encontraron datos de etiqueta en la respuesta');
+        }
+      }
+    } catch {
+      alert('Error interno al obtener la etiqueta');
+    }
+  };
+
+  // Descargar etiqueta
+  const handleReimprimirEtiqueta = async (transportOrderNumber) => {
+    try {
+      const response = await reimprimirEtiqueta(transportOrderNumber);
+      if (response.error) {
+        alert(`Error al reimprimir etiqueta: ${response.error}`);
+      } else {
+        const etiquetaData = response.data?.data || response.data;
+        if (etiquetaData?.labelData) {
+          const labelData = etiquetaData.labelData;
+          let mimeType = 'image/jpeg';
+          let fileExtension = 'jpg';
+          if (labelData.startsWith('/9j/')) { mimeType = 'image/jpeg'; fileExtension = 'jpg'; }
+          else if (labelData.startsWith('iVBORw0KGgo')) { mimeType = 'image/png'; fileExtension = 'png'; }
+          else if (labelData.startsWith('JVBERi0x')) { mimeType = 'application/pdf'; fileExtension = 'pdf'; }
+          const byteCharacters = atob(labelData);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: mimeType });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `etiqueta_${etiquetaData.transportOrderNumber || transportOrderNumber}_${etiquetaData.reference || 'GPS'}.${fileExtension}`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          alert('Etiqueta descargada exitosamente');
+        } else {
+          alert('Etiqueta reimpresa exitosamente, pero no se pudo generar el archivo de descarga');
+        }
+      }
+    } catch {
+      alert('Error interno al reimprimir la etiqueta');
+    }
+  };
+
+  // Marcar como entregado al courier
+  const handleMarcarEnTransito = async (order) => {
+    try {
+      await axios.patch(`/envios/compras/${order.id_compra}/estado-envio`, { estado_envio: 'en_transito' });
+      alert('Compra marcada como entregada al courier (en tránsito)');
+      // Refrescar compras
+      setOrders((prev) => prev.map(o => o.id_compra === order.id_compra ? { ...o, estado: 'en_transito' } : o));
+    } catch (error) {
+      alert(error?.response?.data?.message || 'Error al actualizar el estado de envío');
+    }
+  };
 
   useEffect(() => {
     async function fetchCompras() {
@@ -18,6 +136,15 @@ export default function AdminCompras() {
     }
     fetchCompras();
   }, []);
+
+  useEffect(() => {
+    if (orders.length > 0) {
+      orders.forEach(order => {
+        cargarEnvioCompra(order.id_compra);
+      });
+    }
+    // eslint-disable-next-line
+  }, [orders]);
 
   // Filtrado y búsqueda
   let filteredOrders = [...orders];
@@ -127,7 +254,7 @@ export default function AdminCompras() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestión de Compras</h1>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Gestión de Compras</h2>
           <p className="text-gray-600">Administra todas las compras realizadas en la plataforma</p>
         </div>
         {/* Estadísticas */}
@@ -203,7 +330,7 @@ export default function AdminCompras() {
                 <option value="todas">Todos los estados</option>
                 <option value="en_transito">Enviadas</option>
                 <option value="entregado">Entregadas</option>
-                <option value="en_elaboracion">Pendientes</option>
+                <option value="en_preparacion">Pendientes</option>
               </select>
             </div>
             {/* Botón exportar */}
@@ -350,6 +477,69 @@ export default function AdminCompras() {
                         <div className="text-gray-900">{getMetodoPagoTexto(order.metodo_pago)}</div>
                       </div>
                     </div>
+                    {/* Botón Procesar Envío o gestión de etiqueta */}
+                    {order.estado === 'en_preparacion' && enviosData[order.id_compra] && enviosData[order.id_compra].transport_order_number ? (
+                      <div className="flex gap-2 mt-4 flex-wrap">
+                        <button
+                          onClick={() => handleVerEtiqueta(enviosData[order.id_compra].transport_order_number)}
+                          className="flex items-center px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                          <FaEye className="w-3 h-3 mr-2" />
+                          Ver Etiqueta
+                        </button>
+                        <button
+                          onClick={() => handleReimprimirEtiqueta(enviosData[order.id_compra].transport_order_number)}
+                          className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          <FaPrint className="w-3 h-3 mr-2" />
+                          Descargar Etiqueta
+                        </button>
+                        {enviosData[order.id_compra].barcode && (
+                          <button
+                            onClick={() => {
+                              const barcode = enviosData[order.id_compra].barcode;
+                              navigator.clipboard.writeText(barcode).then(() => {
+                                alert(`Código de barras copiado al portapapeles:\n${barcode}`);
+                              }).catch(() => {
+                                alert(`Código de barras: ${barcode}`);
+                              });
+                            }}
+                            className="flex items-center px-3 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            title="Copiar código de barras al portapapeles"
+                          >
+                            <FaBarcode className="w-3 h-3 mr-2" />
+                            Copiar Código
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleMarcarEnTransito(order)}
+                          className="flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                        >
+                          <FaTruck className="w-4 h-4 mr-2" />
+                          Marcar como entregado al courier
+                        </button>
+                      </div>
+                    ) : order.estado === 'en_preparacion' && (
+                      <div className="mt-4 flex flex-col items-end gap-2">
+                        <button
+                          onClick={() => handleProcesarEnvio(order)}
+                          disabled={processingShipment === order.id_compra}
+                          className="flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {processingShipment === order.id_compra ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Procesando...
+                            </>
+                          ) : (
+                            <>
+                              <FaTruck className="w-4 h-4 mr-2" />
+                              Procesar Envío
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -421,6 +611,39 @@ export default function AdminCompras() {
           </>
         )}
       </div>
+      {/* Modal Etiqueta */}
+      {modalEtiqueta.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl font-bold"
+              onClick={() => {
+                if (modalEtiqueta.url) window.URL.revokeObjectURL(modalEtiqueta.url);
+                setModalEtiqueta({ open: false, url: null, mimeType: null, etiquetaData: null });
+              }}
+              title="Cerrar"
+            >
+              ×
+            </button>
+            <h3 className="text-lg font-bold mb-4 text-center">Etiqueta de Envío</h3>
+            <div className="mb-4 text-sm text-gray-700">
+              <div><b>Orden de Transporte:</b> {modalEtiqueta.etiquetaData?.transportOrderNumber || 'N/A'}</div>
+              <div><b>Referencia:</b> {modalEtiqueta.etiquetaData?.reference || 'N/A'}</div>
+              <div><b>Destinatario:</b> {modalEtiqueta.etiquetaData?.recipient || 'N/A'}</div>
+              <div><b>Dirección:</b> {modalEtiqueta.etiquetaData?.address || 'N/A'}</div>
+              <div><b>Código de Barras:</b> {modalEtiqueta.etiquetaData?.barcode || 'N/A'}</div>
+              <div><b>Tipo de archivo:</b> {modalEtiqueta.mimeType === 'application/pdf' ? 'PDF' : 'Imagen'}</div>
+            </div>
+            <div className="flex justify-center items-center min-h-[300px]">
+              {modalEtiqueta.mimeType === 'application/pdf' ? (
+                <iframe src={modalEtiqueta.url} title="Etiqueta PDF" className="w-full h-[500px] border" />
+              ) : (
+                <img src={modalEtiqueta.url} alt="Etiqueta de envío" className="max-w-full max-h-[500px] border" />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
