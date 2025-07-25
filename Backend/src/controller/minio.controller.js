@@ -30,7 +30,13 @@ export async function postImagen(fileBuffer, nombreProducto) {
             isBuffer: Buffer.isBuffer(fileBuffer)
         });
 
-       const nombreLimpio = nombreProducto.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+          const nombreLimpio = nombreProducto
+              .trim()
+              .toLowerCase()
+              .normalize("NFD")                      
+              .replace(/[\u0300-\u036f]/g, "")      
+              .replace(/\s+/g, '_')                 
+              .replace(/[^a-z0-9_]/g, '')           
        const fileName = `${nombreLimpio}.webp`;
        console.log("📸 Nombre de archivo generado:", fileName);
 

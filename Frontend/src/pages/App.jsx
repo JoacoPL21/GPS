@@ -15,7 +15,7 @@ import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
 import Sidebar from '../components/Sidebar'; 
-import ContactSection from './Contact/contact_us';   
+import ContactSection from './Contact/contact_us.jsx';   
 import SuccessPage from './Carrito/success.jsx';
 import FailurePage from './Carrito/failure.jsx';
 import MultiStepCart from './Carrito/multi-step-cart.jsx';

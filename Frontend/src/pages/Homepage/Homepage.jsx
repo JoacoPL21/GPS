@@ -1,4 +1,4 @@
-import ContactSection from '../Contact/contact_us';
+import ContactSection from '../Contact/contact_us.jsx';
 import ProductFeatures from '../../components/ProductFeatures';
 import ImageCarousel from '../../components/ImageCarousel';
 import FeaturedProducts from '../../components/FeaturedProducts';
