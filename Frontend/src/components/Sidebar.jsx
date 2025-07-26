@@ -1,7 +1,7 @@
 import '../styles/Sidebar.css';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { FaBoxOpen, FaTags, FaShoppingCart, FaHeart, FaUser, FaCreditCard, FaChartBar, FaUsers, FaTruck, FaStore, FaCog, FaSignOutAlt, FaBars, FaShoppingBag } from 'react-icons/fa';
+import { FaBoxOpen, FaTags, FaShoppingCart, FaHeart, FaUser, FaCreditCard, FaChartBar, FaUsers, FaTruck, FaStore, FaCog, FaSignOutAlt, FaBars, FaShoppingBag, FaStar } from 'react-icons/fa';
 import { useState } from 'react';
 
 const customerMenu = [
@@ -19,6 +19,7 @@ const adminMenu = [
     title: 'Gestión',
     items: [
       { title: 'Gestión de Productos', url: '/productos', icon: <FaBoxOpen /> },
+      { title: 'Productos Destacados', url: '/gestion-destacados', icon: <FaStar /> },
       { title: 'Gestión de Envíos', url: '/dashboard/admin-compras', icon: <FaTruck /> },
     ],
   },

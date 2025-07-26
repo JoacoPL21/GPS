@@ -54,7 +54,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "gestiondestac",
+        path: "gestion-destacados",
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
             <GestionDestacados />
