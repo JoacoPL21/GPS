@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4 text-amber-100">Maderas Lemaco</h3>
+            <h3 className="text-xl font-bold mb-4 text-amber-100">Maderas Los Alamos</h3>
             <p className="text-amber-300 mb-4">
               Especialistas en muebles de madera artesanales. 
               <br />
@@ -96,7 +96,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-amber-800 mt-8 pt-8 text-center text-amber-300">
-          <p>&copy; {new Date().getFullYear()} Maderas Lemaco . Todos los derechos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Maderas Los Alamos. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

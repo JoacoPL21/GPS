@@ -83,13 +83,13 @@ const Valoraciones = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold mb-2">Mis Valoraciones</h2>
         <p className="text-gray-500">Gestiona las valoraciones de tus productos comprados</p>
       </div>
 
       {/* Estadísticas rápidas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-sm border-gray-400 p-6 flex items-center gap-3">
           <FaClock className="w-8 h-8 text-orange-500" />
           <div>
@@ -107,7 +107,7 @@ const Valoraciones = () => {
       </div>
 
       {/* Tabs visuales con animación */}
-      <div className="w-full bg-white mb-6 relative">
+      <div className="w-full bg-white mb-6 relative max-w-4xl mx-auto">
         <div className="grid grid-cols-2 border-gray-400 rounded-lg overflow-hidden relative">
           {/* Highlight animado sólido */}
           <div
@@ -138,9 +138,9 @@ const Valoraciones = () => {
       ) : error ? (
         <div className="text-center text-red-500 py-8">{error}</div>
       ) : activeTab === 'pending' ? (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-4xl mx-auto">
           {pendientes.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border-gray-400 p-6 text-center">
+            <div className="bg-white rounded-lg shadow-sm border-gray-400 p-6 text-center max-w-4xl mx-auto">
               <FaCheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
               <p className="text-lg font-medium mb-2">¡Excelente!</p>
               <p className="text-gray-500">No tienes productos pendientes de valorar.</p>
@@ -193,9 +193,9 @@ const Valoraciones = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-4xl mx-auto">
           {realizados.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="bg-white rounded-lg shadow-sm border p-6 text-center max-w-4xl mx-auto">
               <FaStar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-lg font-medium mb-2">Sin valoraciones</p>
               <p className="text-gray-500">Aún no has valorado ningún producto.</p>

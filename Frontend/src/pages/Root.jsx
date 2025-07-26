@@ -21,7 +21,7 @@ function Root() {
       <main className="main_content p-4 flex-1">
         <Outlet />
       </main>
-      <Footer /> {/* Usa el componente Footer aquí */}
+      <Footer /> 
     </div>
   );
 }

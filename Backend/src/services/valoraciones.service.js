@@ -16,7 +16,6 @@ export async function getValoracionesPorProducto(id_producto) {
     }
 }
 
-// Función para verificar si el producto existe
 export async function verificarProductoExiste(id_producto) {
     try {
         const productosRepository = AppDataSource.getRepository(Productos);
@@ -30,18 +29,15 @@ export async function verificarProductoExiste(id_producto) {
     }
 }
 
-// Función para crear una nueva valoración
 export async function createValoracion(valoracionData) {
     try {
         const valoracionesRepository = AppDataSource.getRepository(Valoraciones);
         
-        // Verificar si el producto existe
         const productoExiste = await verificarProductoExiste(valoracionData.id_producto);
         if (!productoExiste) {
             return [null, "El producto especificado no existe"];
         }
         
-        // Verificar si ya existe una valoración del mismo usuario para el mismo producto
         const valoracionExistente = await valoracionesRepository.findOne({
             where: {
                 id_usuario: valoracionData.id_usuario,

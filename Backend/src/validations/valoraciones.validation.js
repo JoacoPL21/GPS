@@ -24,7 +24,7 @@ export const valoracionCreateValidation = Joi.object({
   })
 });
 
-// Validación para actualizar valoraciones (incluye ID de valoración)
+// Validación para actualizar valoraciones 
 export const valoracionUpdateValidation = Joi.object({
   id_valoracion: Joi.number().integer().positive().required().messages({
     "number.base": "El ID de la valoración debe ser un número",

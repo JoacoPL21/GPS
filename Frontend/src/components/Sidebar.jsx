@@ -71,26 +71,24 @@ export default function Sidebar({ isOpen, toggle }) {
           )}
         </div>
         {isAdmin && (
-          <div className="px-6 py-4 mt-auto">
-            <div className="relative flex w-full bg-gray-100 rounded-lg h-10 p-1 transition-colors items-center">
-              <span
-                className="absolute top-0 left-0 h-full w-1/2 rounded-md bg-[#a47148] transition-all duration-300 z-0"
+          <div className="pb-0 mt-auto">
+            <div className="relative flex w-full bg-gray-100 rounded-t-lg transition-colors items-center">
+              <div
+                className="absolute top-0 left-0 h-full w-1/2 transition-transform duration-300 ease-in-out z-0 bg-[#A47048]"
                 style={{
                   transform: role === 'admin' ? 'translateX(100%)' : 'translateX(0%)',
-                  transition: 'transform 0.3s cubic-bezier(.4,1.5,.5,1)',
+                  transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
                 }}
               />
               <button
                 onClick={() => setRole('customer')}
-                className={`relative z-10 flex-1 h-full rounded-md text-sm transition-colors ${role === 'customer' ? 'text-white' : 'text-gray-700'}`}
-                style={{ background: 'transparent' }}
+                className={`relative z-10 flex items-center justify-center py-2 px-4 text-sm font-medium transition w-full ${role === 'customer' ? 'text-white' : 'text-[#A47048]'}`}
               >
                 Cliente
               </button>
               <button
                 onClick={() => setRole('admin')}
-                className={`relative z-10 flex-1 h-full rounded-md text-sm transition-colors ${role === 'admin' ? 'text-white' : 'text-gray-700'}`}
-                style={{ background: 'transparent' }}
+                className={`relative z-10 flex items-center justify-center py-2 px-4 text-sm font-medium transition w-full ${role === 'admin' ? 'text-white' : 'text-[#A47048]'}`}
               >
                 Admin
               </button>

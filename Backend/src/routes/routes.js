@@ -3,6 +3,7 @@ import authRoutes from "./auth.routes.js";
 import userRoutes, { userRouter } from "./user.routes.js";
 import productosRoutes from "./productos.routes.js";
 import valoracionesRoutes from "./valoraciones.routes.js";
+import enviosRoutes from "./envios.routes.js";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router
     .use('/users', userRoutes) // Rutas de admin (adminRouter)
     .use('/productos', productosRoutes)
     .use('/valoraciones', valoracionesRoutes)
+    .use('/envios', enviosRoutes)
 
 export default router;

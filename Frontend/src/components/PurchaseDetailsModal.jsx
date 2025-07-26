@@ -1,73 +1,26 @@
 import React from 'react';
-import { FaTimes, FaCalendar, FaMapMarkerAlt, FaCreditCard, FaTruck, FaBox } from 'react-icons/fa';
+import { FaTimes, FaCalendar, FaMapMarkerAlt, FaCreditCard, FaTruck, FaBox, FaInfoCircle } from 'react-icons/fa';
+import { formatearFecha, formatearPrecio, getEstadoPagoColor, getEstadoPagoTexto, getMetodoPagoTexto, getEstadoEnvioInfo } from '../utils/formatters';
 
-const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
-  const formatearFecha = (fecha) => {
-    return new Date(fecha).toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+const PurchaseDetailsModal = ({ compra, isOpen, onClose, envio }) => {
+  const idCompra = compra?.id_compra || compra?.id;
+  const paymentStatus = compra?.payment_status || compra?.estado;
+  const estadoEnvio = getEstadoEnvioInfo(envio);
 
-  const getEstado = (estado) => {
-    switch (estado) {
-      case 'pending':
-        return 'Pendiente';
-      case 'approved':
-        return 'Aprobado';
+  const getIconComponent = (iconName) => {
+    switch (iconName) {
+      case 'FaInfoCircle':
+        return FaInfoCircle;
+      case 'FaTruck':
+        return FaTruck;
+      case 'FaBox':
+        return FaBox;
       default:
-        return 'Pendiente';
+        return FaInfoCircle;
     }
   };
 
-  const formatearPrecio = (precio) => {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP'
-    }).format(precio);
-  };
-
-  const getEstadoColor = (estado) => {
-    switch (estado) {
-      case 'Aprobado':
-        return 'bg-green-100 text-green-800';
-      case 'pendiente':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'rechazado':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getEstadoEnvioColor = (estado) => {
-    switch (estado) {
-      case 'en_elaboracion':
-        return 'bg-blue-100 text-blue-800';
-      case 'en_transito':
-        return 'bg-orange-100 text-orange-800';
-      case 'entregado':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getEstadoEnvioText = (estado) => {
-    switch (estado) {
-      case 'en_elaboracion':
-        return 'En elaboración';
-      case 'en_transito':
-        return 'En tránsito';
-      case 'entregado':
-        return 'Entregado';
-      default:
-        return 'Pendiente';
-    }
-  };
+  const EstadoIcon = getIconComponent(estadoEnvio.icono);
 
   if (!isOpen || !compra) return null;
 
@@ -77,18 +30,15 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Detalles de Compra #{compra.id}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Detalles de Compra #{idCompra}</h2>
             <div className="flex items-center mt-2 space-x-4">
               <div className="flex items-center text-sm text-gray-500">
                 <FaCalendar className="w-4 h-4 mr-2" />
-                {formatearFecha(compra.fecha)}
+                {formatearFecha(compra.createdAt || compra.fecha)}
               </div>
-              {compra.estado === 'approved' && compra.estado_envio && (
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getEstadoEnvioColor(compra.estado_envio)}`}>
-                  <FaTruck className="w-4 h-4 mr-1" />
-                  {getEstadoEnvioText(compra.estado_envio)}
-                </span>
-              )}
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getEstadoPagoColor(paymentStatus)}`}>
+                {getEstadoPagoTexto(paymentStatus)}
+              </span>
             </div>
           </div>
           <button
@@ -101,80 +51,117 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Información de la compra */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Información del Pedido</h3>
-              <div className="space-y-3">
+          {/* Información detallada de la compra */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Información de la compra</h4>
+              <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Número de factura:</span>
-                  <span className="font-medium">{compra.facturacion}</span>
+                  <span className="text-gray-600">ID de compra:</span>
+                  <span className="font-medium">#{idCompra}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Estado del pago:</span>
-                  <span className={`inline-flex items-center px-2 py-1 rounded text-sm font-medium ${getEstadoColor(compra.estado)}`}>
-                    {compra.estado}
+                  <span className={`px-2 py-1 rounded text-xs ${getEstadoPagoColor(paymentStatus)}`}>
+                    {getEstadoPagoTexto(paymentStatus)}
                   </span>
                 </div>
-                {compra.estado === 'Aprobado' && compra.estado_envio && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Estado del envío:</span>
-                    <span className={`inline-flex items-center px-2 py-1 rounded text-sm font-medium ${getEstadoEnvioColor(compra.estado_envio)}`}>
-                      <FaTruck className="w-3 h-3 mr-1" />
-                      {getEstadoEnvioText(compra.estado_envio)}
-                    </span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Método de pago:</span>
+                  <span className="font-medium">{getMetodoPagoTexto(compra.payment_method || compra.metodo_pago)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total pagado:</span>
+                  <span className="font-medium text-lg">{formatearPrecio(compra.payment_amount || compra.total)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Fecha de compra:</span>
+                  <span className="font-medium">{formatearFecha(compra.createdAt || compra.fecha)}</span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Resumen de Pago</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal:</span>
-                  <span className="font-medium">{formatearPrecio(compra.total)}</span>
+            {/* Información de envío */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Información de envío</h4>
+              {paymentStatus === 'approved' ? (
+                <div className="space-y-3 text-sm">
+                  {envio ? (
+                    <>
+                      <div className="flex items-center gap-2 mb-3">
+                        <EstadoIcon className={`w-5 h-5 ${estadoEnvio.color}`} />
+                        <span className={`font-medium ${estadoEnvio.color}`}>{estadoEnvio.texto}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Estado:</span>
+                        <span className="font-medium">{envio.current_status || 'En proceso'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Ubicación actual:</span>
+                        <span className="font-medium">{envio.current_location || 'No disponible'}</span>
+                      </div>
+                      {envio.transport_order_number && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Orden de transporte:</span>
+                          <span className="font-mono text-sm bg-gray-200 px-2 py-1 rounded">{envio.transport_order_number}</span>
+                        </div>
+                      )}
+                      {envio.last_tracking_update && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Última actualización:</span>
+                          <span className="font-medium">{formatearFecha(envio.last_tracking_update)}</span>
+                        </div>
+                      )}
+                      {envio.delivered_date && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Fecha de entrega:</span>
+                          <span className="font-medium text-green-600">{formatearFecha(envio.delivered_date)}</span>
+                        </div>
+                      )}
+                      {envio.delivered_to && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Entregado a:</span>
+                          <span className="font-medium">{envio.delivered_to}</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-gray-600">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FaInfoCircle className="w-4 h-4" />
+                        <span>Envío aún no procesado</span>
+                      </div>
+                      <p className="text-sm">Tu pago ha sido confirmado. El envío será procesado pronto.</p>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Envío:</span>
-                  <span className="font-medium">Gratis</span>
+              ) : (
+                <div className="text-gray-600">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FaInfoCircle className="w-4 h-4" />
+                    <span>Esperando confirmación de pago</span>
+                  </div>
+                  <p className="text-sm">Una vez confirmado el pago, procesaremos tu envío.</p>
                 </div>
-                <div className="flex justify-between border-t pt-3">
-                  <span className="text-lg font-semibold">Total:</span>
-                  <span className="text-lg font-bold text-gray-900">{formatearPrecio(compra.total)}</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* Productos */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Productos ({compra.productos?.length || 0})</h3>
-            <div className="space-y-4">
-              {compra.productos?.map((producto) => (
-                <div key={producto.id_producto} className="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg">
-                  <div className="flex-shrink-0">
-                    <img
-                      src={producto.imagen || '/images/imagenotfound.png'}
-                      alt={producto.nombre_producto}
-                      className="w-20 h-20 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.target.src = '/images/imagenotfound.png';
-                      }}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 mb-1">{producto.nombre_producto}</h4>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <div className="space-y-1">
-                        <div>Cantidad: {producto.cantidad}</div>
-                        <div>Precio unitario: {formatearPrecio(producto.precio_unitario)}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-medium text-gray-900">
-                          {formatearPrecio(producto.precio_unitario * producto.cantidad)}
-                        </div>
-                      </div>
+          {/* Lista detallada de productos */}
+          <div className="mt-6">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Productos en esta compra</h4>
+            <div className="space-y-3">
+              {(compra.productos || []).map((producto, index) => (
+                <div key={producto.id_producto || index} className="flex items-center gap-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <img
+                    src={producto.imagen || producto.imagen_producto || '/images/imagenotfound.png'}
+                    alt={producto.nombre || producto.nombre_producto}
+                    className="w-16 h-16 object-cover rounded-lg border border-gray-300"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">{producto.nombre || producto.nombre_producto}</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Cantidad: {producto.cantidad} × {formatearPrecio(producto.precio || producto.precio_unitario)} = {formatearPrecio((producto.precio || producto.precio_unitario) * producto.cantidad)}
                     </div>
                   </div>
                 </div>
@@ -190,10 +177,15 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
                 Dirección de Envío
               </h3>
               <div className="text-sm text-gray-600">
-                <p className="font-medium">Juan Pérez</p>
-                <p>Calle Mayor 123, 2º A</p>
-                <p>Madrid, Madrid 28001</p>
-                <p>España</p>
+                <p className="font-medium">
+                  {compra.nombre && compra.apellido ? `${compra.nombre} ${compra.apellido}` : 
+                   compra.cliente || 'Cliente'}
+                </p>
+                {compra.direccion && <p>{compra.direccion}</p>}
+                {(compra.ciudad || compra.region) && (
+                  <p>{[compra.ciudad, compra.region].filter(Boolean).join(', ')}</p>
+                )}
+                {compra.codigo_postal && <p>Código Postal: {compra.codigo_postal}</p>}
               </div>
             </div>
 
@@ -203,7 +195,7 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose }) => {
                 Método de Pago
               </h3>
               <div className="text-sm text-gray-600">
-                <span className="font-medium">{compra.metodo_pago}</span>
+                <span className="font-medium">{getMetodoPagoTexto(compra.payment_method || compra.metodo_pago)}</span>
               </div>
             </div>
           </div>
