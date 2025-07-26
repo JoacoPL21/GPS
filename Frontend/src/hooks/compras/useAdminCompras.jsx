@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getAllComprasAdmin } from '../../services/compras.service';
 import { getEnvioPorCompra, procesarEnvio, reimprimirEtiqueta } from '../../services/envios.service';
 import axios from '../../services/root.service.js';
+import { toast } from '../../services/toast.service';
 
 export const useAdminCompras = () => {
   const [orders, setOrders] = useState([]);
@@ -57,13 +58,13 @@ export const useAdminCompras = () => {
       const destinationCoverage = "STGO";
       const { error } = await procesarEnvio(order.id_compra, serviceCode, destinationCoverage);
       if (error) {
-        alert(error?.response?.data?.message || error);
+        toast.error('Error en la operación', error?.response?.data?.message || error);
       } else {
-        alert('Orden de transporte creada exitosamente');
         await cargarEnvioCompra(order.id_compra, true);
+        toast.success('Envío procesado', 'Orden de transporte creada exitosamente');
       }
     } catch (error) {
-      alert(error?.response?.data?.message || 'Error interno al procesar el envío');
+      toast.error('Error en la operación', error?.response?.data?.message || 'Error interno al procesar el envío');
     } finally {
       setProcessingShipment(null);
     }
@@ -73,7 +74,7 @@ export const useAdminCompras = () => {
     try {
       const response = await reimprimirEtiqueta(transportOrderNumber);
       if (response.error) {
-        alert(`Error al obtener etiqueta: ${response.error}`);
+        toast.error('Error en la operación', `Error al obtener etiqueta: ${response.error}`);
       } else {
         const etiquetaData = response.data?.data || response.data;
         if (etiquetaData?.labelData) {
@@ -90,11 +91,11 @@ export const useAdminCompras = () => {
           const url = window.URL.createObjectURL(blob);
           setModalEtiqueta({ open: true, url, mimeType, etiquetaData });
         } else {
-          alert('No se encontraron datos de etiqueta en la respuesta');
+          toast.error('Error en la operación', 'No se encontraron datos de etiqueta en la respuesta');
         }
       }
     } catch {
-      alert('Error interno al obtener la etiqueta');
+      toast.error('Error en la operación', 'Error interno al obtener la etiqueta');
     }
   };
 
@@ -102,7 +103,7 @@ export const useAdminCompras = () => {
     try {
       const response = await reimprimirEtiqueta(transportOrderNumber);
       if (response.error) {
-        alert(`Error al reimprimir etiqueta: ${response.error}`);
+        toast.error('Error en la operación', `Error al reimprimir etiqueta: ${response.error}`);
       } else {
         const etiquetaData = response.data?.data || response.data;
         if (etiquetaData?.labelData) {
@@ -125,23 +126,23 @@ export const useAdminCompras = () => {
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
-          alert('Etiqueta descargada exitosamente');
+          toast.success('Acción completada', 'Etiqueta descargada exitosamente');
         } else {
-          alert('Etiqueta reimpresa exitosamente, pero no se pudo generar el archivo de descarga');
+          toast.warning('Advertencia', 'Etiqueta reimpresa exitosamente, pero no se pudo generar el archivo de descarga');
         }
       }
     } catch {
-      alert('Error interno al reimprimir la etiqueta');
+      toast.error('Error en la operación', 'Error interno al reimprimir la etiqueta');
     }
   };
 
   const handleMarcarEnTransito = async (order) => {
     try {
       await axios.patch(`/envios/compras/${order.id_compra}/estado-envio`, { estado_envio: 'en_transito' });
-      alert('Compra marcada como entregada al courier (en tránsito)');
+      toast.success('Acción completada', 'Compra marcada como entregada al courier (en tránsito)');
       setOrders((prev) => prev.map(o => o.id_compra === order.id_compra ? { ...o, estado: 'en_transito' } : o));
     } catch (error) {
-      alert(error?.response?.data?.message || 'Error al actualizar el estado de envío');
+      toast.error('Error en la operación', error?.response?.data?.message || 'Error al actualizar el estado de envío');
     }
   };
 
