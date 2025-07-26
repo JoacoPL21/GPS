@@ -2,6 +2,8 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { useCategorias } from "../hooks/productos/useCategorias";
 import { Fragment, useEffect, useState } from "react"
+import { usePaginacion } from '../hooks/productos/usePaginacion'
+import PaginacionControles from './PaginacionControles'
 
 const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEditing, submitting, uploadProgress = 0 }) => {
 
@@ -86,7 +88,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v2M7 7h10"
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
           />
         </svg>
       ),
@@ -171,6 +173,21 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
     return labels[field] || field
   }
 
+  const {
+    currentPage,
+    itemsPerPage,
+    paginatedItems,
+    totalItems,
+    handlePageChange,
+    handleItemsPerPageChange,
+    resetPagination
+  } = usePaginacion(productos, 12) // productos viene de tu hook actual
+
+  // Resetear paginación cuando cambian los productos
+  useEffect(() => {
+    resetPagination()
+  }, [productos.length])
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -199,7 +216,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
             >
               <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all">
                 {/* Header del Modal */}
-                <div className="bg-orange-400 px-8 py-6 text-white">
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 px-8 py-6 text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="bg-white/20 p-2 rounded-full">
@@ -412,10 +429,10 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             name="id_categoria"
                             value={form.id_categoria}
                             onChange={onChange}
-                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all appearance-none bg-white ${
+                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all appearance-none bg-white ${
                               errors.categoria
                                 ? "border-red-300 bg-red-50"
-                                : "border-gray-200 hover:border-gray-300 focus:border-orange-400"
+                                : "border-gray-200 hover:border-gray-300 focus:border-orange-500"
                             }`}
                           >
                             <option value="">Selecciona una categoría</option>
@@ -733,7 +750,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
-                            className="bg-orange-400 h-2 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${uploadProgress}%` }}
                           ></div>
                         </div>
@@ -745,7 +762,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-1 flex items-center justify-center space-x-2 bg-orange-400 hover:bg-orange-500 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
+                        className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
                       >
                         {submitting ? (
                           <>
@@ -796,7 +813,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                         type="button"
                         onClick={onClose}
                         disabled={submitting}
-                        className="flex-1 flex items-center justify-center space-x-2 bg-gray-400 hover:bg-gray-500 disabled:bg-gray-300 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+                        className="flex-1 flex items-center justify-center space-x-2 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 text-gray-700 disabled:text-gray-400 font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -812,6 +829,48 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
         </div>
       </Dialog>
     </Transition>
+  )
+}
+
+const ProductosAdmin = () => {
+  const {
+    currentPage,
+    itemsPerPage,
+    paginatedItems,
+    totalItems,
+    handlePageChange,
+    handleItemsPerPageChange,
+    resetPagination
+  } = usePaginacion(productos, 12) // productos viene de tu hook actual
+
+  // Resetear paginación cuando cambian los productos
+  useEffect(() => {
+    resetPagination()
+  }, [productos.length])
+
+  return (
+    <div className="space-y-6">
+      {/* ...existing header and controls... */}
+      
+      {/* Lista de productos paginados */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {paginatedItems.map((producto) => (
+          // Tu componente de producto existente
+          <ProductoCard key={producto.id} producto={producto} />
+        ))}
+      </div>
+
+      {/* Controles de paginación */}
+      <PaginacionControles
+        currentPage={currentPage}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+      />
+
+      {/* ...existing modals and other components... */}
+    </div>
   )
 }
 
