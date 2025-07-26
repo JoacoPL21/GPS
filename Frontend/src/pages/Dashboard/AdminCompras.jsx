@@ -183,7 +183,7 @@ export default function AdminCompras() {
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               >
-                <option value="todas">Todos los estados</option>
+                <option value="todas">Todas las compras</option>
                 <option value="en_transito">Enviadas</option>
                 <option value="entregado">Entregadas</option>
                 <option value="en_preparacion">Pendientes</option>

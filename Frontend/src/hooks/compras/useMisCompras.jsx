@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getComprasUsuario } from '../../services/valoraciones.service';
-import { getEnvioPorCompra, getTracking } from '../../services/envios.service';
+import { getEnvioPorCompra } from '../../services/envios.service';
 
 export const useMisCompras = () => {
   const { authUser } = useAuth();
@@ -10,7 +10,6 @@ export const useMisCompras = () => {
   const [error, setError] = useState(null);
   const [enviosData, setEnviosData] = useState({});
   const [compraExpandida, setCompraExpandida] = useState(null);
-  const [loadingTracking, setLoadingTracking] = useState({});
 
   const cargarCompras = async () => {
     if (!authUser) return;
@@ -53,28 +52,7 @@ export const useMisCompras = () => {
     }
   };
 
-  const actualizarTracking = async (id_compra) => {
-    setLoadingTracking(prev => ({ ...prev, [id_compra]: true }));
 
-    try {
-      const { data, error } = await getTracking(id_compra);
-      if (!error && data?.data) {
-        setEnviosData(prev => ({
-          ...prev,
-          [id_compra]: data.data
-        }));
-        alert('Estado de envío actualizado');
-      } else {
-        // Si hay error, mostrar mensaje pero no es crítico
-        alert(`No se pudo actualizar desde Chilexpress, pero aquí tienes la información actual del envío. ${error || ''}`);
-      }
-    } catch (error) {
-      console.error('Error al actualizar tracking:', error);
-      alert('Error al actualizar el estado del envío. La información mostrada es la última disponible.');
-    } finally {
-      setLoadingTracking(prev => ({ ...prev, [id_compra]: false }));
-    }
-  };
 
   useEffect(() => {
     cargarCompras();
@@ -96,9 +74,7 @@ export const useMisCompras = () => {
     error,
     enviosData,
     compraExpandida,
-    loadingTracking,
     setCompraExpandida,
-    actualizarTracking,
     cargarCompras,
   };
 }; 

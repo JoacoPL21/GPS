@@ -36,11 +36,24 @@ export async function getComprasUsuario(id_usuario) {
 
                 return {
                     id: compra.id_compra,
+                    id_compra: compra.id_compra,
                     fecha: compra.createdAt,
+                    createdAt: compra.createdAt,
                     total: compra.payment_amount,
+                    payment_amount: compra.payment_amount,
                     estado: compra.payment_status,
+                    payment_status: compra.payment_status,
                     estado_envio: compra.estado_envio,
                     metodo_pago: compra.payment_type,
+                    payment_method: compra.payment_type,
+                    nombre: compra.nombre,
+                    apellido: compra.apellido,
+                    email: compra.email,
+                    telefono: compra.telefono,
+                    direccion: compra.direccion,
+                    region: compra.region,
+                    ciudad: compra.ciudad,
+                    codigo_postal: compra.codigo_postal,
                     productos
                 };
             })
@@ -177,11 +190,17 @@ export async function getAllCompras() {
                 email: usuario?.email || '',
                 telefono: usuario?.telefono || 'No registra',
                 direccion: compra.direccion,
+                region: compra.region,
+                ciudad: compra.ciudad,
+                codigo_postal: compra.codigo_postal,
+                nombre: compra.nombre,
+                apellido: compra.apellido,
                 fecha: compra.createdAt,
                 total: compra.payment_amount,
                 estado: compra.estado_envio,
                 estado_pago: compra.payment_status,
                 metodo_pago: compra.payment_type,
+                payment_method: compra.payment_type,
                 tracking: compra.tracking || '', 
                 id_pago: compra.payment_id || 'Pendiente',
                 productos
