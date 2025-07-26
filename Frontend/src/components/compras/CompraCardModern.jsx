@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaCalendar, FaDollarSign, FaBox, FaTruck, FaCheckCircle, FaEye, FaCreditCard, FaDownload } from 'react-icons/fa';
 import { formatearFecha, formatearPrecio } from '../../utils/formatters';
+import { generarFacturaPDF, generarFacturaTexto } from '../../services/factura.service';
 
 const CompraCardModern = ({ 
   compra, 
@@ -59,6 +60,19 @@ const CompraCardModern = ({
     }
   }
 
+  const handleGenerarFactura = async (tipo = 'pdf') => {
+    try {
+      if (tipo === 'pdf') {
+        await generarFacturaPDF(compra);
+      } else {
+        await generarFacturaTexto(compra);
+      }
+    } catch (error) {
+      console.error('Error al generar factura:', error);
+      alert('Error al generar la factura. Inténtalo de nuevo.');
+    }
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 max-w-3xl mx-auto">
       {/* Header de la compra */}
@@ -81,7 +95,10 @@ const CompraCardModern = ({
                 Ver detalles
               </button>
             )}
-            <button className="flex items-center px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+            <button 
+              onClick={() => handleGenerarFactura('pdf')}
+              className="flex items-center px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
               <FaDownload className="h-4 w-4 mr-2" />
               Factura
             </button>
