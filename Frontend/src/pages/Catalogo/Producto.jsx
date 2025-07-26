@@ -6,6 +6,7 @@ import ValoracionesProducto from '../../components/ProductoClientes/Valoraciones
 import CardInfoProducto from "../../components/ProductoClientes/CardInfoProductos.jsx"
 import PageHeader from "../../components/PageHeader"
 import { FaShoppingCart } from "react-icons/fa";
+import ErrorProductos from "../../components/ProductoClientes/ErrorProductos.jsx";
 
 
 
@@ -53,18 +54,8 @@ const Producto = () => {
 
 if (!producto) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f5eee7] to-[#f0e6dd] flex items-center justify-center">
-      <div className="text-center bg-white p-8 rounded-2xl shadow-lg max-w-md">
-        <div className="text-[#a47148] text-6xl mb-4">🔍</div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Producto no encontrado</h2>
-        <p className="text-gray-600 mb-6">El producto que buscas no existe o ha sido eliminado.</p>
-        <button
-          onClick={() => window.history.back()}
-          className="bg-[#a47148] text-white px-6 py-2 rounded-full hover:bg-[#8c5d3d] transition-all"
-        >
-          Volver al catálogo
-        </button>
-      </div>
+    <div>
+      <ErrorProductos message="Producto no encontrado" onRetry={() => window.location.reload()} />
     </div>
   )
 }

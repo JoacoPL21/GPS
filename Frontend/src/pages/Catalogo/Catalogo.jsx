@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useCart } from "../../context/CartContext.jsx"
 import { useProductos } from "../../hooks/productos/useProductos"
 import CardCatalogo from "../../components/ProductoClientes/CardCatalogo.jsx"
@@ -11,7 +11,6 @@ const CatalogoConnected = () => {
   const { productos, loading, error } = useProductos()
   const { addItemToCart } = useCart()
 
-  // Estados para filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("nombre")
   const [sortOrder, setSortOrder] = useState("asc")
@@ -19,41 +18,49 @@ const CatalogoConnected = () => {
   const [viewMode, setViewMode] = useState("grid")
   const [showFilters, setShowFilters] = useState(false)
   const [addedToCart, setAddedToCart] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
 
-  // Filtrar y ordenar productos
-  const filteredAndSortedProducts = useMemo(() => {
-    if (!productos) return []
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, priceRange, sortBy, sortOrder])
 
-    const filtered = productos.filter((producto) => {
-      const matchesSearch =
-        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (producto.descripcion && producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
-      const matchesPrice = producto.precio >= priceRange.min && producto.precio <= priceRange.max
+const filteredAndSortedProducts = useMemo(() => {
+  if (!productos) return []
+
+  const filtered = productos.filter((producto) => {
+    const matchesSearch =
+      producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (producto.descripcion && producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
+    const matchesPrice = producto.precio >= priceRange.min && producto.precio <= priceRange.max
       return matchesSearch && matchesPrice
-    })
+  })
 
-    // Ordenar
-    filtered.sort((a, b) => {
-      let aValue = a[sortBy]
-      let bValue = b[sortBy]
+  // Ordenar
+  filtered.sort((a, b) => {
+    let aValue = a[sortBy]
+    let bValue = b[sortBy]
+    if (sortBy === "precio") {
+      aValue = Number.parseFloat(aValue)
+      bValue = Number.parseFloat(bValue)
+    }
 
-      if (sortBy === "precio") {
-        aValue = Number.parseFloat(aValue)
-        bValue = Number.parseFloat(bValue)
-      }
+    if (sortOrder === "asc") {
+      return aValue > bValue ? 1 : -1
+    } else {
+      return aValue < bValue ? 1 : -1
+    }
+  })
 
-      if (sortOrder === "asc") {
-        return aValue > bValue ? 1 : -1
-      } else {
-        return aValue < bValue ? 1 : -1
-      }
-    })
+  return filtered
+}, [productos, searchTerm, sortBy, sortOrder, priceRange])
 
-    return filtered
-  }, [productos, searchTerm, sortBy, sortOrder, priceRange])
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage
+    return filteredAndSortedProducts.slice(start, start + itemsPerPage)
+  }, [filteredAndSortedProducts, currentPage])
 
   const handleAddToCart = (producto) => {
-    // CORRECCIÓN: Normalizar la estructura del producto antes de agregarlo
     const itemToAdd = {
       id_producto: producto.id_producto,
       nombre: producto.nombre,
@@ -62,20 +69,13 @@ const CatalogoConnected = () => {
       categoria: producto.categoria,
       stock: producto.stock,
     }
-
     addItemToCart(itemToAdd)
     setAddedToCart(producto.id_producto)
-    console.log(`Producto ${producto.nombre} agregado al carrito`)
-
-    // Remover el feedback después de 2 segundos
-    setTimeout(() => {
-      setAddedToCart(null)
-    }, 2000)
+    setTimeout(() => setAddedToCart(null), 2000)
   }
 
-  // Componente de Loading Skeleton
   const ProductSkeleton = () => (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse max-w-[300px] w-full mx-auto">
       <div className="h-64 bg-gray-200"></div>
       <div className="p-6">
         <div className="h-4 bg-gray-200 rounded mb-2"></div>
@@ -85,13 +85,8 @@ const CatalogoConnected = () => {
     </div>
   )
 
-  // Mostrar error
   if (error) {
-    return (
-      <div>
-        <ErrorProductos message={error} onRetry={() => window.location.reload()} />
-      </div>
-    )
+    return <ErrorProductos message={error} onRetry={() => window.location.reload()} />
   }
 
   return (
@@ -105,7 +100,7 @@ const CatalogoConnected = () => {
         title="Nuestro Catálogo"
       />
 
-      <div>
+    <div>
         {/* Barra de herramientas */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -173,40 +168,6 @@ const CatalogoConnected = () => {
                 <option value="precio-asc">Precio: Menor a Mayor</option>
                 <option value="precio-desc">Precio: Mayor a Menor</option>
               </select>
-
-              {/* Vista */}
-              <div className="flex bg-gray-100 rounded-xl p-1">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === "list" ? "bg-white shadow-sm" : "hover:bg-gray-200"
-                  }`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                    />
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -256,37 +217,28 @@ const CatalogoConnected = () => {
           )}
         </div>
 
-        {/* Productos */}
-        <div className="mb-8">
-          {loading ? (
-            <div
-              className={`grid gap-6 ${
-                viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"
-              }`}
-            >
-              {[...Array(8)].map((_, index) => (
-                <ProductSkeleton key={index} />
-              ))}
-            </div>
-          ) : filteredAndSortedProducts.length > 0 ? (
-            <div
-              className={`grid gap-6 ${
-                viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"
-              }`}
-            >
-              {filteredAndSortedProducts.map((producto) => (
-                <div key={producto.id_producto} className="relative">
-                  <CardCatalogo producto={producto} onAddToCart={handleAddToCart} viewMode={viewMode} />
-                  {/* Feedback visual al agregar al carrito */}
-                  {addedToCart === producto.id_producto && (
-                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium animate-bounce">
-                      ¡Agregado!
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
+      {/* Productos */}
+      <div className="mb-8">
+        {loading ? (
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[...Array(12)].map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))}
+          </div>
+        ) : paginatedProducts.length > 0 ? (
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {paginatedProducts.map((producto) => (
+              <div key={producto.id_producto} className="relative max-w-[300px] w-full mx-auto">
+                <CardCatalogo producto={producto} onAddToCart={handleAddToCart} viewMode={viewMode} />
+                {addedToCart === producto.id_producto && (
+                  <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium animate-bounce">
+                    ¡Agregado!
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
             <div className="text-center py-16">
               <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
                 <svg
@@ -315,35 +267,32 @@ const CatalogoConnected = () => {
                   >
                     Limpiar búsqueda
                   </button>
-                )}
-              </div>
+        )}
+      </div>
             </div>
           )}
         </div>
 
-        {/* Estadísticas del catálogo */}
-        {!loading && productos && productos.length > 0 && (
-      <div className="bg-white rounded-2xl shadow-lg p-4 mb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center place-items-center">
-         <div>
-            <div className="text-2xl font-bold text-[#a47148]">{productos.length}</div>
-            <div className="text-sm text-gray-600">Total productos</div>
-         </div>
-            <div>
-              <div className="text-2xl font-bold text-[#a47148]">
-                ${Math.min(...productos.map((p) => p.precio)).toLocaleString()}
-              </div>
-              <div className="text-sm text-gray-600">Precio mínimo</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-[#a47148]">
-                ${Math.max(...productos.map((p) => p.precio)).toLocaleString()}
-              </div>
-              <div className="text-sm text-gray-600">Precio máximo</div>
-            </div>
-          </div>
-        </div>  
-        )}
+      {/* Paginación */}
+      {!loading && (
+        <div className="flex justify-center items-center space-x-2 mt-8">
+          {Array.from({ length: Math.ceil(filteredAndSortedProducts.length / itemsPerPage) }, (_, i) => i + 1).map(
+            (page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                  currentPage === page
+                    ? "bg-[#a47148] text-white"
+                    : "bg-white text-[#a47148] border border-[#a47148] hover:bg-orange-50"
+                }`}
+              >
+                {page}
+              </button>
+            )
+          )}
+        </div>
+      )}
       </div>
     </div>
   )
