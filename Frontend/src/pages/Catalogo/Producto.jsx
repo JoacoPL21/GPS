@@ -63,6 +63,7 @@ if (!producto) {
   return (
     <div>
       <PageHeader
+        fullWidth
         breadcrumbs={[{ label: "Inicio", to: "/" }, { label: "Catálogo", to: "/catalogo" }, { label: producto.nombre }]}
         title="Detalle del Producto"
       />
@@ -75,13 +76,15 @@ if (!producto) {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             <div className="relative">
-              <img
-                src={producto.imagen || "/placeholder.svg"}
-                alt={producto.nombre}
-                className="w-full h-96 lg:h-[600px] object-cover"
-              />
+            <div className="w-full aspect-[4/3] max-h-[500px]">
+                <img
+                  src={producto.imagen || "/placeholder.svg"}
+                  alt={producto.nombre}
+                  className="w-full h-full object-contain"
+                />
+              </div>
               <div className="absolute top-4 left-4">
                 <span className="bg-[#a47148] text-white px-3 py-1 rounded-full text-sm font-medium">
                   {producto.categoria}
@@ -89,7 +92,7 @@ if (!producto) {
               </div>
             </div>
 
-            <div className="p-8 flex flex-col justify-between">
+            <div className="p-8 flex flex-col justify-between min-h-[500px]">
               <div className="space-y-6">
                 <div>
                   <h1 className="text-4xl font-bold text-gray-800 mb-4">{producto.nombre}</h1>
@@ -97,7 +100,7 @@ if (!producto) {
                 </div>
 
                 <div className="bg-[#f5eee7] p-6 rounded-xl">
-                  <div className="text-3xl font-bold text-[#a47148] mb-2">${producto.precio.toLocaleString()} CLP</div>
+                  <div className="text-3xl font-bold text-[#a47148] mb-2">$ {producto.precio.toLocaleString("es-CL", { minimumFractionDigits: 0 })} CLP</div>
                 </div>
 
                 <div className="space-y-4">
@@ -135,7 +138,7 @@ if (!producto) {
                     <div className="flex justify-between items-center">
                       <span className="font-semibold text-gray-800">Total:</span>
                       <span className="text-2xl font-bold text-[#a47148]">
-                        ${(producto.precio * cantidad).toLocaleString()} CLP
+                        $ {(producto.precio * cantidad).toLocaleString("es-CL", { minimumFractionDigits: 0 })} CLP
                       </span>
                     </div>
                   </div>
