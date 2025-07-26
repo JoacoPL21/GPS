@@ -162,12 +162,18 @@ export async function getAllCompras() {
                 where: { id_compra: compra.id_compra },
                 relations: ["Productos"]
             });
-            const productos = productosCompra.map(cp => ({
-                id_producto: cp.id_producto,
-                cantidad: cp.cantidad,
-                precio: cp.precio_unitario,
-                nombre: cp.Productos?.nombre || 'Producto no disponible',
-                imagen: cp.Productos?.image_url || null
+            const productos = await Promise.all(productosCompra.map(async cp => {
+                let imagen = null;
+                if (cp.Productos?.image_url) {
+                    imagen = await getUrlImage(cp.Productos.image_url);
+                }
+                return {
+                    id_producto: cp.id_producto,
+                    cantidad: cp.cantidad,
+                    precio: cp.precio_unitario,
+                    nombre: cp.Productos?.nombre || 'Producto no disponible',
+                    imagen: imagen
+                };
             }));
             // Mapeo de estado para frontend
             let estado = 'pendiente';
