@@ -11,7 +11,7 @@ export const getAllUsers = async () => {
 }
 
 export const registerDireccion = async (direccionData) => {
-    console.log('Datos de dirección en el servicio:', direccionData);
+
     try {
         const token = localStorage.getItem('token');
         if (!token) {
