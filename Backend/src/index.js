@@ -60,8 +60,8 @@ async function setupServer() {
     
     app.use(
       cors({
+        origin: true,
         credentials: true,
-        origin: true, // Permitir todos los orígenes (puedes especificar uno específico aquí)
       }),
     );
 

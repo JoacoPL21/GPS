@@ -13,7 +13,7 @@ const ContactSection = () => {
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e
   ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -63,7 +63,7 @@ const ContactSection = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-amber-900">Teléfono</p>
-                    <p className="text-amber-700">+56 9 1234 5678</p>
+                    <p className="text-amber-700">+56 9 86692555</p>
                   </div>
                 </div>
 
@@ -74,7 +74,7 @@ const ContactSection = () => {
                   <div>
                     <p className="font-semibold text-amber-900">Email</p>
                     <p className="text-amber-700">
-                      contacto@artesaniamadera.cl
+                     ventasmaderalosalamos@gmail.com
                     </p>
                   </div>
                 </div>
@@ -86,7 +86,7 @@ const ContactSection = () => {
                   <div>
                     <p className="font-semibold text-amber-900">Ubicación</p>
                     <p className="text-amber-700">
-                      Villarrica, Región de la Araucanía
+                     Los Acacios 589 Villa San Pedro, Los Alamos, Chile
                     </p>
                   </div>
                 </div>
@@ -104,28 +104,6 @@ const ContactSection = () => {
                       Lunes a Viernes: 9:00 - 18:00
                     </p>
                     <p className="text-amber-700">Sábados: 9:00 - 14:00</p>
-                  </div>
-                </div>
-
-                {/* Teléfono */}
-                <div className="flex items-center space-x-4">
-                  <div className="bg-amber-100 p-3 rounded-full flex-shrink-0">
-                    <Phone className="w-6 h-6 text-amber-700" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-amber-900">Teléfono</p>
-                    <p className="text-amber-700">+56 9 1234 5678</p>
-                  </div>
-                </div>
-
-                {/* Correo Electrónico */}
-                <div className="flex items-center space-x-4">
-                  <div className="bg-amber-100 p-3 rounded-full flex-shrink-0">
-                    <Mail className="w-6 h-6 text-amber-700" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-amber-900">Email</p>
-                    <p className="text-amber-700">contacto@artesaniamadera.cl</p>
                   </div>
                 </div>
               </div>

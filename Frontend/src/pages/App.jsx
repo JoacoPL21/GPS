@@ -15,17 +15,19 @@ import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
 import Sidebar from '../components/Sidebar'; 
-import ContactSection from './Contact/contact_us';   
+import ContactSection from './Contact/contact_us.jsx';   
 import SuccessPage from './Carrito/success.jsx';
 import FailurePage from './Carrito/failure.jsx';
 import MultiStepCart from './Carrito/multi-step-cart.jsx';
 import MisCompras from "./Profile/MisCompras.jsx";
-import MisPedidos from "./Profile/MisPedidos.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
 import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
 import ForgotPassword from "./User/ForgotPassword.jsx";
 import ResetPassword from "./User/ResetPassword.jsx";
+import AdminCompras from "./Dashboard/AdminCompras.jsx";
+import Envios from './Homepage/Envios.jsx';
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -43,11 +45,20 @@ const router = createBrowserRouter([
       { path: "logout", element: <Logout /> },
       { path: "success", element: <SuccessPage /> },
       { path: "failure", element: <FailurePage /> },
+      { path: "envios", element: <Envios /> },
       {
         path: "dashboard",
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
             <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/admin-compras",
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminCompras />
           </ProtectedRoute>
         ),
       },
@@ -96,14 +107,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ValoracionFormPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "profile/mis-pedidos",
-        element: (
-          <ProtectedRoute>
-            <MisPedidos />
           </ProtectedRoute>
         ),
       },
