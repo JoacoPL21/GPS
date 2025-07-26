@@ -28,74 +28,6 @@ const getCategoryColor = (categoria) => {
     }
   }
 
-  if (viewMode === "list") {
-    return (
-      <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-      
-        <div className="flex">
-           <Link to={`/producto/${producto.id_producto}`}>
-          <div className="relative w-48 h-48 bg-gradient-to-br from-[#e9dbce] to-[#d4b8a3] flex items-center justify-center flex-shrink-0">
-            <img src={producto.imagen} alt={producto.nombre} className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" />
-
-            <div className="absolute top-3 left-3">
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${categoryColor}`}>
-                {producto.categoria}
-              </span>
-            </div>
-
-            <div className="absolute top-3 right-3">
-              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${stockStatus.color}`}>
-                {stockStatus.text}
-              </span>
-            </div>
-          </div>
-        </Link>
-          <div className="flex-1 p-6 flex flex-col justify-between">
-            <div>
-              <Link to={`/producto/${producto.id_producto}`}>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2 group-hover:text-[#a47148] transition-colors">
-                {producto.nombre}
-              </h3>
-              </Link>
-              <p className="text-gray-600 mb-4 leading-relaxed">{producto.descripcion}</p>
-
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                    />
-                  </svg>
-                  <span className="text-sm text-gray-600">{producto.stock} disponibles</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="text-3xl font-bold text-[#a47148]">${producto.precio.toLocaleString()} CLP</div>
-
-              <button
-                onClick={handleAddToCart}
-                disabled={!stockStatus.available}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  stockStatus.available
-                    ? "bg-gradient-to-r from-[#a47148] to-[#8c5d3d] hover:from-[#946746] hover:to-[#7e5137] text-white hover:scale-105 hover:shadow-lg"
-                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                <FaShoppingCart className="w-5 h-5" />
-                <span>{stockStatus.available ? "Agregar al carrito" : "No disponible"}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group hover:scale-105">
       <Link to={`/producto/${producto.id_producto}`}>
@@ -150,7 +82,7 @@ const getCategoryColor = (categoria) => {
 
         <div className="flex items-center justify-between">
           <div className="text-2xl font-bold text-[#a47148]">
-            ${producto.precio.toLocaleString()}
+            ${producto.precio.toLocaleString("es-CL", { minimumFractionDigits: 0 })}
             <span className="text-sm font-normal text-gray-500 ml-1">CLP</span>
           </div>
 

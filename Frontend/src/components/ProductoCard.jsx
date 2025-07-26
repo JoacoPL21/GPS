@@ -88,11 +88,12 @@ const ProductoCard = ({
       >
         <img
           src={producto.imagen|| "/placeholder.png"}
+          alt={producto.nombre}
           className="object-cover w-full h-full"
         />
 
         {/* Badge de estado en la esquina superior derecha */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 z-10">
           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${estadoStatus.color}`}>
             {estadoStatus.text}
           </span>
@@ -100,7 +101,7 @@ const ProductoCard = ({
 
         {/* Badge de stock bajo si aplica */}
         {producto.stock <= 5 && (
-          <div className="absolute bottom-3 left-3">
+          <div className="absolute bottom-3 left-3 z-10">
             <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -118,16 +119,16 @@ const ProductoCard = ({
         {/* Overlay de selección */}
         {selectionMode && (
           <div
-            className={`absolute inset-0 transition-all duration-300 ${
-              isSelected ? "bg-blue-500 bg-opacity-20" : "bg-black bg-opacity-0 group-hover:bg-opacity-10"
+            className={`absolute inset-0 z-20 transition-all duration-300 ${
+              isSelected ? "bg-blue-500 bg-opacity-30" : "bg-black bg-opacity-0 group-hover:bg-opacity-20"
             }`}
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <div
                 className={`w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
                   isSelected
-                    ? "border-blue-500 bg-blue-500 text-white"
-                    : "border-white bg-white bg-opacity-80 text-gray-600 group-hover:border-blue-300"
+                    ? "border-blue-500 bg-blue-500 text-white shadow-lg"
+                    : "border-white bg-white bg-opacity-90 text-gray-600 group-hover:border-blue-300"
                 }`}
               >
                 {isSelected ? (
@@ -212,7 +213,7 @@ const ProductoCard = ({
               <>
                 <button
                   onClick={handleEditClick}
-                  className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                  className="flex-1 flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -227,7 +228,7 @@ const ProductoCard = ({
 
                 <button
                   onClick={handleDeleteClick}
-                  className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                  className="flex-1 flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

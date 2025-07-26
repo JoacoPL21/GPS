@@ -24,43 +24,73 @@ export async function registerDireccionService(direccionData, userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
         
-        console.log('Guardando dirección:', direccionData);
+        console.log('🏠 Validando límite de direcciones para usuario:', userId);
         
-        // Agregar el ID del usuario a los datos de la dirección
+        // 1. Verificar cuántas direcciones tiene el usuario
+        const direccionesExistentes = await direccionRepository.count({
+            where: { id_usuario: userId }
+        });
+        
+        console.log(`📊 Direcciones existentes: ${direccionesExistentes}/3`);
+        
+        // 2. Validar límite de 3 direcciones
+        if (direccionesExistentes >= 3) {
+            return [null, "No puedes tener más de 3 direcciones registradas. Elimina una dirección existente antes de agregar una nueva."];
+        }
+        
+        console.log('✅ Límite válido, guardando dirección:', direccionData);
+        
+        // 3. Agregar el ID del usuario a los datos de la dirección
         const direccionConUsuario = {
             ...direccionData,
             id_usuario: userId
         };
         
-        // Crear y guardar la nueva dirección
+        // 4. Crear y guardar la nueva dirección
         const newDireccion = direccionRepository.create(direccionConUsuario);
         const savedDireccion = await direccionRepository.save(newDireccion);
         
+        console.log('🎉 Dirección guardada exitosamente:', savedDireccion.id_direccion);
+        
         return [savedDireccion, null];
     } catch (error) {
-        console.error("Error al registrar dirección:", error);
+        console.error('❌ Error al registrar dirección:', error);
         return [null, "Error interno del servidor"];
     }
 }
 
-// ✅ CORRECTO - getDireccionByUserIdService
+
 export async function getDireccionByUserIdService(userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
         
-        // Buscar TODAS las direcciones del usuario por FK
+        console.log("🔍 Buscando direcciones para usuario:", userId);
+        
+        // Buscar direcciones del usuario (máximo 3 por validación)
         const direcciones = await direccionRepository.find({
             where: { id_usuario: userId }
         });
         
-        return [direcciones, null];
+        console.log(`📍 Direcciones encontradas: ${direcciones.length}/3`);
+        
+        if (direcciones.length === 0) {
+            return [[], null];
+        }
+        
+        // Formatear direcciones con nombres reales de ChileXpress
+        console.log("🔄 Iniciando formateo de direcciones...");
+        const direccionesFormateadas = await formatDireccionesWithNames(direcciones);
+        
+        console.log("✅ Direcciones formateadas y listas para enviar");
+        
+        return [direccionesFormateadas, null];
     } catch (error) {
-        console.error("Error al obtener direcciones:", error);
+        console.error("❌ Error al obtener direcciones:", error);
         return [null, "Error interno del servidor"];
     }
 }
 
-// ✅ CORREGIDO - deleteDireccionByUserIdService
+
 export async function deleteDireccionByUserIdService(direccionId, userId) {
     try {
         const direccionRepository = AppDataSource.getRepository(Direccion);
@@ -139,3 +169,153 @@ export const updateUserProfileService = async (userId, updateData) => {
         return [null, { message: 'Error interno del servidor' }];
     }
 };
+
+/**
+ * 🌍 Obtiene el nombre de una región desde ChileXpress
+ * @param {string} regionCode - Código de región (ej: R8)
+ * @returns {string} Nombre de la región o el código original si falla
+ */
+async function getRegionName(regionCode) {
+    try {
+        const CHILEXPRESS_KEY = process.env.CHILEXPRESS_API_KEY;
+        const baseUrl = 'https://testservices.wschilexpress.com';
+        const url = `${baseUrl}/georeference/api/v1.0/regions`;
+        
+        console.log(`🌍 Consultando región: ${regionCode}`);
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                "Ocp-Apim-Subscription-Key": CHILEXPRESS_KEY,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`❌ Error HTTP ${response.status} obteniendo regiones`);
+            return regionCode;
+        }
+
+        const data = await response.json();
+        
+        if (data.statusCode !== 0 || !data.regions) {
+            console.error("❌ Respuesta inválida de ChileXpress para regiones");
+            return regionCode;
+        }
+
+        // Buscar la región por código
+        const region = data.regions.find(r => r.regionId === regionCode);
+        const regionName = region ? region.regionName : regionCode;
+        
+        console.log(`✅ ${regionCode} → ${regionName}`);
+        return regionName;
+        
+    } catch (error) {
+        console.error(`❌ Error consultando región ${regionCode}:`, error);
+        return regionCode; // Fallback al código original
+    }
+}
+
+async function getCommuneName(regionCode, communeCode) {
+    try {
+        const CHILEXPRESS_KEY = process.env.CHILEXPRESS_API_KEY;
+        const baseUrl = 'https://testservices.wschilexpress.com';
+        const url = `${baseUrl}/georeference/api/v1.0/coverage-areas?RegionCode=${regionCode}&type=0`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                "Ocp-Apim-Subscription-Key": CHILEXPRESS_KEY,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`❌ Error HTTP ${response.status} obteniendo comunas`);
+            return communeCode;
+        }
+
+        const data = await response.json();
+        
+        if (data.statusCode !== 0 || !data.coverageAreas) {
+            console.error("❌ Respuesta inválida de ChileXpress para comunas");
+            return communeCode;
+        }
+
+        
+        const commune = data.coverageAreas.find(c => {
+            // Comparar como strings y como números
+            return c.ineCountyCode === communeCode || 
+                   c.ineCountyCode === parseInt(communeCode) ||
+                   c.ineCountyCode?.toString() === communeCode.toString();
+        });
+        
+        if (!commune) {
+            console.log(`❌ No se encontró comuna con ineCountyCode: ${communeCode}`);
+            
+            return communeCode;
+        }
+        
+     
+        const communeName = commune.countyName;
+        return communeName;
+        
+    } catch (error) {
+        console.error(`❌ Error consultando comuna ${communeCode}:`, error);
+        return communeCode;
+    }
+}
+
+
+async function formatDireccionesWithNames(direcciones) {
+    if (!direcciones || direcciones.length === 0) {
+        return [];
+    }
+    
+   
+    
+    try {
+        // Formatear cada dirección secuencialmente
+        const direccionesFormateadas = await Promise.all(
+            direcciones.map(async (direccion) => {
+            
+                
+                // Solo formatear si tenemos códigos (no nombres ya formateados)
+                const shouldFormatRegion = direccion.region && direccion.region.length <= 3;
+                const shouldFormatCommune = direccion.comuna && !isNaN(direccion.comuna);
+                
+                let regionName = direccion.region;
+                let communeName = direccion.comuna;
+                
+                // Obtener nombre de región si es necesario
+                if (shouldFormatRegion) {
+                    regionName = await getRegionName(direccion.region);
+                }
+                
+                // Obtener nombre de comuna si es necesario
+                if (shouldFormatCommune && shouldFormatRegion) {
+                    communeName = await getCommuneName(direccion.region, direccion.comuna);
+                }
+                
+                return {
+                    ...direccion,
+                    region: regionName,
+                    comuna: communeName,
+                    // Mantener códigos originales para referencia
+                    region_code: direccion.region,
+                    comuna_code: direccion.comuna
+                };
+            })
+        );
+        
+    
+        return direccionesFormateadas;
+        
+    } catch (error) {
+        console.error('❌ Error formateando direcciones:', error);
+        // Fallback: retornar direcciones originales
+        return direcciones;
+    }
+}

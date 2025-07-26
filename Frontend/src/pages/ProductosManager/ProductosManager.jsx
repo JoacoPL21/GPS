@@ -5,6 +5,7 @@ import Swal from "sweetalert2"
 import ProductoModal from "../../components/ProductoModal"
 import CategoriasModal from "../../components/CategoriasModal"
 import PageHeader from "../../components/PageHeader"
+import PaginacionControles from "../../components/PaginacionControles"
 import { handleApiError } from "../../services/productos.service.js"
 
 // Componentes refactorizados
@@ -21,6 +22,7 @@ import EstadoVacio from "../../components/ProductsManager/EstadoVacio"
 import { useGestorProductos } from "../../hooks/productos/useGestorProductos"
 import { useProductsFilters } from "../../hooks/productos/useProductsFilters"
 import { useValidacionFormulario } from "../../hooks/productos/useValidacionFormulario"
+import { usePaginacion } from "../../hooks/productos/usePaginacion"
 
 function ProductosManager() {
   // Hooks principales
@@ -47,6 +49,17 @@ function ProductosManager() {
     limpiarFiltros
   } = useProductsFilters(productos);
 
+  // Hook de paginación
+  const {
+    currentPage,
+    itemsPerPage,
+    paginatedItems: productosPaginados,
+    totalItems,
+    handlePageChange,
+    handleItemsPerPageChange,
+    resetPagination
+  } = usePaginacion(productosFiltradosYOrdenados, 12);
+
   // Efectos
   useEffect(() => {
     gestor.cargarProductos();
@@ -60,6 +73,18 @@ function ProductosManager() {
       gestor.loadCategorias();
     }
   }, [gestor.modalAbierto]);
+
+  // Efecto para resetear paginación cuando cambian los filtros o productos
+  useEffect(() => {
+    resetPagination();
+  }, [productosFiltradosYOrdenados.length, filtros.busqueda, filtros.categoria, filtros.estado, filtros.ordenamiento]);
+
+  // Efecto para resetear selección cuando cambia la página o el modo de vista
+  useEffect(() => {
+    if (modoSeleccion) {
+      setProductosSeleccionados([]);
+    }
+  }, [currentPage, filtros.modoVista]);
 
   // Estado para categorías - usar directamente las del gestor
   const [loadingCategorias, setLoadingCategorias] = useState(false);
@@ -321,10 +346,10 @@ function ProductosManager() {
 
   // Funciones de selección
   const manejarSeleccionarTodos = () => {
-    if (productosSeleccionados.length === productosFiltradosYOrdenados.length) {
+    if (productosSeleccionados.length === productosPaginados.length) {
       setProductosSeleccionados([]);
     } else {
-      setProductosSeleccionados(productosFiltradosYOrdenados.map((p) => p.id_producto));
+      setProductosSeleccionados(productosPaginados.map((p) => p.id_producto));
     }
   };
 
@@ -468,7 +493,7 @@ function ProductosManager() {
           mostrarEliminados={gestor.mostrarEliminados}
           modoSeleccion={modoSeleccion}
           productosSeleccionados={productosSeleccionados}
-          productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+          productosFiltradosYOrdenados={productosPaginados}
           onToggleEliminados={gestor.alternarEliminados}
           onToggleModoSeleccion={() => setModoSeleccion(!modoSeleccion)}
           onSeleccionarTodos={manejarSeleccionarTodos}
@@ -480,10 +505,10 @@ function ProductosManager() {
           <InstruccionesModoSeleccion />
         )}
 
-        {/* Lista de productos */}
+        {/* Lista de productos paginados */}
         {filtros.modoVista === "grid" ? (
           <VistaGrilla 
-            productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+            productosFiltradosYOrdenados={productosPaginados}
             modoSeleccion={modoSeleccion}
             mostrarEliminados={gestor.mostrarEliminados}
             manejarClickProducto={manejarClickProducto}
@@ -494,7 +519,7 @@ function ProductosManager() {
           />
         ) : (
           <VistaTabla 
-            productosFiltradosYOrdenados={productosFiltradosYOrdenados}
+            productosFiltradosYOrdenados={productosPaginados}
             modoSeleccion={modoSeleccion}
             productosSeleccionados={productosSeleccionados}
             mostrarEliminados={gestor.mostrarEliminados}
@@ -506,6 +531,19 @@ function ProductosManager() {
             manejarEliminar={manejarEliminar}
             manejarRestaurar={manejarRestaurar}
           />
+        )}
+
+        {/* Controles de paginación */}
+        {productosFiltradosYOrdenados.length > 0 && (
+          <div className="mt-8">
+            <PaginacionControles
+              currentPage={currentPage}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+          </div>
         )}
 
         {/* Estado vacío */}
