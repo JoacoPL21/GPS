@@ -27,7 +27,7 @@ function Navbar({ isOpen, setOpen }) {
         <div className="absolute left-4 z-30">
           <Hamburger toggled={isOpen} toggle={setOpen} />
         </div>
-        <h1 className="text-xl font-bold">Maderas Lemaco</h1>
+        <h1 className="text-xl font-bold">Maderas Los Alamos</h1>
 
         <nav className="hidden md:flex absolute right-4 gap-4 items-center">
           {/* Perfil con dropdown moderno */}
@@ -89,13 +89,6 @@ function Navbar({ isOpen, setOpen }) {
                       onClick={() => setDropdownOpen(false)}
                     >
                       <FaStar className="text-orange-400" /> Mis Valoraciones
-                    </Link>
-                    <Link
-                      to="/profile/mis-pedidos"
-                      className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      <FaBus className="text-orange-400" /> Mis Pedidos
                     </Link>
                     <div className="border-t border-gray-100 my-1" />
                     <Link
