@@ -72,15 +72,15 @@ const MisCompras = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      {/* Header */}
-      <div className="mb-8 max-w-3xl mx-auto">
+                    <div className="container mx-auto px-4 py-8 max-w-4xl">
+                  {/* Header */}
+                  <div className="mb-8 max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold mb-2">Mis Compras</h2>
         <p className="text-gray-500">Revisa el historial de tus compras realizadas</p>
       </div>
 
       {compras.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border-gray-400 p-8 text-center max-w-3xl mx-auto">
+                            <div className="bg-white rounded-lg shadow-sm border-gray-400 p-8 text-center max-w-4xl mx-auto">
           <FaShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Aún no tienes compras</h3>
           <p className="text-gray-600 mb-6">Cuando realices tu primera compra, aparecerá aquí tu historial.</p>
@@ -93,7 +93,7 @@ const MisCompras = () => {
         </div>
       ) : (
         <>
-          <div className="space-y-6 max-w-3xl mx-auto">
+                                <div className="space-y-6 max-w-4xl mx-auto">
             {currentCompras.map((compra) => {
               const idCompra = compra.id_compra || compra.id;
               
@@ -107,8 +107,8 @@ const MisCompras = () => {
             })}
           </div>
           
-          {/* Paginación */}
-          <div className="max-w-3xl mx-auto">
+                                {/* Paginación */}
+                      <div className="max-w-4xl mx-auto">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

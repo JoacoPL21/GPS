@@ -65,7 +65,6 @@ export default function AdminCompras() {
       case "entregado":
         return <FaCheckCircle className="h-4 w-4 text-emerald-600" />;
       case "en_transito":
-      case "en tránsito":
         return <FaTruck className="h-4 w-4 text-slate-600" />;
       case "en_preparacion":
       case "preparando":
@@ -102,7 +101,6 @@ export default function AdminCompras() {
       case "entregado":
         return "bg-emerald-600 text-white";
       case "en_transito":
-      case "en tránsito":
         return "bg-slate-600 text-white";
       case "en_preparacion":
       case "preparando":
@@ -166,7 +164,7 @@ export default function AdminCompras() {
     <div className="min-h-screen">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Gestión de Compras</h2>
-        <p className="text-gray-600">Administra todas las compras realizadas en la plataforma</p>
+        <p className="text-gray-600">Administra las compras con pagos aprobados</p>
       </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -198,7 +196,7 @@ export default function AdminCompras() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="grid gap-6 mb-8 md:grid-cols-4">
           <div className="bg-gradient-to-br from-slate-600 to-slate-700 text-white rounded-lg shadow-xl p-6">
             <div className="flex items-center justify-between">

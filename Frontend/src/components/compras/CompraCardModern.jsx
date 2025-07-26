@@ -74,7 +74,7 @@ const CompraCardModern = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 max-w-3xl mx-auto">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 max-w-4xl mx-auto">
       {/* Header de la compra */}
       <div className="bg-gradient-to-r from-gray-50 to-stone-50 border-b border-gray-200 p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

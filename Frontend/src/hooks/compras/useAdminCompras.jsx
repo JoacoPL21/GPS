@@ -164,6 +164,13 @@ export const useAdminCompras = () => {
   }, [orders]);
 
   let filteredOrders = [...orders];
+  
+  // Filtrar solo compras con payment_status approved
+  filteredOrders = filteredOrders.filter((order) => {
+    const paymentStatus = order.payment_status || order.estado_pago;
+    return paymentStatus === 'approved';
+  });
+  
   if (search) {
     filteredOrders = filteredOrders.filter((order) =>
       order.cliente?.toLowerCase().includes(search.toLowerCase()) ||
@@ -191,10 +198,10 @@ export const useAdminCompras = () => {
   };
 
   const stats = {
-    total: orders.length,
-    enviadas: orders.filter((c) => c.estado === "en_transito").length,
-    entregadas: orders.filter((c) => c.estado === "entregado").length,
-    en_preparacion: orders.filter((c) => c.estado === "en_preparacion").length,
+    total: filteredOrders.length, // Solo compras aprobadas
+    enviadas: filteredOrders.filter((c) => c.estado === "en_transito").length,
+    entregadas: filteredOrders.filter((c) => c.estado === "entregado").length,
+    en_preparacion: filteredOrders.filter((c) => c.estado === "en_preparacion").length,
   };
 
   return {
