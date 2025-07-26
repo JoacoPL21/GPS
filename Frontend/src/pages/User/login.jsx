@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import useLogin from "../../hooks/auth/useLogin";
 import Swal from "sweetalert2";
@@ -152,6 +152,17 @@ const Login = () => {
               Iniciar Sesión
             </button>
           </form>
+          
+          {/* AGREGAR ESTE ENLACE */}
+          <div className="text-center text-sm mt-3 mb-4">
+            <Link 
+              to="/forgot-password" 
+              className="text-blue-600 hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+          
           <p className="text-center text-sm mt-4">
             ¿No tienes una cuenta?{" "}
             <a href="/register" className="text-blue-600 hover:underline">

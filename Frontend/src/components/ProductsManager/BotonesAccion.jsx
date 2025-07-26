@@ -11,8 +11,8 @@ const BotonesAccion = ({
       {!mostrarEliminados && (
         <>
           <button
-            onClick={onAgregar}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
+            onClick={onAgregar} 
+            className="flex items-center space-x-2 px-6 py-3 bg-orange-400 text-white rounded-xl hover:bg-orange-500 hover:to-red-600 transition-all shadow-lg hover:shadow-xl"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -22,7 +22,7 @@ const BotonesAccion = ({
           
           <button
             onClick={onAgregarCategoria}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-400 text-white rounded-xl hover:bg-blue-500 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -37,7 +37,7 @@ const BotonesAccion = ({
           
           <button
             onClick={onExportar}
-            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-lime-500 to-green-500 text-white rounded-xl hover:from-lime-600 hover:to-green-600 transition-all shadow-lg hover:shadow-xl"
+            className="flex items-center space-x-2 px-4 py-2 bg-lime-400 text-white rounded-xl hover:bg-lime-500 hover:to-green-600 transition-all shadow-lg hover:shadow-xl"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -55,7 +55,7 @@ const BotonesAccion = ({
       <button
         onClick={onRefrescar}
         disabled={cargando}
-        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl hover:from-teal-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center space-x-2 px-6 py-3 bg-teal-500 text-white rounded-xl hover:bg-teal-600 hover:shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg 
           className={`w-5 h-5 ${cargando ? 'animate-spin' : ''}`} 

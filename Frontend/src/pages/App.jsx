@@ -20,12 +20,13 @@ import SuccessPage from './Carrito/success.jsx';
 import FailurePage from './Carrito/failure.jsx';
 import MultiStepCart from './Carrito/multi-step-cart.jsx';
 import MisCompras from "./Profile/MisCompras.jsx";
-import MisPedidos from "./Profile/MisPedidos.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
 import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
+import ForgotPassword from "./User/ForgotPassword.jsx";
+import ResetPassword from "./User/ResetPassword.jsx";
 import AdminCompras from "./Dashboard/AdminCompras.jsx";
-
+import Envios from './Homepage/Envios.jsx';
 
 const router = createBrowserRouter([
   {
@@ -39,9 +40,12 @@ const router = createBrowserRouter([
       { path: "producto/:id_producto", element: <Producto /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password", element: <ResetPassword /> },
       { path: "logout", element: <Logout /> },
       { path: "success", element: <SuccessPage /> },
       { path: "failure", element: <FailurePage /> },
+      { path: "envios", element: <Envios /> },
       {
         path: "dashboard",
         element: (
@@ -103,14 +107,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ValoracionFormPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "profile/mis-pedidos",
-        element: (
-          <ProtectedRoute>
-            <MisPedidos />
           </ProtectedRoute>
         ),
       },

@@ -84,7 +84,7 @@ const VistaTabla = ({
                   <div className="flex items-center">
                     <img
                       className="h-12 w-12 object-cover rounded-lg border border-gray-200"
-                      src={producto.imagen_url}
+                      src={producto.imagen}
                       alt={producto.nombre}
                       onError={(e) => {
                         e.target.src = "/placeholder-image.svg";
