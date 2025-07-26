@@ -58,7 +58,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f5eee7] to-[#f0e6dd] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div >
       <div className="max-w-md w-full space-y-8">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Header */}
