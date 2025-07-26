@@ -12,7 +12,6 @@ export const useMisCompras = () => {
   const [compraExpandida, setCompraExpandida] = useState(null);
   const [loadingTracking, setLoadingTracking] = useState({});
 
-  // Cargar compras del usuario
   const cargarCompras = async () => {
     if (!authUser) return;
     
@@ -34,7 +33,6 @@ export const useMisCompras = () => {
     }
   };
 
-  // Cargar información de envío para una compra
   const cargarEnvioCompra = async (id_compra) => {
     if (enviosData[id_compra]) return; // Ya está cargado
 
@@ -55,7 +53,6 @@ export const useMisCompras = () => {
     }
   };
 
-  // Actualizar tracking de un envío
   const actualizarTracking = async (id_compra) => {
     setLoadingTracking(prev => ({ ...prev, [id_compra]: true }));
 
@@ -79,12 +76,10 @@ export const useMisCompras = () => {
     }
   };
 
-  // Cargar compras al montar el componente
   useEffect(() => {
     cargarCompras();
   }, [authUser]);
 
-  // Cargar envíos para compras aprobadas
   useEffect(() => {
     if (compras.length > 0) {
       compras.forEach(compra => {
@@ -96,15 +91,12 @@ export const useMisCompras = () => {
   }, [compras]);
 
   return {
-    // State
     compras,
     loading,
     error,
     enviosData,
     compraExpandida,
     loadingTracking,
-
-    // Actions
     setCompraExpandida,
     actualizarTracking,
     cargarCompras,

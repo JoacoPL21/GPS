@@ -5,7 +5,6 @@ const ExportButton = ({
   showDropdown, 
   onToggleDropdown
 }) => {
-  // Cerrar dropdown al hacer clic fuera o presionar Escape
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showDropdown && !event.target.closest('.export-dropdown')) {

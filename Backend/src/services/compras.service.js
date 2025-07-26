@@ -34,7 +34,6 @@ export async function getComprasUsuario(id_usuario) {
                   };
                 }));
 
-                // Mapear campos de la compra con nuevos nombres
                 return {
                     id: compra.id_compra,
                     fecha: compra.createdAt,
@@ -54,13 +53,10 @@ export async function getComprasUsuario(id_usuario) {
     }
 }
 
-// Verificar si un usuario ha comprado un producto específico
 export async function verificarCompraProducto(id_usuario, id_producto) {
     try {
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
         
-        // Usar una consulta más específica que incluya la relación con Compras
-        // y filtre directamente por el usuario
         const compraProducto = await compraProductoRepository
             .createQueryBuilder("cp")
             .leftJoinAndSelect("cp.Compras", "compra")
@@ -93,7 +89,7 @@ export async function getProductosCompradosConValoracion(id_usuario) {
         });
 
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
-        const productosMap = new Map(); // Usar Map para evitar duplicados por id_producto
+        const productosMap = new Map();
 
         for (const compra of compras) {
             const productosCompra = await compraProductoRepository.find({
@@ -102,9 +98,7 @@ export async function getProductosCompradosConValoracion(id_usuario) {
             });
 
             for (const cp of productosCompra) {
-                // Solo agregar si el producto no existe ya en el Map
                 if (!productosMap.has(cp.id_producto)) {
-                    // Buscar valoración del usuario para ese producto
                     const valoracion = await AppDataSource.getRepository(Valoraciones).findOne({
                         where: {
                             id_usuario: parseInt(id_usuario),
@@ -112,7 +106,6 @@ export async function getProductosCompradosConValoracion(id_usuario) {
                         }
                     });
 
-                    // Obtener la URL firmada de la imagen
                     let imagen = null;
                     if (cp.Productos?.image_url) {
                       imagen = await getUrlImage(cp.Productos.image_url);
@@ -136,7 +129,6 @@ export async function getProductosCompradosConValoracion(id_usuario) {
             }
         }
 
-        // Convertir el Map a array
         const productos = Array.from(productosMap.values());
 
         return [productos, null];
@@ -154,10 +146,8 @@ export async function getAllCompras() {
             order: { id_compra: "DESC" },
             relations: ["Usuarios"]
         });
-        // Mapear la info relevante para el admin
         const comprasAdmin = await Promise.all(compras.map(async (compra) => {
             const usuario = compra.Usuarios;
-            // Obtener productos de la compra
             const productosCompra = await compraProductoRepository.find({
                 where: { id_compra: compra.id_compra },
                 relations: ["Productos"]
@@ -175,7 +165,6 @@ export async function getAllCompras() {
                     imagen: imagen
                 };
             }));
-            // Mapeo de estado para frontend
             let estado = 'pendiente';
             if (compra.estado_envio === 'entregado') {
                 estado = 'entregada';
@@ -195,7 +184,7 @@ export async function getAllCompras() {
                 metodo_pago: compra.payment_type,
                 tracking: compra.tracking || '', 
                 id_pago: compra.payment_id || 'Pendiente',
-                productos // <-- Agrega los productos aquí
+                productos
             };
         }));
         console.log('Compras mapeadas para admin:', comprasAdmin);

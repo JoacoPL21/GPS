@@ -20,7 +20,6 @@ export const useAdminCompras = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Cargar compras
   const fetchCompras = async () => {
     setLoading(true);
     setError(null);
@@ -39,7 +38,6 @@ export const useAdminCompras = () => {
     }
   };
 
-  // Cargar información de envío para una compra
   const cargarEnvioCompra = async (id_compra, forzarRecarga = false) => {
     if (enviosData[id_compra] && !forzarRecarga) return;
     try {
@@ -52,7 +50,6 @@ export const useAdminCompras = () => {
     }
   };
 
-  // Procesar envío (crear orden de transporte)
   const handleProcesarEnvio = async (order) => {
     setProcessingShipment(order.id_compra);
     try {
@@ -72,7 +69,6 @@ export const useAdminCompras = () => {
     }
   };
 
-  // Ver etiqueta (modal)
   const handleVerEtiqueta = async (transportOrderNumber) => {
     try {
       const response = await reimprimirEtiqueta(transportOrderNumber);
@@ -102,7 +98,6 @@ export const useAdminCompras = () => {
     }
   };
 
-  // Descargar etiqueta
   const handleReimprimirEtiqueta = async (transportOrderNumber) => {
     try {
       const response = await reimprimirEtiqueta(transportOrderNumber);
@@ -140,7 +135,6 @@ export const useAdminCompras = () => {
     }
   };
 
-  // Marcar como entregado al courier
   const handleMarcarEnTransito = async (order) => {
     try {
       await axios.patch(`/envios/compras/${order.id_compra}/estado-envio`, { estado_envio: 'en_transito' });
@@ -152,18 +146,15 @@ export const useAdminCompras = () => {
     }
   };
 
-  // Cerrar modal etiqueta
   const closeModalEtiqueta = () => {
     if (modalEtiqueta.url) window.URL.revokeObjectURL(modalEtiqueta.url);
     setModalEtiqueta({ open: false, url: null, mimeType: null, etiquetaData: null });
   };
 
-  // Cargar compras al montar el componente
   useEffect(() => {
     fetchCompras();
   }, []);
 
-  // Cargar envíos cuando se cargan las compras
   useEffect(() => {
     if (orders.length > 0) {
       orders.forEach(order => {
@@ -172,7 +163,6 @@ export const useAdminCompras = () => {
     }
   }, [orders]);
 
-  // Filtrado y búsqueda
   let filteredOrders = [...orders];
   if (search) {
     filteredOrders = filteredOrders.filter((order) =>
@@ -185,7 +175,6 @@ export const useAdminCompras = () => {
     filteredOrders = filteredOrders.filter((order) => order.estado === filter);
   }
 
-  // Paginación
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -201,7 +190,6 @@ export const useAdminCompras = () => {
     setCurrentPage(1);
   };
 
-  // Estadísticas
   const stats = {
     total: orders.length,
     enviadas: orders.filter((c) => c.estado === "en_transito").length,
@@ -210,7 +198,6 @@ export const useAdminCompras = () => {
   };
 
   return {
-    // State
     orders,
     search,
     filter,
@@ -227,8 +214,6 @@ export const useAdminCompras = () => {
     startIndex,
     endIndex,
     stats,
-
-    // Actions
     setSearch,
     setFilter,
     handlePageChange,

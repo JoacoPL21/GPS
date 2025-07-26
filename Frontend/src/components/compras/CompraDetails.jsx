@@ -7,7 +7,6 @@ const CompraDetails = ({ compra, envio, isAdmin = false }) => {
   const paymentStatus = compra.payment_status || compra.estado;
   const estadoEnvio = getEstadoEnvioInfo(envio);
 
-  // Importar iconos dinámicamente
   const getIconComponent = (iconName) => {
     switch (iconName) {
       case 'FaInfoCircle':

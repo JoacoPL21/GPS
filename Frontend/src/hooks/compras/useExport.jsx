@@ -5,7 +5,6 @@ export const useExport = () => {
   const [exporting, setExporting] = useState(false);
   const [showExportDropdown, setShowExportDropdown] = useState(false);
 
-  // Exportar todas las compras con filtros
   const handleExportarCSV = async (orders, filters, enviosData) => {
     setExporting(true);
     try {
@@ -21,7 +20,6 @@ export const useExport = () => {
     }
   };
 
-  // Exportar compras de la página actual
   const handleExportarFiltrados = async (currentCompras, enviosData) => {
     setExporting(true);
     try {
@@ -41,22 +39,17 @@ export const useExport = () => {
     }
   };
 
-  // Cerrar dropdown
   const closeExportDropdown = () => {
     setShowExportDropdown(false);
   };
 
-  // Toggle dropdown
   const toggleExportDropdown = () => {
     setShowExportDropdown(!showExportDropdown);
   };
 
   return {
-    // State
     exporting,
     showExportDropdown,
-
-    // Actions
     handleExportarCSV,
     handleExportarFiltrados,
     closeExportDropdown,
