@@ -183,7 +183,7 @@ async function createCompras() {
       ComprasRepository.save(ComprasRepository.create({
         id_usuario: 1,
         facturacion: "1234567890",
-        estado_envio: "en_elaboracion",
+        estado_envio: "en_preparacion",
         total: 12000,
         createdAt: new Date(),
         updatedAt: new Date(),

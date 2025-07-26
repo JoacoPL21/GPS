@@ -17,7 +17,12 @@ const CompraCard = ({
 }) => {
   const idCompra = compra.id_compra || compra.id;
 
-  const getEstadoEnvioIcon = (estado) => {
+  const getEstadoEnvioIcon = (estado, estadoPago) => {
+    // Si el pago está pendiente, mostrar icono de espera
+    if (estadoPago === 'pending') {
+      return <FaClock className="w-4 h-4" />;
+    }
+    
     switch (estado) {
       case 'en_preparacion':
         return <FaBox className="w-4 h-4" />;
@@ -30,6 +35,24 @@ const CompraCard = ({
     }
   };
 
+  const getEstadoEnvioTexto = (estado, estadoPago) => {
+    // Si el pago está pendiente, mostrar "Esperando Pago"
+    if (estadoPago === 'pending') {
+      return 'Esperando Pago';
+    }
+    
+    return getEstadoTexto(estado);
+  };
+
+  const getEstadoEnvioColor = (estado, estadoPago) => {
+    // Si el pago está pendiente, usar color gris
+    if (estadoPago === 'pending') {
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+    
+    return getEstadoColor(estado);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       {/* Header de la compra */}
@@ -37,9 +60,9 @@ const CompraCard = ({
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
             <span className="text-lg font-semibold text-gray-900">Compra #{idCompra}</span>
-            <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs rounded border font-medium ${getEstadoColor(compra.estado)}`}>
-              {getEstadoEnvioIcon(compra.estado)}
-              {getEstadoTexto(compra.estado)}
+            <span className={`inline-flex items-center gap-1 px-3 py-1 text-xs rounded border font-medium ${getEstadoEnvioColor(compra.estado, compra.estado_pago)}`}>
+              {getEstadoEnvioIcon(compra.estado, compra.estado_pago)}
+              {getEstadoEnvioTexto(compra.estado, compra.estado_pago)}
             </span>
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -151,7 +174,7 @@ const CompraCard = ({
           )}
           
           {/* Botones específicos para admin */}
-          {isAdmin && compra.estado === 'en_preparacion' && envio && envio.transport_order_number && (
+          {isAdmin && compra.estado === 'en_preparacion' && compra.estado_pago !== 'pending' && envio && envio.transport_order_number && (
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => onVerEtiqueta(envio.transport_order_number)}
@@ -194,7 +217,7 @@ const CompraCard = ({
             </div>
           )}
           
-          {isAdmin && compra.estado === 'en_preparacion' && !envio?.transport_order_number && (
+          {isAdmin && compra.estado === 'en_preparacion' && compra.estado_pago !== 'pending' && !envio?.transport_order_number && (
             <button
               onClick={() => onProcesarEnvio(compra)}
               disabled={processingShipment === idCompra}

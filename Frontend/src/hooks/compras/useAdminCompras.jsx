@@ -45,8 +45,8 @@ export const useAdminCompras = () => {
       if (data?.data) {
         setEnviosData(prev => ({ ...prev, [id_compra]: data.data }));
       }
-    } catch {
-      // Silenciar error
+    } catch (error) {
+      console.error('Error loading shipment:', error);
     }
   };
 
@@ -139,7 +139,6 @@ export const useAdminCompras = () => {
     try {
       await axios.patch(`/envios/compras/${order.id_compra}/estado-envio`, { estado_envio: 'en_transito' });
       alert('Compra marcada como entregada al courier (en tránsito)');
-      // Refrescar compras
       setOrders((prev) => prev.map(o => o.id_compra === order.id_compra ? { ...o, estado: 'en_transito' } : o));
     } catch (error) {
       alert(error?.response?.data?.message || 'Error al actualizar el estado de envío');
