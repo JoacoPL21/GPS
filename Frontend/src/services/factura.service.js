@@ -1,10 +1,5 @@
 import { formatearFecha, formatearPrecio, getMetodoPagoTexto } from '../utils/formatters';
 
-/**
- * Genera una factura en PDF para una compra específica
- * @param {Object} compra - Datos de la compra
- * @returns {Promise<void>}
- */
 export const generarFacturaPDF = async (compra) => {
   try {
     // Importar jsPDF dinámicamente
@@ -64,7 +59,7 @@ export const generarFacturaPDF = async (compra) => {
     doc.text(`Número de Factura: #${idCompra}`, margin, 200);
     doc.text(`Fecha: ${formatearFecha(compra.createdAt || compra.fecha)}`, margin, 210);
     doc.text(`Método de Pago: ${getMetodoPagoTexto(compra.payment_method || compra.metodo_pago)}`, margin, 220);
-    doc.text(`ID de Pago: ${compra.id_pago || 'N/A'}`, margin, 230);
+    doc.text(`ID de Pago: ${compra.payment_id || compra.id_pago || compra.external_reference || 'N/A'}`, margin, 230);
     
     // Tabla de productos
     doc.setFontSize(14);
@@ -138,11 +133,6 @@ export const generarFacturaPDF = async (compra) => {
   }
 };
 
-/**
- * Genera una factura simple en formato de texto
- * @param {Object} compra - Datos de la compra
- * @returns {Promise<void>}
- */
 export const generarFacturaTexto = async (compra) => {
   try {
     const idCompra = compra.id_compra || compra.id;
@@ -171,7 +161,7 @@ INFORMACIÓN DE LA FACTURA:
 Número de Factura: #${idCompra}
 Fecha: ${formatearFecha(compra.createdAt || compra.fecha)}
 Método de Pago: ${getMetodoPagoTexto(compra.payment_method || compra.metodo_pago)}
-ID de Pago: ${compra.id_pago || 'N/A'}
+ID de Pago: ${compra.payment_id || compra.id_pago || compra.external_reference || 'N/A'}
 
 PRODUCTOS:
 ${(compra.productos || []).map((producto, index) => {

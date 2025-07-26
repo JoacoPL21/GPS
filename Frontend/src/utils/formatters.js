@@ -1,13 +1,8 @@
-/**
- * Formatea una fecha a formato legible en español
- * @param {string|Date} fechaString - Fecha a formatear
- * @returns {string} Fecha formateada
- */
 export const formatearFecha = (fechaString) => {
   try {
     const fecha = new Date(fechaString);
     
-    // Verificar si la fecha es válida
+    
     if (isNaN(fecha.getTime())) {
       throw new Error('Fecha inválida');
     }
@@ -25,11 +20,7 @@ export const formatearFecha = (fechaString) => {
   }
 };
 
-/**
- * Formatea un precio a formato de moneda chilena
- * @param {number|string} precio - Precio a formatear
- * @returns {string} Precio formateado
- */
+
 export const formatearPrecio = (precio) => {
   // Manejar valores undefined, null o no numéricos
   const valor = parseFloat(precio);
@@ -42,11 +33,7 @@ export const formatearPrecio = (precio) => {
   }).format(valor);
 };
 
-/**
- * Obtiene el color CSS para el estado de envío
- * @param {string} estado - Estado del envío
- * @returns {string} Clases CSS para el color
- */
+
 export const getEstadoColor = (estado) => {
   switch (estado) {
     case 'completada':
@@ -63,11 +50,7 @@ export const getEstadoColor = (estado) => {
   }
 };
 
-/**
- * Obtiene el color CSS para el estado de pago
- * @param {string} estado - Estado del pago
- * @returns {string} Clases CSS para el color
- */
+
 export const getEstadoPagoColor = (estado) => {
   switch (estado) {
     case 'approved':
@@ -81,11 +64,6 @@ export const getEstadoPagoColor = (estado) => {
   }
 };
 
-/**
- * Obtiene el texto del estado de pago
- * @param {string} estado - Estado del pago
- * @returns {string} Texto del estado
- */
 export const getEstadoPagoTexto = (estado) => {
   switch (estado) {
     case 'approved':
@@ -99,11 +77,7 @@ export const getEstadoPagoTexto = (estado) => {
   }
 };
 
-/**
- * Obtiene el texto del estado de envío
- * @param {string} estado - Estado del envío
- * @returns {string} Texto del estado
- */
+
 export const getEstadoTexto = (estado) => {
   switch (estado) {
     case 'en_preparacion':
@@ -117,25 +91,19 @@ export const getEstadoTexto = (estado) => {
   }
 };
 
-/**
- * Obtiene el texto del método de pago
- * @param {string} metodo - Método de pago
- * @returns {string} Texto del método
- */
+
 export const getMetodoPagoTexto = (metodo) => {
   switch (metodo) {
     case 'credit_card':
-      return 'Tarjeta de crédito';
+      return 'Tarjeta de Crédito';
+    case 'debit_card':
+      return 'Tarjeta de Débito';
     default:
       return 'N/A';
   }
 };
 
-/**
- * Obtiene información del estado de envío con icono y descripción
- * @param {Object} envio - Datos del envío
- * @returns {Object} Información del estado
- */
+
 export const getEstadoEnvioInfo = (envio) => {
   if (!envio) {
     return {

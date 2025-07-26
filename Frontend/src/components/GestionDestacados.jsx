@@ -6,7 +6,7 @@ import { FaStar, FaRegStar, FaEye, FaEyeSlash, FaExclamationTriangle } from "rea
 
 
 function GestionDestacados() {
-  const { productos, loading, error, loadProductos } = useProductos();
+  const { productos, loading, error, setProductos } = useProductos();
   const { toggleDestacado, loading: toggleLoading } = useToggleDestacado();
   const { conteo, loadConteo } = useConteoDestacados();
   const [successMessage, setSuccessMessage] = useState("");
@@ -17,21 +17,26 @@ function GestionDestacados() {
     
     if (resultado.success) {
       setSuccessMessage(resultado.data.message);
-      setErrorMessage(""); // Limpiar errores previos
+      setErrorMessage(""); 
       
-      // Recargar productos y conteo para actualizar la vista
-      await loadProductos();
+      // Actualizar el estado local sin recargar todos los productos
+      setProductos(prevProductos => 
+        prevProductos.map(producto => 
+          producto.id_producto === id_producto 
+            ? { ...producto, destacado: !producto.destacado }
+            : producto
+        )
+      );
+      
       await loadConteo();
       
-      // Limpiar mensaje después de 3 segundos
       setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
     } else {
       setErrorMessage(resultado.error);
-      setSuccessMessage(""); // Limpiar mensajes de éxito previos
+      setSuccessMessage(""); 
       
-      // Limpiar mensaje de error después de 5 segundos
       setTimeout(() => {
         setErrorMessage("");
       }, 5000);
@@ -68,22 +73,22 @@ function GestionDestacados() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Gestión de Productos Destacados</h1>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Gestión de Productos Destacados</h2>
           <p className="text-gray-600 mb-4">
             Marca o desmarca productos como destacados. Los productos destacados aparecerán en la página principal.
             Si no hay productos destacados, se mostrarán los últimos 4 productos agregados.
           </p>
           
           {/* Contador de productos destacados */}
-          <div className="bg-gradient-to-r from-orange-100 to-amber-100 p-4 rounded-lg">
+          <div className="bg-[#A65F00] p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-800">Productos Destacados</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="font-semibold text-white">Productos Destacados</h3>
+                <p className="text-sm text-gray-100">
                   {conteo} de 8 productos marcados como destacados
                 </p>
               </div>
@@ -134,11 +139,18 @@ function GestionDestacados() {
 
         {/* Productos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {productos.map((producto) => (
+          {productos
+            .sort((a, b) => {
+              // Ordenar destacados primero, luego por nombre
+              if (a.destacado && !b.destacado) return -1;
+              if (!a.destacado && b.destacado) return 1;
+              return a.nombre.localeCompare(b.nombre);
+            })
+            .map((producto) => (
             <div
               key={producto.id_producto}
               className={`bg-white rounded-2xl shadow-lg overflow-hidden border-2 ${
-                producto.destacado ? "border-orange-500" : "border-gray-200"
+                producto.destacado ? "border-[#A65F00]" : "border-gray-200"
               }`}
             >
               {/* Imagen */}
@@ -149,7 +161,7 @@ function GestionDestacados() {
                   className="w-full h-48 object-cover"
                 />
                 {producto.destacado && (
-                  <div className="absolute top-3 left-3 bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                  <div className="absolute top-3 left-3 bg-[#A65F00] text-white px-2 py-1 rounded text-xs font-semibold">
                     Destacado
                   </div>
                 )}
@@ -158,7 +170,7 @@ function GestionDestacados() {
               {/* Información del producto */}
               <div className="p-6">
                 <h3 className="font-semibold text-gray-800 mb-2">{producto.nombre}</h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{producto.descripcion}</p>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-1">{producto.descripcion}</p>
                 
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xl font-bold text-orange-600">
@@ -184,10 +196,10 @@ function GestionDestacados() {
                   disabled={toggleLoading || (!producto.destacado && conteo >= 8)}
                   className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
                     producto.destacado
-                      ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-red-100 text-red-700 hover:bg-red-200"
                       : conteo >= 8
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-orange-500 text-white hover:bg-orange-600"
+                      : "bg-[#A65F00] text-white hover:bg-[#8B4F00]"
                   } ${toggleLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   {toggleLoading ? (
@@ -215,26 +227,6 @@ function GestionDestacados() {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Información adicional */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mt-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Información</h2>
-          <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <div>
-              <h3 className="font-medium text-gray-800 mb-2">Límite de Productos</h3>
-              <p>
-                Máximo 8 productos pueden ser marcados como destacados. Una vez alcanzado el límite, 
-                no se podrán agregar más productos hasta que se desmarquen algunos.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-800 mb-2">Comportamiento</h3>
-              <p>
-                Si no hay productos destacados, se mostrarán automáticamente los últimos 4 productos agregados en la página principal.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

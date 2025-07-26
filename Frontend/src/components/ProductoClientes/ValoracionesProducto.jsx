@@ -1,6 +1,4 @@
-/**
- * Componente de valoraciones de producto con estética moderna y resumen
- */
+
 import { FaStar } from "react-icons/fa";
 import { useValoraciones } from "../../hooks/valoraciones/useValoraciones";
 import ValoracionForm from "../ValoracionForm";
