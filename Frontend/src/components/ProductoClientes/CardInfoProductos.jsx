@@ -10,19 +10,10 @@ const CardInfoProducto = ({ producto }) => {
         </div>
 
         <div className="mt-4 md:mt-0">
-          <div className="bg-gradient-to-r from-amber-100 to-orange-100 px-4 py-2 rounded-full">
-            <span className="text-sm font-medium text-gray-700">Artesanía Premium</span>
-          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Categoría */}
-        <Caracteristica
-          iconPath="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-          titulo="Categoría"
-          valor={producto.categoria}
-        />
 
         {/* Stock */}
         <Caracteristica
@@ -33,7 +24,7 @@ const CardInfoProducto = ({ producto }) => {
 
         {/* Precio */}
         <Caracteristica
-          iconPath="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+          iconPath="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1 "
           titulo="Precio"
           valor={`$${producto.precio.toLocaleString()} CLP`}
         />
@@ -44,8 +35,16 @@ const CardInfoProducto = ({ producto }) => {
           titulo="Estado"
           valor={producto.stock > 0 ? "Disponible" : "Agotado"}
         />
+        {/* Dimensiones */}
+        <Caracteristica
+          iconPath="M12 4v16m8-8H4m16 0a8 8 0 11-16 0 8 8 0 0116 0z"
+          titulo="Dimensiones"
+          valor={`${producto.alto} x ${producto.ancho} x ${producto.profundidad} cm`}
+        />
+
       </div>
     </div>
+    
   );
 };
 

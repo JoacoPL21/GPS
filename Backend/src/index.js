@@ -7,7 +7,8 @@ import session from "express-session";
 import passport from "passport";
 import express, { json, urlencoded } from "express";
 import {
-  cookieKey } from "./config/configENV.js";
+  cookieKey, WEB_HOST, WEB_PORT
+} from "./config/configENV.js";
 import { connectDB } from "./config/configDB.js";
 import { createProductos, createUser, createCategoria, createValoraciones, createCompra_Producto, createEnvios, createCompras} from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
@@ -59,8 +60,8 @@ async function setupServer() {
     
     app.use(
       cors({
+        origin: true,
         credentials: true,
-        origin: true, // Permitir todos los orígenes (puedes especificar uno específico aquí)
       }),
     );
 
@@ -122,8 +123,8 @@ async function setupServer() {
       res.status(500).json({ error: 'Algo salió mal' });
     });
 
-    const WEB_PORT = process.env.WEB_PORT || 1214;
-    const WEB_HOST = process.env.WEB_HOST || '0.0.0.0';
+    
+  
     // Configuración del puerto y host
     app.listen(WEB_PORT, WEB_HOST, () => {
       console.log(`=> Servidor corriendo en http://${WEB_HOST}:${WEB_PORT}/api`);
