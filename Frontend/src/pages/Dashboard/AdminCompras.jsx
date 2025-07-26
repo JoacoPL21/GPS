@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { FaShoppingBag, FaClock, FaBox, FaTruck, FaSearch, FaChevronLeft, FaChevronRight, FaUser, FaCreditCard, FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendar, FaDollarSign, FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaEye, FaPrint, FaBarcode } from "react-icons/fa";
 import { useAdminCompras } from "../../hooks/compras/useAdminCompras";
-import CompraCard from "../../components/compras/CompraCard";
 import ExportButton from "../../components/compras/ExportButton";
 import Pagination from "../../components/compras/Pagination";
 
@@ -14,6 +13,7 @@ export default function AdminCompras() {
     enviosData,
     processingShipment,
     modalEtiqueta,
+    expandedProducts,
     loading,
     error,
     filteredOrders,
@@ -31,6 +31,7 @@ export default function AdminCompras() {
     handleReimprimirEtiqueta,
     handleMarcarEnTransito,
     closeModalEtiqueta,
+    toggleProductExpansion,
     fetchCompras,
   } = useAdminCompras();
 
@@ -345,7 +346,7 @@ export default function AdminCompras() {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      {(order.productos || []).slice(0, 3).map((product, index) => (
+                      {(order.productos || []).slice(0, expandedProducts[order.id_compra] ? order.productos.length : 3).map((product, index) => (
                         <div key={product.id_producto || index} className="bg-stone-50 rounded-lg p-4 border-l-4 border-stone-300">
                           <div className="flex items-start gap-4">
                             <div className="flex-shrink-0">
@@ -378,8 +379,14 @@ export default function AdminCompras() {
                       ))}
                       {order.productos && order.productos.length > 3 && (
                         <div className="bg-gray-100 rounded-lg p-4 border-2 border-dashed border-gray-300">
-                          <button className="w-full text-center text-sm text-gray-600">
-                            Ver {order.productos.length - 3} productos más
+                          <button 
+                            onClick={() => toggleProductExpansion(order.id_compra)}
+                            className="w-full text-center text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                          >
+                            {expandedProducts[order.id_compra] 
+                              ? "Ver menos productos" 
+                              : `Ver ${order.productos.length - 3} productos más`
+                            }
                           </button>
                         </div>
                       )}
@@ -400,7 +407,8 @@ export default function AdminCompras() {
                           </span>
                         </div>
                         <div className="text-sm text-gray-600">
-                          {order.metodo_pago === 'credit_card' ? 'Tarjeta de Crédito/Debito' : 
+                          {order.metodo_pago === 'credit_card' ? 'Tarjeta de Crédito' : 
+                           order.metodo_pago === 'debit_card' ? 'Tarjeta de Débito' :
                            order.metodo_pago || 'No especificado'}
                         </div>
                         <div className="text-lg font-bold text-gray-800">${Math.floor(order.total || 0).toLocaleString()}</div>

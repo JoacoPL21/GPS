@@ -18,6 +18,7 @@ export const useAdminCompras = () => {
     mimeType: null, 
     etiquetaData: null 
   });
+  const [expandedProducts, setExpandedProducts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -151,6 +152,13 @@ export const useAdminCompras = () => {
     setModalEtiqueta({ open: false, url: null, mimeType: null, etiquetaData: null });
   };
 
+  const toggleProductExpansion = (orderId) => {
+    setExpandedProducts(prev => ({
+      ...prev,
+      [orderId]: !prev[orderId]
+    }));
+  };
+
   useEffect(() => {
     fetchCompras();
   }, []);
@@ -163,13 +171,22 @@ export const useAdminCompras = () => {
     }
   }, [orders]);
 
-  let filteredOrders = [...orders];
-  
-  // Filtrar solo compras con payment_status approved
-  filteredOrders = filteredOrders.filter((order) => {
+  // Filtrar solo compras con payment_status approved para estadísticas
+  const approvedOrders = orders.filter((order) => {
     const paymentStatus = order.payment_status || order.estado_pago;
     return paymentStatus === 'approved';
   });
+
+  // Calcular estadísticas sobre todas las compras aprobadas (sin filtros de búsqueda)
+  const stats = {
+    total: approvedOrders.length,
+    enviadas: approvedOrders.filter((c) => c.estado === "en_transito").length,
+    entregadas: approvedOrders.filter((c) => c.estado === "entregado").length,
+    en_preparacion: approvedOrders.filter((c) => c.estado === "en_preparacion").length,
+  };
+
+  // Aplicar filtros para la visualización
+  let filteredOrders = [...approvedOrders];
   
   if (search) {
     filteredOrders = filteredOrders.filter((order) =>
@@ -197,13 +214,6 @@ export const useAdminCompras = () => {
     setCurrentPage(1);
   };
 
-  const stats = {
-    total: filteredOrders.length, // Solo compras aprobadas
-    enviadas: filteredOrders.filter((c) => c.estado === "en_transito").length,
-    entregadas: filteredOrders.filter((c) => c.estado === "entregado").length,
-    en_preparacion: filteredOrders.filter((c) => c.estado === "en_preparacion").length,
-  };
-
   return {
     orders,
     search,
@@ -213,6 +223,7 @@ export const useAdminCompras = () => {
     enviosData,
     processingShipment,
     modalEtiqueta,
+    expandedProducts,
     loading,
     error,
     filteredOrders,
@@ -230,6 +241,7 @@ export const useAdminCompras = () => {
     handleReimprimirEtiqueta,
     handleMarcarEnTransito,
     closeModalEtiqueta,
+    toggleProductExpansion,
     fetchCompras,
   };
 }; 

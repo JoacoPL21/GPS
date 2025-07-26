@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getComprasUsuario } from '../../services/valoraciones.service';
+import { getComprasUsuario } from '../../services/compras.service';
 import { getEnvioPorCompra } from '../../services/envios.service';
 
 export const useMisCompras = () => {

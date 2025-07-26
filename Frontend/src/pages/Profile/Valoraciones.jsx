@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { FaStar, FaCalendarAlt, FaClock, FaCheckCircle } from 'react-icons/fa';
 import ValoracionModal from '../../components/ValoracionModal';
 import { createOrUpdateValoracion } from '../../services/valoraciones.service';
-import Swal from 'sweetalert2';
+import { toast } from '../../services/toast.service';
 
 const Valoraciones = () => {
-  const { pendientes, realizados, loading, error } = useProductosCompradosConValoracion();
+  const { pendientes, realizados, loading, error, fetchProductos } = useProductosCompradosConValoracion();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('pending');
   const [selectedProducto, setSelectedProducto] = useState(null);
@@ -53,28 +53,14 @@ const Valoraciones = () => {
       });
       
       if (res.data && !res.error) {
-        Swal.fire({
-          icon: 'success',
-          title: '¡Valoración guardada!',
-          showConfirmButton: false,
-          timer: 1200
-        });
+        toast.success('Acción completada', 'Valoración guardada exitosamente');
         handleCloseModal();
-        // Recargar los datos
-        window.location.reload();
+        fetchProductos();
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: res.error || 'No se pudo guardar la valoración'
-        });
+        toast.error('Error en la operación', res.error || 'No se pudo guardar la valoración');
       }
     } catch {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo guardar la valoración'
-      });
+      toast.error('Error en la operación', 'No se pudo guardar la valoración');
     } finally {
       setSubmitting(false);
     }
@@ -195,7 +181,7 @@ const Valoraciones = () => {
       ) : (
         <div className="space-y-6 max-w-4xl mx-auto">
           {realizados.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border p-6 text-center max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm border-0 p-6 text-center max-w-4xl mx-auto">
               <FaStar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-lg font-medium mb-2">Sin valoraciones</p>
               <p className="text-gray-500">Aún no has valorado ningún producto.</p>
