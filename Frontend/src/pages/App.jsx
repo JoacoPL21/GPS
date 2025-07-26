@@ -18,7 +18,6 @@ import MultiStepCart from './Carrito/multi-step-cart.jsx';
 import MisCompras from "./Profile/MisCompras.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
-import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
 import ForgotPassword from "./User/ForgotPassword.jsx";
 import ResetPassword from "./User/ResetPassword.jsx";
 import AdminCompras from "./Dashboard/AdminCompras.jsx";
@@ -95,14 +94,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Valoraciones />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "profile/valoraciones/valorar/:id_producto",
-        element: (
-          <ProtectedRoute>
-            <ValoracionFormPage />
           </ProtectedRoute>
         ),
       },
