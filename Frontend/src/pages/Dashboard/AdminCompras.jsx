@@ -3,12 +3,14 @@ import { FaShoppingBag, FaClock, FaBox, FaTruck, FaSearch, FaChevronLeft, FaChev
 import { useAdminCompras } from "../../hooks/compras/useAdminCompras";
 import CompraCard from "../../components/compras/CompraCard";
 import ExportButton from "../../components/compras/ExportButton";
+import Pagination from "../../components/compras/Pagination";
 
 export default function AdminCompras() {
   const {
     search,
     filter,
     currentPage,
+    itemsPerPage,
     enviosData,
     processingShipment,
     modalEtiqueta,
@@ -23,6 +25,7 @@ export default function AdminCompras() {
     setSearch,
     setFilter,
     handlePageChange,
+    handleItemsPerPageChange,
     handleProcesarEnvio,
     handleVerEtiqueta,
     handleReimprimirEtiqueta,
@@ -445,32 +448,17 @@ export default function AdminCompras() {
             </div>
         )}
 
-            {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-8">
-            <div className="text-sm text-gray-600">
-              Mostrando {startIndex + 1} a {Math.min(endIndex, filteredOrders.length)} de {filteredOrders.length} compras
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                <FaChevronLeft className="h-4 w-4" />
-                    </button>
-              <span className="text-sm text-gray-600">
-                Página {currentPage} de {totalPages}
-                            </span>
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                <FaChevronRight className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-        )}
+            {/* Paginación mejorada */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              totalItems={filteredOrders.length}
+              startIndex={startIndex}
+              endIndex={endIndex}
+            />
       </div>
 
       {modalEtiqueta.open && (

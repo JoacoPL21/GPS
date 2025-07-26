@@ -3,6 +3,7 @@ import { FaShoppingBag } from 'react-icons/fa';
 import { useMisCompras } from '../../hooks/compras/useMisCompras';
 import CompraCardModern from '../../components/compras/CompraCardModern';
 import PurchaseDetailsModal from '../../components/PurchaseDetailsModal';
+import Pagination from '../../components/compras/Pagination';
 
 const MisCompras = () => {
   const {
@@ -14,6 +15,16 @@ const MisCompras = () => {
 
     // Actions
     cargarCompras,
+    
+    // Paginación
+    currentPage,
+    itemsPerPage,
+    totalPages,
+    startIndex,
+    endIndex,
+    currentCompras,
+    handlePageChange,
+    handleItemsPerPageChange,
   } = useMisCompras();
 
   const [selectedCompra, setSelectedCompra] = useState(null);
@@ -81,19 +92,35 @@ const MisCompras = () => {
           </a>
         </div>
       ) : (
-        <div className="space-y-6 max-w-3xl mx-auto">
-          {compras.map((compra) => {
-            const idCompra = compra.id_compra || compra.id;
-            
-            return (
-              <CompraCardModern
-                key={idCompra}
-                compra={compra}
-                onVerDetalles={handleVerDetalles}
-              />
-            );
-          })}
-        </div>
+        <>
+          <div className="space-y-6 max-w-3xl mx-auto">
+            {currentCompras.map((compra) => {
+              const idCompra = compra.id_compra || compra.id;
+              
+              return (
+                <CompraCardModern
+                  key={idCompra}
+                  compra={compra}
+                  onVerDetalles={handleVerDetalles}
+                />
+              );
+            })}
+          </div>
+          
+          {/* Paginación */}
+          <div className="max-w-3xl mx-auto">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              totalItems={compras.length}
+              startIndex={startIndex}
+              endIndex={endIndex}
+            />
+          </div>
+        </>
       )}
 
       {/* Modal de detalles */}

@@ -10,6 +10,10 @@ export const useMisCompras = () => {
   const [error, setError] = useState(null);
   const [enviosData, setEnviosData] = useState({});
   const [compraExpandida, setCompraExpandida] = useState(null);
+  
+  // Estados de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const cargarCompras = async () => {
     if (!authUser) return;
@@ -68,6 +72,22 @@ export const useMisCompras = () => {
     }
   }, [compras]);
 
+  // Lógica de paginación
+  const totalPages = Math.ceil(compras.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCompras = compras.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   return {
     compras,
     loading,
@@ -76,5 +96,14 @@ export const useMisCompras = () => {
     compraExpandida,
     setCompraExpandida,
     cargarCompras,
+    // Paginación
+    currentPage,
+    itemsPerPage,
+    totalPages,
+    startIndex,
+    endIndex,
+    currentCompras,
+    handlePageChange,
+    handleItemsPerPageChange,
   };
 }; 
