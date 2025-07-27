@@ -97,35 +97,33 @@ export const productoCreateValidation = Joi.object({
 }).unknown(false).messages({
   "object.unknown": "Los campos adicionales no están permitidos",
 });
-/*
+
+// Validación para actualización de productos
 export const productoUpdateValidation = Joi.object({
   nombre: Joi.string()
     .min(3)
     .max(50)
-    .required()
+    .optional() // Cambiado a opcional para actualizaciones parciales
     .messages({
       "string.min": "El nombre del producto debe tener al menos 3 caracteres",
-      "any.required": "El nombre del producto es obligatorio",
       "string.max": "El nombre del producto no puede tener más de 50 caracteres",
       "string.empty": "El nombre del producto no puede estar vacío",
       "string.base": "El nombre del producto debe ser una cadena de texto",
     }),
   precio: Joi.number()
     .positive()
-    .required()
+    .optional() // Cambiado a opcional
     .messages({
       "number.positive": "El precio debe ser un número positivo",
-      "any.required": "El precio es obligatorio",
       "number.base": "El precio debe ser un número",
     }),
   stock: Joi.number()
     .integer()
     .min(0)
-    .required()
+    .optional() // Cambiado a opcional
     .messages({
       "number.integer": "El stock debe ser un número entero",
       "number.min": "El stock no puede ser negativo",
-      "any.required": "El stock es obligatorio",
       "number.base": "El stock debe ser un número",
     }),
   descripcion: Joi.string()
@@ -136,19 +134,58 @@ export const productoUpdateValidation = Joi.object({
       "string.base": "La descripción debe ser una cadena de texto",
     }),
   estado: Joi.string()
-    .valid("disponible", "agotado")
-    .required()
+    .valid("activo", "inactivo") // Corregido para usar los valores correctos
+    .optional() // Cambiado a opcional
     .messages({
-      "any.only": 'El estado debe ser uno de los siguientes valores: "disponible", "agotado"',
-      "any.required": "El estado es obligatorio",
+      "any.only": 'El estado debe ser uno de los siguientes valores: "activo", "inactivo"',
       "string.base": "El estado debe ser una cadena de texto",
     }),
-    imagen: Joi.string()
-    .uri()
-    .required()
+  image_url: Joi.string()
+    .optional()
     .messages({
-      "string.uri": "La imagen debe ser una URL válida",
-      "any.required": "La imagen es obligatoria",
       "string.base": "La imagen debe ser una cadena de texto",
     }),
-  })*/
+  id_categoria: Joi.number()
+    .optional() // Cambiado a opcional
+    .messages({
+      "number.base": "La categoría debe ser un número",
+    }),
+  peso: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El peso debe ser un número positivo",
+      "number.base": "El peso debe ser un número",
+      "number.precision": "El peso debe tener máximo 2 decimales",
+    }),
+  ancho: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El ancho debe ser un número positivo",
+      "number.base": "El ancho debe ser un número",
+      "number.precision": "El ancho debe tener máximo 2 decimales",
+    }),
+  alto: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "El alto debe ser un número positivo",
+      "number.base": "El alto debe ser un número",
+      "number.precision": "El alto debe tener máximo 2 decimales",
+    }),
+  profundidad: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      "number.positive": "La profundidad debe ser un número positivo",
+      "number.base": "La profundidad debe ser un número",
+      "number.precision": "La profundidad debe tener máximo 2 decimales",
+    }),
+}).unknown(false).messages({
+  "object.unknown": "Los campos adicionales no están permitidos",
+});

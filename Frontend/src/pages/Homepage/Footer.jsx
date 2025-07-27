@@ -33,26 +33,6 @@ const Footer = () => {
             </div>
           </div>
 
-          <div>
-            <Link to="/catalogo" className="font-semibold mb-4 !text-amber-100">Productos</Link>
-            <ul className="space-y-2 text-amber-300">
-              <li>
-                <Link to="#" className="text-base font-medium !text-amber-300 !no-underline">
-                 Muebles
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className="text-base font-medium !text-amber-300 !no-underline">
-                  Construcción
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className="text-base font-medium !text-amber-300 !no-underline">
-                  Decoración
-                </Link>
-              </li>
-            </ul>
-          </div>
 
           <div>
             <h4 className="font-semibold mb-4 text-amber-100">Servicio</h4>
@@ -63,14 +43,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-base font-medium !text-amber-300 !no-underline">
                   Devoluciones
-                </Link>
               </li>
               <li>
-                <Link to="#" className="text-base font-medium !text-amber-300 !no-underline">
+
                   Garantía
-                </Link>
+
               </li>
             </ul>
           </div>

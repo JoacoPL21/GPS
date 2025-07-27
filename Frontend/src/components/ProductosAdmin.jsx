@@ -354,7 +354,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             value={form.precio}
                             onChange={onChange}
                             min="0"
-                            step="100"
+                            step="10"
                             className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                               errors.precio
                                 ? "border-red-300 bg-red-50"

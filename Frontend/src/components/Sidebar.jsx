@@ -10,7 +10,6 @@ const customerMenu = [
     items: [
       { title: 'Inicio', url: '/', icon: <FaBoxOpen /> },
       { title: 'Catálogo', url: '/catalogo', icon: <FaTags /> },
-      { title: 'Envíos', url: '/envios', icon: <FaTruck /> },
     ],
   },
 ];
