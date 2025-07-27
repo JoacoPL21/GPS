@@ -10,9 +10,9 @@ export function useChilexpressData() {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch(`http://localhost:3000/api/chilexpress/regiones`);
-      
+      const API_URL=import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/chilexpress/regiones`);
+
       if (!response.ok) {
         throw new Error('Error al cargar regiones');
       }
@@ -34,9 +34,9 @@ export function useChilexpressData() {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch(`http://localhost:3000/api/chilexpress/areas-cobertura/${regionCode}`);
-      
+
+      const response = await fetch(`${API_URL}/chilexpress/areas-cobertura/${regionCode}`);
+
       if (!response.ok) {
         throw new Error('Error al cargar comunas');
       }
