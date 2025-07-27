@@ -642,7 +642,7 @@ async function createCompra_Producto() {
       // Compra 0 - Presentacion
       Compra_ProductoRepository.save(Compra_ProductoRepository.create({
         id_compra: 6,
-        id_producto: 8, 
+        id_producto: 9, 
         cantidad: 2,
         precio_unitario: 15000,
       })),
