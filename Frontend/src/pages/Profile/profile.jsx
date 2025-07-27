@@ -50,7 +50,7 @@ const Profile = () => {
       text: "Esta acción no se puede deshacer",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#d97706",
+      confirmButtonColor: "#f97316",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
@@ -67,7 +67,7 @@ const Profile = () => {
           title: "¡Eliminada!",
           text: "Dirección eliminada correctamente.",
           icon: "success",
-          confirmButtonColor: "#d97706",
+          confirmButtonColor: "#f97316",
           confirmButtonText: "Aceptar",
         })
       } else {
@@ -75,7 +75,7 @@ const Profile = () => {
           title: "Error",
           text: response.message || "No se pudo eliminar la dirección",
           icon: "error",
-          confirmButtonColor: "#d97706",
+          confirmButtonColor: "#f97316",
           confirmButtonText: "Aceptar",
         })
       }
@@ -85,7 +85,7 @@ const Profile = () => {
         title: "Error",
         text: "Ocurrió un error al eliminar la dirección",
         icon: "error",
-        confirmButtonColor: "#d97706",
+        confirmButtonColor: "#f97316",
         confirmButtonText: "Aceptar",
       })
     }
@@ -103,7 +103,7 @@ const Profile = () => {
           title: "¡Perfil actualizado!",
           text: "Tu información ha sido actualizada correctamente.",
           icon: "success",
-          confirmButtonColor: "#d97706",
+          confirmButtonColor: "#f97316",
           confirmButtonText: "Aceptar",
         })
       } else {
@@ -111,7 +111,7 @@ const Profile = () => {
           title: "Error",
           text: response.message || "No se pudo actualizar el perfil",
           icon: "error",
-          confirmButtonColor: "#d97706",
+          confirmButtonColor: "#f97316",
           confirmButtonText: "Aceptar",
         })
       }
@@ -121,7 +121,7 @@ const Profile = () => {
         title: "Error",
         text: "Ocurrió un error al actualizar el perfil",
         icon: "error",
-        confirmButtonColor: "#d97706",
+        confirmButtonColor: "#f97316",
         confirmButtonText: "Aceptar",
       })
     }
@@ -151,28 +151,29 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto max-w-7xl px-4 py-8">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-4">
-            Mi Perfil
-          </h1>
-          <p className="text-lg text-amber-700 max-w-2xl mx-auto">
-            Gestiona tu información personal y direcciones de envío para una experiencia de compra personalizada
-          </p>
+        <div className="mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Mi Perfil</h1>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Gestiona tu información personal y direcciones de envío para una experiencia de compra personalizada
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Información del Usuario */}
           <div className="lg:col-span-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-amber-200/50">
-              {/* Header con gradiente */}
-              <div className="relative h-32 bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-900/10 to-amber-900/20"></div>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              {/* Header con gradiente sutil */}
+              <div className="relative h-32 bg-orange-400 ">
                 <div className="absolute -bottom-12 left-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-xl flex items-center justify-center border-4 border-white">
-                    <span className="text-2xl font-bold text-white">{getInitials(authUser?.nombreCompleto)}</span>
+                  <div className="w-24 h-24 bg-white rounded-2xl shadow-lg flex items-center justify-center border-4 border-white">
+                    <span className="text-2xl font-bold text-orange-600">{getInitials(authUser?.nombreCompleto)}</span>
                   </div>
                 </div>
               </div>
@@ -180,16 +181,16 @@ const Profile = () => {
               {/* Contenido */}
               <div className="pt-16 p-6">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-amber-900 mb-2">{authUser?.nombreCompleto || "Usuario"}</h2>
-                  <span className="inline-flex px-4 py-2 text-sm font-semibold rounded-full bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{authUser?.nombreCompleto || "Usuario"}</h2>
+                  <span className="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
                     ✓ Cuenta Activa
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   {/* Email */}
-                  <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all duration-300 border border-amber-100">
-                    <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors border border-gray-100">
+                    <div className="w-12 h-12 bg-orange-400 rounded-xl flex items-center justify-center shadow-sm">
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
@@ -200,14 +201,14 @@ const Profile = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-amber-600">Email</p>
-                      <p className="text-amber-900 font-medium">{authUser?.email || "No disponible"}</p>
+                      <p className="text-sm font-medium text-gray-500">Email</p>
+                      <p className="text-gray-900 font-medium">{authUser?.email || "No disponible"}</p>
                     </div>
                   </div>
 
                   {/* Teléfono */}
-                  <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all duration-300 border border-amber-100">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors border border-gray-100">
+                    <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-sm">
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
@@ -218,8 +219,8 @@ const Profile = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-amber-600">Teléfono</p>
-                      <p className="text-amber-900 font-medium">{authUser?.telefono || "No disponible"}</p>
+                      <p className="text-sm font-medium text-gray-500">Teléfono</p>
+                      <p className="text-gray-900 font-medium">{authUser?.telefono || "No disponible"}</p>
                     </div>
                   </div>
                 </div>
@@ -228,7 +229,7 @@ const Profile = () => {
                 <div className="mt-8 space-y-3">
                   <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white px-6 py-4 rounded-2xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+                    className="w-full bg-orange-400 text-white px-6 py-3 rounded-xl hover:bg-orange-500 transition-colors flex items-center justify-center space-x-3 shadow-sm font-medium"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -243,7 +244,7 @@ const Profile = () => {
 
                   <Link
                     to="/mis-compras"
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+                    className="w-full bg-gray-400 !text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-colors flex items-center justify-center space-x-3 shadow-sm font-medium"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -255,22 +256,16 @@ const Profile = () => {
                     </svg>
                     <span>Mis Compras</span>
                   </Link>
-                  {/* Link a mis valoraciones con signo de estrella y color dorado */}
+
                   <Link
                     to="/profile/valoraciones"
-                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-4 rounded-2xl hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+                    className="w-full bg-yellow-400 !text-white px-6 py-3 rounded-xl hover:bg-yellow-500 transition-colors flex items-center justify-center space-x-3 shadow-sm font-medium"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-                      />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                     </svg>
                     <span>Mis Valoraciones</span>
                   </Link>
-                  
                 </div>
               </div>
             </div>
@@ -278,24 +273,24 @@ const Profile = () => {
 
           {/* Direcciones de Envío */}
           <div className="lg:col-span-2">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-amber-200/50">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 p-6">
+              <div className="bg-gray-50 border-b border-gray-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-white mb-1">Direcciones de Envío</h2>
-                    <p className="text-amber-100">Gestiona tus direcciones de entrega</p>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-1">Direcciones de Envío</h2>
+                    <p className="text-gray-600">Gestiona tus direcciones de entrega</p>
                   </div>
 
                   <div className="text-right">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3 border border-white/30">
-                      <p className="text-white text-sm font-medium">Direcciones</p>
-                      <p className="text-white text-2xl font-bold">
+                    <div className="bg-white rounded-xl px-4 py-3 border border-gray-200 shadow-sm">
+                      <p className="text-gray-600 text-sm font-medium">Direcciones</p>
+                      <p className="text-gray-900 text-2xl font-bold">
                         {direcciones.length}
-                        <span className="text-amber-200 text-lg">/3</span>
+                        <span className="text-gray-500 text-lg">/3</span>
                       </p>
                     </div>
-                    {direcciones.length >= 3 && <p className="text-amber-200 text-xs mt-1">Límite alcanzado</p>}
+                    {direcciones.length >= 3 && <p className="text-orange-600 text-xs mt-1">Límite alcanzado</p>}
                   </div>
                 </div>
               </div>
@@ -304,8 +299,8 @@ const Profile = () => {
               <div className="p-6">
                 {isLoadingDirecciones ? (
                   <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
-                      <svg className="animate-spin w-10 h-10 text-amber-600" fill="none" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gray-200">
+                      <svg className="animate-spin w-8 h-8 text-orange-500" fill="none" viewBox="0 0 24 24">
                         <circle
                           className="opacity-25"
                           cx="12"
@@ -321,24 +316,24 @@ const Profile = () => {
                         ></path>
                       </svg>
                     </div>
-                    <p className="text-amber-800 text-xl font-semibold">Cargando direcciones...</p>
+                    <p className="text-gray-700 text-xl font-medium">Cargando direcciones...</p>
                   </div>
                 ) : direcciones.length > 0 ? (
                   <div className="space-y-4">
                     {direcciones.map((direccion, index) => (
                       <div
                         key={direccion.id_direccion}
-                        className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group border border-amber-200/50"
+                        className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors group border border-gray-100"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-xl flex items-center justify-center font-bold shadow-lg">
+                            <div className="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center font-bold shadow-sm">
                               {index + 1}
                             </div>
 
-                            <div className="w-10 h-10 bg-gradient-to-br from-amber-200 to-orange-200 rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-gray-200 rounded-xl flex items-center justify-center">
                               <svg
-                                className="w-5 h-5 text-amber-700"
+                                className="w-5 h-5 text-gray-600"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -359,10 +354,10 @@ const Profile = () => {
                             </div>
 
                             <span
-                              className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${
+                              className={`inline-flex px-3 py-1 text-sm font-medium rounded-full border ${
                                 direccion.tipo_de_direccion === "predeterminada"
-                                  ? "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 border-amber-300"
-                                  : "bg-gradient-to-r from-stone-100 to-gray-100 text-stone-800 border-stone-300"
+                                  ? "bg-orange-100 text-orange-800 border-orange-200"
+                                  : "bg-gray-100 text-gray-800 border-gray-200"
                               }`}
                             >
                               {direccion.tipo_de_direccion || "Dirección"}
@@ -371,7 +366,7 @@ const Profile = () => {
 
                           <button
                             onClick={() => handleDeleteDireccion(direccion.id_direccion)}
-                            className="opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gradient-to-r from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 text-red-700 p-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg shadow-sm"
                             title="Eliminar dirección"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -387,22 +382,22 @@ const Profile = () => {
 
                         <div className="grid md:grid-cols-2 gap-4 text-sm">
                           <div className="space-y-1">
-                            <p className="text-amber-600 font-semibold">Dirección</p>
-                            <p className="text-amber-900 font-medium">
+                            <p className="text-gray-500 font-medium">Dirección</p>
+                            <p className="text-gray-900 font-medium">
                               {direccion.calle} {direccion.numero}
                             </p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-amber-600 font-semibold">Comuna</p>
-                            <p className="text-amber-900 font-medium">{direccion.comuna}</p>
+                            <p className="text-gray-500 font-medium">Comuna</p>
+                            <p className="text-gray-900 font-medium">{direccion.comuna}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-amber-600 font-semibold">Región</p>
-                            <p className="text-amber-900 font-medium">{direccion.region}</p>
+                            <p className="text-gray-500 font-medium">Región</p>
+                            <p className="text-gray-900 font-medium">{direccion.region}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-amber-600 font-semibold">Código Postal</p>
-                            <p className="text-amber-900 font-medium">{direccion.codigo_postal}</p>
+                            <p className="text-gray-500 font-medium">Código Postal</p>
+                            <p className="text-gray-900 font-medium">{direccion.codigo_postal}</p>
                           </div>
                         </div>
                       </div>
@@ -410,8 +405,8 @@ const Profile = () => {
                   </div>
                 ) : (
                   <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
-                      <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gray-200">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -426,8 +421,8 @@ const Profile = () => {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-amber-800 mb-2">No hay direcciones registradas</h3>
-                    <p className="text-amber-600">Agrega tu primera dirección de envío para comenzar</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">No hay direcciones registradas</h3>
+                    <p className="text-gray-600">Agrega tu primera dirección de envío para comenzar</p>
                   </div>
                 )}
               </div>
