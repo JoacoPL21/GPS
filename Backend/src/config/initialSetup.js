@@ -112,18 +112,10 @@ async function createProductos() {
     const count = await ProductosRepository.count();
     if (count > 0) {
       console.log(chalk.yellow("ℹ️  Productos ya existen. Se omite creación."));
-      
-      // Log de productos existentes para debug
-      console.log('🔍 [createProductos] Listando productos existentes para debug:');
-      const productosExistentes = await ProductosRepository.find();
-      productosExistentes.forEach(producto => {
-        console.log(`🔍 [createProductos] Producto ID: ${producto.id_producto}, Nombre: ${producto.nombre}, Estado: ${producto.estado}`);
-      });
-      
       return;
     }
     
-    console.log('🔧 [createProductos] Creando productos iniciales...');
+
     const productosCreados = await Promise.all([
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Jardinera",
@@ -136,7 +128,8 @@ async function createProductos() {
         id_categoria:2,
         alto: 30,
         ancho: 60,
-        profundidad: 20
+        profundidad: 20,
+        peso: 5
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Macetero",
@@ -149,7 +142,8 @@ async function createProductos() {
         id_categoria:2,
         alto: 30,
         ancho: 15,
-        profundidad: 15
+        profundidad: 15,
+        peso: 3
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Medallero",
@@ -162,7 +156,8 @@ async function createProductos() {
         id_categoria:2,
         alto: 30,
         ancho: 2,
-        profundidad: 20
+        profundidad: 20,
+        peso: 3
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Escaño",
@@ -187,7 +182,8 @@ async function createProductos() {
         id_categoria:3,
         alto: 30,
         ancho: 60,
-        profundidad: 60
+        profundidad: 60,
+        peso: 15
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Silla de madera",
@@ -199,7 +195,8 @@ async function createProductos() {
         id_categoria:3,
         alto: 30,
         ancho: 60,
-        profundidad: 60
+        profundidad: 60,
+        peso: 15
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Estantería",
@@ -211,7 +208,8 @@ async function createProductos() {
         id_categoria:3,
         alto: 30,
         ancho: 60,
-        profundidad: 20
+        profundidad: 20,
+        peso: 30
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Escritorio",
@@ -223,7 +221,8 @@ async function createProductos() {
         id_categoria:3,
         alto: 75,
         ancho: 60,
-        profundidad: 20
+        profundidad: 20,
+        peso: 25
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Juguete de madera",
@@ -236,7 +235,8 @@ async function createProductos() {
         id_categoria:1,
         alto: 15,
         ancho: 15,
-        profundidad: 15
+        profundidad: 15,
+        peso: 0.5
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Puzzle de madera",
@@ -249,7 +249,8 @@ async function createProductos() {
         id_categoria:1,
         alto: 15,
         ancho: 15,
-        profundidad: 15
+        profundidad: 15,
+        peso: 0.5
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Lotes de Madera",
@@ -263,6 +264,7 @@ async function createProductos() {
         alto: 4,
         ancho: 15,
         profundidad: 100,
+        peso: 13
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Madera prensada",
@@ -275,7 +277,8 @@ async function createProductos() {
         id_categoria:4,
         alto: 4,
         ancho: 15,
-        profundidad: 100
+        profundidad: 100,
+        peso: 4
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Tablero de madera",
@@ -288,7 +291,8 @@ async function createProductos() {
         id_categoria:4,
         alto: 4,
         ancho: 15,
-        profundidad: 100
+        profundidad: 100,
+        peso: 13
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Viga de madera",
@@ -301,7 +305,8 @@ async function createProductos() {
         id_categoria:4,
         alto: 10,
         ancho: 15,
-        profundidad: 200
+        profundidad: 200,
+        peso: 1
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Bandeja de madera",
@@ -327,7 +332,8 @@ async function createProductos() {
         id_categoria:2,
         alto: 20,
         ancho: 15,
-        profundidad: 2
+        profundidad: 2,
+        peso: 0.5
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Reloj de pared",
@@ -340,7 +346,8 @@ async function createProductos() {
         id_categoria:2,
         alto: 30,
         ancho: 30,
-        profundidad: 5
+        profundidad: 5,
+        peso: 0.5
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Cajón organizador",
@@ -353,7 +360,8 @@ async function createProductos() {
         id_categoria:2,
         alto: 20,
         ancho: 30,
-        profundidad: 40
+        profundidad: 40,
+        peso: 5
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Banco de madera",
@@ -366,7 +374,8 @@ async function createProductos() {
         id_categoria:3,
         alto: 45,
         ancho: 120,
-        profundidad: 40
+        profundidad: 40,
+        peso: 7,
       })),
       ProductosRepository.save(ProductosRepository.create({
         nombre: "Sofá de madera",
@@ -379,14 +388,10 @@ async function createProductos() {
         id_categoria:3,
         alto: 90,
         ancho: 200,
-        profundidad: 100
+        profundidad: 100,
+        peso: 30
       })),
     ]);
-    console.log('🔧 [createProductos] Productos creados con IDs:');
-    productosCreados.forEach(producto => {
-      console.log(`🔧 [createProductos] Producto creado - ID: ${producto.id_producto}, Nombre: ${producto.nombre}`);
-    });
-    
     console.log(chalk.green("✅ Productos creados exitosamente."));
   } catch (error) {
     console.error(chalk.red("❌ Error al crear productos:", error));
