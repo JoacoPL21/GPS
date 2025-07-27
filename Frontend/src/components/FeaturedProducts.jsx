@@ -110,9 +110,9 @@ function FeaturedProducts() {
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xl font-bold text-amber-900">{product.price}</span>
+                        <span className="text-xl font-bold text-black">{product.price}</span>
                         {product.originalPrice && (
-                          <span className="text-sm text-amber-600 line-through">{product.originalPrice}</span>
+                          <span className="text-sm text-black line-through">{product.originalPrice}</span>
                         )}
                       </div>
                     </div>

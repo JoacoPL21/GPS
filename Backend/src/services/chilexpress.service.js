@@ -96,9 +96,9 @@ export async function createTransportOrder(id_compra, shippingData) {
                 ],
                 packages: [{
                     weight: calculatePackageWeight(productosCompra),
-                    height: "10",
-                    width: "15",
-                    length: "20",
+                    height: calculatePackageHeight(productosCompra),
+                    width: calculatePackageWidth(productosCompra),
+                    length: calculatePackageLength(productosCompra),
                     serviceDeliveryCode: shippingData.serviceCode,
                     productCode: "3",
                     deliveryReference: `GPS-${compra.id_compra}`,
@@ -258,6 +258,36 @@ function extractSupplement(address) {
 }
 
 function calculatePackageWeight(productos) {
-    const totalItems = productos.reduce((sum, p) => sum + p.cantidad, 0);
-    return Math.max(1, Math.ceil(totalItems * 0.5));
+    const totalWeight = productos.reduce((sum, p) => {
+        const weight = parseFloat(p.Productos?.peso) || 0;
+        return sum + (weight * p.cantidad);
+    }, 0);
+    return Math.max(1, Math.ceil(totalWeight));
+}
+
+function calculatePackageHeight(productos) {
+    const maxHeight = productos.reduce((max, p) => {
+        const height = parseFloat(p.Productos?.alto) || 0;
+        return Math.max(max, height);
+    }, 0);
+    // Si no hay dimensiones definidas, usar valor por defecto
+    return Math.max(10, Math.ceil(maxHeight));
+}
+
+function calculatePackageWidth(productos) {
+    const maxWidth = productos.reduce((max, p) => {
+        const width = parseFloat(p.Productos?.ancho) || 0;
+        return Math.max(max, width);
+    }, 0);
+    // Si no hay dimensiones definidas, usar valor por defecto
+    return Math.max(15, Math.ceil(maxWidth));
+}
+
+function calculatePackageLength(productos) {
+    const maxLength = productos.reduce((max, p) => {
+        const length = parseFloat(p.Productos?.profundidad) || 0;
+        return Math.max(max, length);
+    }, 0);
+    // Si no hay dimensiones definidas, usar valor por defecto
+    return Math.max(20, Math.ceil(maxLength));
 } 

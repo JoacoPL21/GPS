@@ -10,18 +10,15 @@ export async function verificarCompraProducto(id_usuario, id_producto) {
         const compraProducto = await compraProductoRepository
             .createQueryBuilder("cp")
             .leftJoinAndSelect("cp.Compras", "compra")
+            .leftJoinAndSelect("compra.Envios", "envio")
             .where("cp.id_producto = :id_producto", { id_producto: parseInt(id_producto) })
             .andWhere("compra.id_usuario = :id_usuario", { id_usuario: parseInt(id_usuario) })
+            .andWhere("(compra.estado_envio = 'entregado' OR envio.estado = 'entregado' OR envio.delivered_date IS NOT NULL)")
             .getOne();
 
-        console.log(`Verificando compra para usuario ${id_usuario} y producto ${id_producto}`);
-        console.log(`Resultado de la verificación:`, compraProducto);
-
         if (compraProducto) {
-            console.log(`Usuario ${id_usuario} ha comprado el producto ${id_producto}`);
             return [true, null];
         } else {
-            console.log(`Usuario ${id_usuario} NO ha comprado el producto ${id_producto}`);
             return [false, null];
         }
     } catch (error) {
@@ -68,7 +65,7 @@ export async function createValoracion(valoracionData) {
         
         const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
         if (!compraProducto[0]) {
-            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+            return [null, "No has comprado este producto o aún no ha sido entregado, por lo que no puedes valorarlo."];
         }
 
         const valoracionExistente = await valoracionesRepository.findOne({
@@ -111,7 +108,7 @@ export async function updateValoracion(valoracionData) {
         
         const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
         if (!compraProducto[0]) {
-            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+            return [null, "No has comprado este producto o aún no ha sido entregado, por lo que no puedes valorarlo."];
         }
         
         const valoracionExistente = await valoracionesRepository.findOne({
@@ -161,7 +158,7 @@ export async function createOrUpdateValoracion(valoracionData) {
         
         const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
         if (!compraProducto[0]) {
-            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+            return [null, "No has comprado este producto o aún no ha sido entregado, por lo que no puedes valorarlo."];
         }
         
         const valoracionesRepository = AppDataSource.getRepository(Valoraciones);
