@@ -25,7 +25,7 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
         title: "Dirección registrada exitosamente",
         text: "Tu dirección de envío ha sido guardada.",
         showConfirmButton: true,
-        confirmButtonColor: "#d97706",
+        confirmButtonColor: "#f97316",
         confirmButtonText: "Aceptar",
       })
       setSuccess(false)
@@ -97,7 +97,7 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
         icon: "warning",
         title: "Límite alcanzado",
         text: `No puedes tener más de ${maxDirections} direcciones. Elimina una dirección existente antes de agregar una nueva.`,
-        confirmButtonColor: "#d97706",
+        confirmButtonColor: "#f97316",
         confirmButtonText: "Entendido",
       })
       return
@@ -135,7 +135,7 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
           title: "Error",
           text: response.message || "No se pudo registrar la dirección",
           icon: "error",
-          confirmButtonColor: "#d97706",
+          confirmButtonColor: "#f97316",
           confirmButtonText: "Aceptar",
         })
       }
@@ -145,7 +145,7 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
         title: "Error",
         text: "Ocurrió un error al registrar la dirección. Por favor intenta nuevamente.",
         icon: "error",
-        confirmButtonColor: "#d97706",
+        confirmButtonColor: "#f97316",
         confirmButtonText: "Aceptar",
       })
     } finally {
@@ -154,15 +154,15 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-amber-200/50 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
       {/* Header del formulario */}
-      <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 p-6">
+      <div className="bg-gray-50 border-b border-gray-200 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-1">
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">
               {hasReachedLimit ? "Límite Alcanzado" : "Agregar Nueva Dirección"}
             </h2>
-            <p className="text-amber-100">
+            <p className="text-gray-600">
               {hasReachedLimit
                 ? `Tienes ${currentDirectionsCount}/${maxDirections} direcciones registradas`
                 : `Tienes ${currentDirectionsCount}/${maxDirections} direcciones registradas`}
@@ -170,8 +170,8 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
           </div>
 
           {/* Icono decorativo */}
-          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center border border-gray-200 shadow-sm">
+            <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -189,8 +189,8 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
         {hasReachedLimit ? (
           // Mensaje cuando se alcanza el límite
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
-              <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gray-200">
+              <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -199,11 +199,11 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-amber-900 mb-3">Límite de direcciones alcanzado</h3>
-            <p className="text-amber-700 mb-4 text-lg">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Límite de direcciones alcanzado</h3>
+            <p className="text-gray-700 mb-4 text-lg">
               Has registrado el máximo de {maxDirections} direcciones permitidas.
             </p>
-            <p className="text-amber-600">Para agregar una nueva dirección, primero elimina una de las existentes.</p>
+            <p className="text-gray-600">Para agregar una nueva dirección, primero elimina una de las existentes.</p>
           </div>
         ) : (
           // Formulario normal cuando no se alcanza el límite
@@ -211,9 +211,9 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
             <div className="grid md:grid-cols-2 gap-6">
               {/* Calle */}
               <div className="group">
-                <label className="block text-sm font-bold text-amber-800 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Calle
-                  <span className="text-red-600 ml-1">*</span>
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -221,14 +221,14 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
                     name="calle"
                     value={form.calle}
                     onChange={handleInputChange}
-                    className={`w-full border-2 ${
-                      error.calle ? "border-red-500 bg-red-50" : "border-amber-200 bg-white"
-                    } rounded-2xl px-5 py-4 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-300 group-hover:border-amber-300 text-amber-900 font-medium `}
+                    className={`w-full border ${
+                      error.calle ? "border-red-300 bg-red-50" : "border-gray-300 bg-white"
+                    } rounded-xl px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors text-gray-900`}
                     placeholder="Ingresa el nombre de la calle"
                     required
                   />
-                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -239,8 +239,8 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
                   </div>
                 </div>
                 {error.calle && (
-                  <p className="text-red-600 text-sm mt-2 flex items-center font-medium">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <p className="text-red-600 text-sm mt-1 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -255,24 +255,24 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
 
               {/* Número */}
               <div className="group">
-                <label className="block text-sm font-bold text-amber-800 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Número
-                  <span className="text-red-600 ml-1">*</span>
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
                   name="numero"
                   value={form.numero}
                   onChange={handleInputChange}
-                  className={`w-full border-2 ${
-                    error.numero ? "border-red-500 bg-red-50" : "border-amber-200 bg-white"
-                  } rounded-2xl px-5 py-4 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-300 group-hover:border-amber-300 text-amber-900 font-medium `}
+                  className={`w-full border ${
+                    error.numero ? "border-red-300 bg-red-50" : "border-gray-300 bg-white"
+                  } rounded-xl px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors text-gray-900`}
                   placeholder="Número de la dirección"
                   required
                 />
                 {error.numero && (
-                  <p className="text-red-600 text-sm mt-2 flex items-center font-medium">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <p className="text-red-600 text-sm mt-1 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -287,24 +287,24 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
 
               {/* Código Postal */}
               <div className="group">
-                <label className="block text-sm font-bold text-amber-800 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Código Postal
-                  <span className="text-red-600 ml-1">*</span>
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
                   name="codigo_postal"
                   value={form.codigo_postal}
                   onChange={handleInputChange}
-                  className={`w-full border-2 ${
-                    error.codigo_postal ? "border-red-500 bg-red-50" : "border-amber-200 bg-white"
-                  } rounded-2xl px-5 py-4 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-300 group-hover:border-amber-300 text-amber-900 font-medium `}
+                  className={`w-full border ${
+                    error.codigo_postal ? "border-red-300 bg-red-50" : "border-gray-300 bg-white"
+                  } rounded-xl px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors text-gray-900`}
                   placeholder="Código postal (7 dígitos)"
                   required
                 />
                 {error.codigo_postal && (
-                  <p className="text-red-600 text-sm mt-2 flex items-center font-medium">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <p className="text-red-600 text-sm mt-1 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -319,19 +319,19 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
 
               {/* Tipo de dirección */}
               <div className="group">
-                <label className="block text-sm font-bold text-amber-800 mb-3">Tipo de dirección</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de dirección</label>
                 <div className="relative">
                   <select
                     name="tipo_de_direccion"
                     value={form.tipo_de_direccion}
                     onChange={handleInputChange}
-                    className="w-full border-2 border-amber-200 rounded-2xl px-5 py-4 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-300 group-hover:border-amber-300 appearance-none bg-white text-amber-900 font-medium"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors appearance-none bg-white text-gray-900"
                   >
                     <option value="predeterminada">Predeterminada</option>
                     <option value="opcional">Opcional</option>
                   </select>
-                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -341,9 +341,9 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
 
             {/* Selector de Región y Comuna */}
             <div className="mt-8">
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border-2 border-amber-200">
-                <h3 className="text-sm font-bold text-amber-800 mb-4 flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-4 flex items-center">
+                  <svg className="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -358,7 +358,7 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
                     />
                   </svg>
                   Ubicación del envío
-                  <span className="text-red-600 ml-1">*</span>
+                  <span className="text-red-500 ml-1">*</span>
                 </h3>
                 <ChilexpressRegionComunaSelector
                   regionValue={form.region}
@@ -371,19 +371,17 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
             </div>
 
             {/* Botón de envío */}
-            <div className="mt-10 flex justify-center">
+            <div className="mt-8 flex justify-center">
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`flex items-center space-x-3 px-10 py-5 rounded-2xl font-bold text-white transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl ${
-                  isLoading
-                    ? "bg-stone-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                className={`flex items-center space-x-3 px-8 py-4 rounded-xl font-medium text-white transition-colors shadow-sm ${
+                  isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-orange-400 hover:bg-orange-500"
                 }`}
               >
                 {isLoading ? (
                   <>
-                    <svg className="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                       <circle
                         className="opacity-25"
                         cx="12"
@@ -402,7 +400,7 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
                   </>
                 ) : (
                   <>
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span>Guardar Dirección</span>
@@ -412,9 +410,9 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
             </div>
 
             {/* Información adicional */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-200">
+            <div className="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
               <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
@@ -425,7 +423,7 @@ const FormDireccionEnvio = ({ onDireccionAdded, currentDirectionsCount = 0, maxD
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-blue-800 mb-2">Información importante</p>
+                  <p className="text-sm font-medium text-blue-800 mb-2">Información importante</p>
                   <p className="text-sm text-blue-700 leading-relaxed">
                     Selecciona la región y comuna donde quieres recibir tus pedidos. Esta información será utilizada
                     para calcular los costos de envío con Chilexpress y garantizar una entrega exitosa.
