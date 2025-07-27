@@ -5,12 +5,12 @@ export function useChilexpressData() {
   const [comunasPorRegion, setComunasPorRegion] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const API_URL=import.meta.env.VITE_BASE_URL;
   const fetchRegiones = async () => {
     try {
       setLoading(true);
       setError(null);
-      const API_URL=import.meta.env.VITE_BASE_URL;
+     
       const response = await fetch(`${API_URL}/chilexpress/regiones`);
 
       if (!response.ok) {
