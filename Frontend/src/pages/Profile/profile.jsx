@@ -243,7 +243,7 @@ const Profile = () => {
                   </button>
 
                   <Link
-                    to="/mis-compras"
+                    to="/profile/ mis-compras"
                     className="w-full bg-gray-400 !text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-colors flex items-center justify-center space-x-3 shadow-sm font-medium"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

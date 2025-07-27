@@ -229,7 +229,7 @@ export function CartProvider({ children }) {
     debouncedSave();
   }, [debouncedSave]);
 
-  // Funciones base optimizadas para interactuar con el carrito
+
   const addItemToCartBase = useCallback((item) => {
     const isDebugMode = process.env.NODE_ENV === 'development';
     if (isDebugMode) {

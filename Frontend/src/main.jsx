@@ -10,11 +10,11 @@ import { initializeAuth } from './services/auth.service.js';
 initializeAuth();
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  
     <CartProvider>  
       <AuthProvider>  
         <App />  
       </AuthProvider>
     </CartProvider>
-  </StrictMode>
+  
 );
