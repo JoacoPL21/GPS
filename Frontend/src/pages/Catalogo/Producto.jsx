@@ -21,7 +21,7 @@ const Producto = () => {
     if (!producto) return
 
     const item = {
-      id_producto: producto.id_producto, // CORRECCIÓN: Cambiar 'id' por 'id_producto'
+      id_producto: producto.id_producto, 
       nombre: producto.nombre,
       precio: producto.precio,
       cantidad: cantidad,

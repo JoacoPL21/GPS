@@ -39,7 +39,8 @@ const CardInfoProducto = ({ producto }) => {
         <Caracteristica
           iconPath="M12 4v16m8-8H4m16 0a8 8 0 11-16 0 8 8 0 0116 0z"
           titulo="Dimensiones"
-          valor={`${producto.alto} x ${producto.ancho} x ${producto.profundidad} cm`}
+          valor={`A: ${producto.alto} x A: ${producto.ancho} x L: ${producto.profundidad} cm${producto.peso ? `, ${producto.peso} Kg` : ''}`}
+
         />
 
       </div>
