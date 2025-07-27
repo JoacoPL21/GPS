@@ -74,19 +74,27 @@ export async function verificarCompraProducto(id_usuario, id_producto) {
     try {
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
         
+        // Primero verificar si existe alguna compra del usuario para este producto
         const compraProducto = await compraProductoRepository
             .createQueryBuilder("cp")
             .leftJoinAndSelect("cp.Compras", "compra")
             .where("cp.id_producto = :id_producto", { id_producto: parseInt(id_producto) })
             .andWhere("compra.id_usuario = :id_usuario", { id_usuario: parseInt(id_usuario) })
-            .andWhere("compra.estado_envio = 'entregado'")
             .getOne();
 
-        if (compraProducto) {
-            return [true, null];
-        } else {
+        if (!compraProducto) {
+            console.log(`Usuario ${id_usuario} NO ha comprado el producto ${id_producto}`);
             return [false, null];
         }
+
+        // Verificar si el estado de envío es "entregado"
+        if (compraProducto.Compras.estado_envio !== 'entregado') {
+            console.log(`Usuario ${id_usuario} ha comprado el producto ${id_producto} pero NO está entregado (estado: ${compraProducto.Compras.estado_envio})`);
+            return [false, null];
+        }
+
+        console.log(`Usuario ${id_usuario} ha comprado y recibido el producto ${id_producto}`);
+        return [true, null];
     } catch (error) {
         console.error("Error al verificar compra del producto:", error);
         return [null, "Error al verificar compra del producto"];
@@ -96,8 +104,12 @@ export async function verificarCompraProducto(id_usuario, id_producto) {
 export async function getProductosCompradosConValoracion(id_usuario) {
     try {
         const comprasRepository = AppDataSource.getRepository(Compras);
+        // Solo obtener compras con estado_envio = 'entregado'
         const compras = await comprasRepository.find({
-            where: { id_usuario: parseInt(id_usuario) },
+            where: { 
+                id_usuario: parseInt(id_usuario),
+                estado_envio: 'entregado'
+            },
             order: { id_compra: "DESC" }
         });
 
@@ -105,42 +117,40 @@ export async function getProductosCompradosConValoracion(id_usuario) {
         const productosMap = new Map();
 
         for (const compra of compras) {
-            // Solo incluir compras que han sido entregadas
-            if (compra.estado_envio === 'entregado') {
-                const productosCompra = await compraProductoRepository.find({
-                    where: { id_compra: compra.id_compra },
-                    relations: ["Productos"]
-                });
+            const productosCompra = await compraProductoRepository.find({
+                where: { id_compra: compra.id_compra },
+                relations: ["Productos"]
+            });
 
-                for (const cp of productosCompra) {
-                    if (!productosMap.has(cp.id_producto)) {
-                        const valoracion = await AppDataSource.getRepository(Valoraciones).findOne({
-                            where: {
-                                id_usuario: parseInt(id_usuario),
-                                id_producto: cp.id_producto
-                            }
-                        });
-
-                        let imagen = null;
-                        if (cp.Productos?.image_url) {
-                          imagen = await getUrlImage(cp.Productos.image_url);
+            for (const cp of productosCompra) {
+                if (!productosMap.has(cp.id_producto)) {
+                    const valoracion = await AppDataSource.getRepository(Valoraciones).findOne({
+                        where: {
+                            id_usuario: parseInt(id_usuario),
+                            id_producto: cp.id_producto
                         }
+                    });
 
-                        productosMap.set(cp.id_producto, {
-                            id_producto: cp.id_producto,
-                            nombre_producto: cp.Productos?.nombre || 'Producto no disponible',
-                            imagen: imagen,
-                            fecha_compra: compra.createdAt,
-                            id_compra: compra.id_compra,
-                            valoracion: valoracion
-                                ? {
-                                    puntuacion: valoracion.puntuacion,
-                                    descripcion: valoracion.descripcion,
-                                    updatedAt: valoracion.updatedAt
-                                }
-                                : null
-                        });
+                    let imagen = null;
+                    if (cp.Productos?.image_url) {
+                      imagen = await getUrlImage(cp.Productos.image_url);
                     }
+
+                    productosMap.set(cp.id_producto, {
+                        id_producto: cp.id_producto,
+                        nombre_producto: cp.Productos?.nombre || 'Producto no disponible',
+                        imagen: imagen,
+                        fecha_compra: compra.createdAt,
+                        id_compra: compra.id_compra,
+                        estado_envio: compra.estado_envio,
+                        valoracion: valoracion
+                            ? {
+                                puntuacion: valoracion.puntuacion,
+                                descripcion: valoracion.descripcion,
+                                updatedAt: valoracion.updatedAt
+                            }
+                            : null
+                    });
                 }
             }
         }
@@ -209,7 +219,7 @@ export async function getAllCompras() {
                 productos
             };
         }));
-
+        console.log('Compras mapeadas para admin:', comprasAdmin);
         return [comprasAdmin, null];
     } catch (error) {
         console.error("Error al obtener todas las compras para admin:", error);
