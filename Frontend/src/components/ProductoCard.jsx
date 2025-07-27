@@ -46,9 +46,6 @@ const ProductoCard = ({
   const handleDeleteClick = (e) => {
     e.stopPropagation() // Evitar que se active la selección
     if (!selectionMode) {
-      console.log('🔷 [ProductoCard] handleDeleteClick - Producto completo:', producto);
-      console.log('🔷 [ProductoCard] handleDeleteClick - ID del producto:', producto.id_producto);
-      console.log('🔷 [ProductoCard] handleDeleteClick - Tipo de ID:', typeof producto.id_producto);
       onEliminar(producto.id_producto)
     }
   }
@@ -56,9 +53,6 @@ const ProductoCard = ({
   const handleRestoreClick = (e) => {
     e.stopPropagation() // Evitar que se active la selección
     if (!selectionMode && onRestaurar) {
-      console.log('🔄 [ProductoCard] handleRestoreClick - Producto completo:', producto);
-      console.log('🔄 [ProductoCard] handleRestoreClick - ID del producto:', producto.id_producto);
-      console.log('🔄 [ProductoCard] handleRestoreClick - Tipo de ID:', typeof producto.id_producto);
       onRestaurar(producto.id_producto)
     }
   }

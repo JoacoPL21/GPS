@@ -99,7 +99,6 @@ function ProductosManager() {
       // Hacer refresh de productos una sola vez (como el botón refresh)
       manejarRefrescar();
     } catch (error) {
-      console.error("Error al sincronizar categorías:", error);
     }
   };
 
