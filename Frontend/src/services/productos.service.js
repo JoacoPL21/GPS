@@ -20,7 +20,7 @@ export async function getProductos() {
     const response = await axios.get("/productos/all");
     return {
       success: true,
-      data: response.data.data, // Manteniendo la estructura original data.data
+      data: response.data.data, 
     };
   } catch (error) {
     console.error("Error al obtener productos:", error);
@@ -37,7 +37,7 @@ export async function getProductosEliminados() {
     const response = await axios.get("/productos/eliminados/all");
     return {
       success: true,
-      data: response.data.data, // Manteniendo la estructura original data.data
+      data: response.data.data, 
     };
   } catch (error) {
     console.error("Error al obtener productos eliminados:", error);
@@ -168,7 +168,7 @@ export async function createProducto(productoData, onProgress) {
     }
 
     // Usar XMLHttpRequest para progreso o fetch nativo
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
     const token = localStorage.getItem('token');
     
     let response;
@@ -276,7 +276,7 @@ export async function updateProducto(id_producto, productoData, onProgress) {
     console.log("🚀 Enviando actualización al backend...");
 
     // Usar XMLHttpRequest para progreso o fetch nativo  
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
     
     let response;
     if (onProgress && productoData.imagen instanceof File) {
