@@ -541,6 +541,27 @@ async function createCompras() {
       createdAt: new Date('2024-01-15'),
       updatedAt: new Date('2024-01-15')
     })),
+    ComprasRepository.save(ComprasRepository.create({
+      id_usuario: 4,
+      payment_id: "1324201336",
+      payment_status: "approved",
+      payment_amount: 75708.00,
+      payment_type: "debit_card",
+      external_reference: "ORD-1753657893409",
+      merchant_order: "32749942716",
+      nombre: "Benjamin",
+      apellido: "Ortiz",
+      email: "benjamin@gmail.com",
+      telefono: "966433091",
+      direccion: "Av. Providencia 1234",
+      region: "Metropolitana",
+      ciudad: "Santiago",
+      codigo_postal: "7500000",
+      estado_envio: "entregado",
+      total: 75708.00,
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date('2024-01-15')
+    })),
 
     console.log(chalk.green("✅ Compras creadas exitosamente."));
   } catch (error) {
@@ -642,7 +663,7 @@ async function createCompra_Producto() {
       // Compra 0 - Presentacion
       Compra_ProductoRepository.save(Compra_ProductoRepository.create({
         id_compra: 6,
-        id_producto: 8, 
+        id_producto: 9, 
         cantidad: 2,
         precio_unitario: 15000,
       })),
@@ -651,6 +672,12 @@ async function createCompra_Producto() {
         id_producto: 2, 
         cantidad: 1,
         precio_unitario: 10000,
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 7,
+        id_producto: 13, 
+        cantidad: 3,
+        precio_unitario: 20000,
       })),
     ]);
 
@@ -694,6 +721,10 @@ async function createEnvios() {
       EnviosRepository.save(EnviosRepository.create({
         id_compra: 6,
         estado: "en_preparacion",
+      })),
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 7,
+        estado: "entregado",
       })),
     ]);
 
