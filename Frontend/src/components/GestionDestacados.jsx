@@ -173,7 +173,7 @@ function GestionDestacados() {
                 <p className="text-gray-600 text-sm mb-3 line-clamp-1">{producto.descripcion}</p>
                 
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xl font-bold text-black">
+                  <span className="text-xl font-bold text-orange-600">
                     ${producto.precio.toLocaleString()}
                   </span>
                   <div className="flex items-center">

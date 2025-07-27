@@ -15,10 +15,16 @@ const ValoracionForm = ({
 
   // Actualizar el estado cuando valoracionExistente cambie
   useEffect(() => {
+    console.log('ValoracionForm - valoracionExistente:', valoracionExistente);
     if (valoracionExistente) {
+      console.log('ValoracionForm - Actualizando con valoración existente:', {
+        puntuacion: valoracionExistente.puntuacion,
+        descripcion: valoracionExistente.descripcion
+      });
       setPuntuacion(valoracionExistente.puntuacion || 0);
       setDescripcion(valoracionExistente.descripcion || '');
     } else {
+      console.log('ValoracionForm - Limpiando formulario');
       setPuntuacion(0);
       setDescripcion('');
     }
@@ -57,7 +63,8 @@ const ValoracionForm = ({
     return (
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <p className="text-blue-800 text-center">
-          Solo puedes valorar productos que hayas comprado y recibido
+          Solo puedes valorar productos que hayas comprado y recibido. 
+          Una vez que tu pedido sea entregado, podrás valorar este producto.
         </p>
       </div>
     );
