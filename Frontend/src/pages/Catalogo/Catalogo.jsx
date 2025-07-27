@@ -14,7 +14,8 @@ const CatalogoConnected = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("nombre")
   const [sortOrder, setSortOrder] = useState("asc")
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 })
+  // Cambiar a strings para manejar valores vacíos
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" })
   const [viewMode, setViewMode] = useState("grid")
   const [showFilters, setShowFilters] = useState(false)
   const [addedToCart, setAddedToCart] = useState(null)
@@ -25,35 +26,40 @@ const CatalogoConnected = () => {
     setCurrentPage(1)
   }, [searchTerm, priceRange, sortBy, sortOrder])
 
-const filteredAndSortedProducts = useMemo(() => {
-  if (!productos) return []
+  const filteredAndSortedProducts = useMemo(() => {
+    if (!productos) return []
 
-  const filtered = productos.filter((producto) => {
-    const matchesSearch =
-      producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (producto.descripcion && producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
-    const matchesPrice = producto.precio >= priceRange.min && producto.precio <= priceRange.max
+    const filtered = productos.filter((producto) => {
+      const matchesSearch =
+        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (producto.descripcion && producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
+
+      // Convertir los valores de precio, usando 0 para min vacío y Infinity para max vacío
+      const minPrice = priceRange.min === "" ? 0 : Number(priceRange.min)
+      const maxPrice = priceRange.max === "" ? Infinity : Number(priceRange.max)
+
+      const matchesPrice = producto.precio >= minPrice && producto.precio <= maxPrice
       return matchesSearch && matchesPrice
-  })
+    })
 
-  // Ordenar
-  filtered.sort((a, b) => {
-    let aValue = a[sortBy]
-    let bValue = b[sortBy]
-    if (sortBy === "precio") {
-      aValue = Number.parseFloat(aValue)
-      bValue = Number.parseFloat(bValue)
-    }
+    // Ordenar
+    filtered.sort((a, b) => {
+      let aValue = a[sortBy]
+      let bValue = b[sortBy]
+      if (sortBy === "precio") {
+        aValue = Number.parseFloat(aValue)
+        bValue = Number.parseFloat(bValue)
+      }
 
-    if (sortOrder === "asc") {
-      return aValue > bValue ? 1 : -1
-    } else {
-      return aValue < bValue ? 1 : -1
-    }
-  })
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
 
-  return filtered
-}, [productos, searchTerm, sortBy, sortOrder, priceRange])
+    return filtered
+  }, [productos, searchTerm, sortBy, sortOrder, priceRange])
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage
@@ -72,6 +78,22 @@ const filteredAndSortedProducts = useMemo(() => {
     addItemToCart(itemToAdd)
     setAddedToCart(producto.id_producto)
     setTimeout(() => setAddedToCart(null), 2000)
+  }
+
+  const handleMinPriceChange = (e) => {
+    const value = e.target.value
+    // Permitir valor vacío o solo números
+    if (value === "" || /^\d+$/.test(value)) {
+      setPriceRange(prev => ({ ...prev, min: value }))
+    }
+  }
+
+  const handleMaxPriceChange = (e) => {
+    const value = e.target.value
+    // Permitir valor vacío o solo números
+    if (value === "" || /^\d+$/.test(value)) {
+      setPriceRange(prev => ({ ...prev, max: value }))
+    }
   }
 
   const ProductSkeleton = () => (
@@ -100,7 +122,7 @@ const filteredAndSortedProducts = useMemo(() => {
         title="Nuestro Catálogo"
       />
 
-    <div>
+      <div>
         {/* Barra de herramientas */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -179,31 +201,30 @@ const filteredAndSortedProducts = useMemo(() => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Rango de Precio (CLP)</label>
                   <div className="flex items-center space-x-4">
                     <input
-                      type="number"
-                      placeholder="Mín"
+                      type="text"
+                      placeholder="Precio mínimo"
                       value={priceRange.min}
-                      onChange={(e) =>
-                        setPriceRange((prev) => ({ ...prev, min: Number.parseInt(e.target.value) || 0 }))
-                      }
+                      onChange={handleMinPriceChange}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     />
                     <span className="text-gray-500">-</span>
                     <input
-                      type="number"
-                      placeholder="Máx"
+                      type="text"
+                      placeholder="Precio máximo"
                       value={priceRange.max}
-                      onChange={(e) =>
-                        setPriceRange((prev) => ({ ...prev, max: Number.parseInt(e.target.value) || 1000000 }))
-                      }
+                      onChange={handleMaxPriceChange}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     />
                   </div>
+                  <div className="mt-2 text-xs text-gray-500">
+                    Deja vacío para sin límite
+                  </div>
                 </div>
-                <div className="flex items-end">
+                <div className="flex items-center">
                   <button
                     onClick={() => {
                       setSearchTerm("")
-                      setPriceRange({ min: 0, max: 1000000 })
+                      setPriceRange({ min: "", max: "" })
                       setSortBy("nombre")
                       setSortOrder("asc")
                     }}
@@ -217,28 +238,28 @@ const filteredAndSortedProducts = useMemo(() => {
           )}
         </div>
 
-      {/* Productos */}
-      <div className="mb-8">
-        {loading ? (
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {[...Array(12)].map((_, index) => (
-              <ProductSkeleton key={index} />
-            ))}
-          </div>
-        ) : paginatedProducts.length > 0 ? (
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {paginatedProducts.map((producto) => (
-              <div key={producto.id_producto} className="relative max-w-[300px] w-full mx-auto">
-                <CardCatalogo producto={producto} onAddToCart={handleAddToCart} viewMode={viewMode} />
-                {addedToCart === producto.id_producto && (
-                  <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium animate-bounce">
-                    ¡Agregado!
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
+        {/* Productos */}
+        <div className="mb-8">
+          {loading ? (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[...Array(12)].map((_, index) => (
+                <ProductSkeleton key={index} />
+              ))}
+            </div>
+          ) : paginatedProducts.length > 0 ? (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {paginatedProducts.map((producto) => (
+                <div key={producto.id_producto} className="relative max-w-[300px] w-full mx-auto">
+                  <CardCatalogo producto={producto} onAddToCart={handleAddToCart} viewMode={viewMode} />
+                  {addedToCart === producto.id_producto && (
+                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium animate-bounce">
+                      ¡Agregado!
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
             <div className="text-center py-16">
               <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
                 <svg
@@ -267,32 +288,31 @@ const filteredAndSortedProducts = useMemo(() => {
                   >
                     Limpiar búsqueda
                   </button>
-        )}
-      </div>
+                )}
+              </div>
             </div>
           )}
         </div>
 
-      {/* Paginación */}
-      {!loading && (
-        <div className="flex justify-center items-center space-x-2 mt-8">
-          {Array.from({ length: Math.ceil(filteredAndSortedProducts.length / itemsPerPage) }, (_, i) => i + 1).map(
-            (page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                  currentPage === page
-                    ? "bg-[#a47148] text-white"
-                    : "bg-white text-[#a47148] border border-[#a47148] hover:bg-orange-50"
-                }`}
-              >
-                {page}
-              </button>
-            )
-          )}
-        </div>
-      )}
+        {/* Paginación */}
+        {!loading && (
+          <div className="flex justify-center items-center space-x-2 mt-8">
+            {Array.from({ length: Math.ceil(filteredAndSortedProducts.length / itemsPerPage) }, (_, i) => i + 1).map(
+              (page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium ${currentPage === page
+                      ? "bg-[#a47148] text-white"
+                      : "bg-white text-[#a47148] border border-[#a47148] hover:bg-orange-50"
+                    }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

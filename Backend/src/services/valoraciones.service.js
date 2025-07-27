@@ -7,6 +7,7 @@ export async function verificarCompraProducto(id_usuario, id_producto) {
     try {
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
         
+        // Primero verificar si existe alguna compra del usuario para este producto
         const compraProducto = await compraProductoRepository
             .createQueryBuilder("cp")
             .leftJoinAndSelect("cp.Compras", "compra")
@@ -14,16 +15,19 @@ export async function verificarCompraProducto(id_usuario, id_producto) {
             .andWhere("compra.id_usuario = :id_usuario", { id_usuario: parseInt(id_usuario) })
             .getOne();
 
-        console.log(`Verificando compra para usuario ${id_usuario} y producto ${id_producto}`);
-        console.log(`Resultado de la verificación:`, compraProducto);
-
-        if (compraProducto) {
-            console.log(`Usuario ${id_usuario} ha comprado el producto ${id_producto}`);
-            return [true, null];
-        } else {
+        if (!compraProducto) {
             console.log(`Usuario ${id_usuario} NO ha comprado el producto ${id_producto}`);
             return [false, null];
         }
+
+        // Verificar si el estado de envío es "entregado"
+        if (compraProducto.Compras.estado_envio !== 'entregado') {
+            console.log(`Usuario ${id_usuario} ha comprado el producto ${id_producto} pero NO está entregado (estado: ${compraProducto.Compras.estado_envio})`);
+            return [false, null];
+        }
+
+        console.log(`Usuario ${id_usuario} ha comprado y recibido el producto ${id_producto}`);
+        return [true, null];
     } catch (error) {
         console.error("Error al verificar compra del producto:", error);
         return [null, "Error al verificar compra del producto"];
@@ -68,7 +72,7 @@ export async function createValoracion(valoracionData) {
         
         const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
         if (!compraProducto[0]) {
-            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+            return [null, "No puedes valorar este producto. Solo puedes valorar productos que hayas comprado y recibido."];
         }
 
         const valoracionExistente = await valoracionesRepository.findOne({
@@ -111,7 +115,7 @@ export async function updateValoracion(valoracionData) {
         
         const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
         if (!compraProducto[0]) {
-            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+            return [null, "No puedes valorar este producto. Solo puedes valorar productos que hayas comprado y recibido."];
         }
         
         const valoracionExistente = await valoracionesRepository.findOne({
@@ -161,7 +165,7 @@ export async function createOrUpdateValoracion(valoracionData) {
         
         const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
         if (!compraProducto[0]) {
-            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+            return [null, "No puedes valorar este producto. Solo puedes valorar productos que hayas comprado y recibido."];
         }
         
         const valoracionesRepository = AppDataSource.getRepository(Valoraciones);
@@ -251,4 +255,4 @@ export async function actualizarPromedioValoraciones(id_producto) {
         console.error("Error al actualizar promedio de valoraciones:", error);
         throw error;
     }
-} 
+}

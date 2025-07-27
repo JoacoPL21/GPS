@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { toast } from '../services/toast.service';
 
 const ValoracionForm = ({ 
   onSubmit, 
@@ -34,12 +35,12 @@ const ValoracionForm = ({
     e.preventDefault();
     
     if (puntuacion === 0) {
-      alert('Por favor selecciona una puntuación');
+      toast.warning('Puntuación requerida', 'Por favor selecciona una puntuación');
       return;
     }
 
     if (descripcion.trim().length < 10) {
-      alert('La descripción debe tener al menos 10 caracteres');
+      toast.warning('Descripción muy corta', 'La descripción debe tener al menos 10 caracteres');
       return;
     }
 
@@ -60,7 +61,14 @@ const ValoracionForm = ({
   }
 
   if (!puedeValorar) {
-    return null;
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <p className="text-blue-800 text-center">
+          Solo puedes valorar productos que hayas comprado y recibido. 
+          Una vez que tu pedido sea entregado, podrás valorar este producto.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -116,7 +124,7 @@ const ValoracionForm = ({
           />
           <p className="text-sm text-gray-500 mt-1">
             {descripcion.length}/500 caracteres (mínimo 10)
-          </p>sol
+          </p>
         </div>
 
         {/* Botón de envío */}
