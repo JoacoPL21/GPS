@@ -2,6 +2,7 @@
 import { FaStar } from "react-icons/fa";
 import { useValoraciones } from "../../hooks/valoraciones/useValoraciones";
 import ValoracionForm from "../ValoracionForm";
+import { toast } from "../../services/toast.service";
 
 const ValoracionesProducto = ({ id_producto }) => {
   const {
@@ -28,9 +29,12 @@ const ValoracionesProducto = ({ id_producto }) => {
   const handleSubmitValoracion = async (valoracionData) => {
     try {
       await enviarValoracion(valoracionData);
-      alert(valoracionUsuario ? 'Valoración actualizada exitosamente' : 'Valoración enviada exitosamente');
+      toast.success(
+        valoracionUsuario ? 'Valoración actualizada' : 'Valoración enviada',
+        valoracionUsuario ? 'Tu valoración ha sido actualizada exitosamente' : 'Tu valoración ha sido enviada exitosamente'
+      );
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      toast.error('Error al procesar valoración', error.message);
     }
   };
 
