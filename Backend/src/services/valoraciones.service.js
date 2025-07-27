@@ -1,6 +1,34 @@
 import Valoraciones from "../entity/valoraciones.entity.js";
 import Productos from "../entity/productos.entity.js";
+import Compra_Producto from "../entity/compra_producto.entity.js";
 import { AppDataSource } from "../config/configDB.js";
+
+export async function verificarCompraProducto(id_usuario, id_producto) {
+    try {
+        const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
+        
+        const compraProducto = await compraProductoRepository
+            .createQueryBuilder("cp")
+            .leftJoinAndSelect("cp.Compras", "compra")
+            .where("cp.id_producto = :id_producto", { id_producto: parseInt(id_producto) })
+            .andWhere("compra.id_usuario = :id_usuario", { id_usuario: parseInt(id_usuario) })
+            .getOne();
+
+        console.log(`Verificando compra para usuario ${id_usuario} y producto ${id_producto}`);
+        console.log(`Resultado de la verificación:`, compraProducto);
+
+        if (compraProducto) {
+            console.log(`Usuario ${id_usuario} ha comprado el producto ${id_producto}`);
+            return [true, null];
+        } else {
+            console.log(`Usuario ${id_usuario} NO ha comprado el producto ${id_producto}`);
+            return [false, null];
+        }
+    } catch (error) {
+        console.error("Error al verificar compra del producto:", error);
+        return [null, "Error al verificar compra del producto"];
+    }
+}
 
 export async function getValoracionesPorProducto(id_producto) {
     try {
@@ -38,6 +66,11 @@ export async function createValoracion(valoracionData) {
             return [null, "El producto especificado no existe"];
         }
         
+        const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
+        if (!compraProducto[0]) {
+            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+        }
+
         const valoracionExistente = await valoracionesRepository.findOne({
             where: {
                 id_usuario: valoracionData.id_usuario,
@@ -49,7 +82,6 @@ export async function createValoracion(valoracionData) {
             return [null, "Ya has valorado este producto anteriormente"];
         }
 
-        // Crear la nueva valoración
         const nuevaValoracion = valoracionesRepository.create({
             id_usuario: valoracionData.id_usuario,
             id_producto: valoracionData.id_producto,
@@ -59,7 +91,6 @@ export async function createValoracion(valoracionData) {
 
         await valoracionesRepository.save(nuevaValoracion);
 
-        // Calcular y actualizar el promedio de valoraciones del producto
         await actualizarPromedioValoraciones(valoracionData.id_producto);
 
         return [nuevaValoracion, null];
@@ -69,18 +100,20 @@ export async function createValoracion(valoracionData) {
     }
 }
 
-// Función para actualizar una valoración existente
 export async function updateValoracion(valoracionData) {
     try {
         const valoracionesRepository = AppDataSource.getRepository(Valoraciones);
         
-        // Verificar si el producto existe
         const productoExiste = await verificarProductoExiste(valoracionData.id_producto);
         if (!productoExiste) {
             return [null, "El producto especificado no existe"];
         }
         
-        // Buscar la valoración existente
+        const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
+        if (!compraProducto[0]) {
+            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+        }
+        
         const valoracionExistente = await valoracionesRepository.findOne({
             where: {
                 id_usuario: valoracionData.id_usuario,
@@ -92,7 +125,6 @@ export async function updateValoracion(valoracionData) {
             return [null, "No existe una valoración para actualizar"];
         }
 
-        // Actualizar la valoración
         await valoracionesRepository.update(
             {
                 id_usuario: valoracionData.id_usuario,
@@ -104,10 +136,8 @@ export async function updateValoracion(valoracionData) {
             }
         );
 
-        // Calcular y actualizar el promedio de valoraciones del producto
         await actualizarPromedioValoraciones(valoracionData.id_producto);
 
-        // Obtener la valoración actualizada
         const valoracionActualizada = await valoracionesRepository.findOne({
             where: {
                 id_usuario: valoracionData.id_usuario,
@@ -122,18 +152,20 @@ export async function updateValoracion(valoracionData) {
     }
 }
 
-// Función para crear o actualizar una valoración (upsert)
 export async function createOrUpdateValoracion(valoracionData) {
     try {
-        // Verificar si el producto existe
         const productoExiste = await verificarProductoExiste(valoracionData.id_producto);
         if (!productoExiste) {
             return [null, "El producto especificado no existe"];
         }
         
+        const compraProducto = await verificarCompraProducto(valoracionData.id_usuario, valoracionData.id_producto);
+        if (!compraProducto[0]) {
+            return [null, "No has comprado este producto, por lo que no puedes valorarlo."];
+        }
+        
         const valoracionesRepository = AppDataSource.getRepository(Valoraciones);
         
-        // Verificar si ya existe una valoración del mismo usuario para el mismo producto
         const valoracionExistente = await valoracionesRepository.findOne({
             where: {
                 id_usuario: valoracionData.id_usuario,
@@ -144,7 +176,6 @@ export async function createOrUpdateValoracion(valoracionData) {
         let valoracionResultado;
 
         if (valoracionExistente) {
-            // Actualizar valoración existente
             await valoracionesRepository.update(
                 {
                     id_usuario: valoracionData.id_usuario,
@@ -156,7 +187,6 @@ export async function createOrUpdateValoracion(valoracionData) {
                 }
             );
             
-            // Obtener la valoración actualizada
             valoracionResultado = await valoracionesRepository.findOne({
                 where: {
                     id_usuario: valoracionData.id_usuario,
@@ -164,7 +194,6 @@ export async function createOrUpdateValoracion(valoracionData) {
                 }
             });
         } else {
-            // Crear nueva valoración
             const nuevaValoracion = valoracionesRepository.create({
                 id_usuario: valoracionData.id_usuario,
                 id_producto: valoracionData.id_producto,
@@ -175,7 +204,6 @@ export async function createOrUpdateValoracion(valoracionData) {
             valoracionResultado = await valoracionesRepository.save(nuevaValoracion);
         }
 
-        // Calcular y actualizar el promedio de valoraciones del producto
         await actualizarPromedioValoraciones(valoracionData.id_producto);
 
         return [valoracionResultado, null];
@@ -185,21 +213,18 @@ export async function createOrUpdateValoracion(valoracionData) {
     }
 }
 
-// Función para calcular el promedio de valoraciones de un producto
 export async function calcularPromedioValoraciones(id_producto) {
     try {
         const valoracionesRepository = AppDataSource.getRepository(Valoraciones);
         
-        // Obtener todas las valoraciones del producto
         const valoraciones = await valoracionesRepository.find({
             where: { id_producto: parseInt(id_producto) }
         });
 
         if (valoraciones.length === 0) {
-            return 0; // No hay valoraciones
+            return 0;
         }
 
-        // Calcular el promedio
         const sumaPuntuaciones = valoraciones.reduce((sum, valoracion) => sum + valoracion.puntuacion, 0);
         const promedio = Math.round(sumaPuntuaciones / valoraciones.length);
 
@@ -210,15 +235,12 @@ export async function calcularPromedioValoraciones(id_producto) {
     }
 }
 
-// Función para actualizar el promedio de valoraciones en el producto
 export async function actualizarPromedioValoraciones(id_producto) {
     try {
         const productosRepository = AppDataSource.getRepository(Productos);
         
-        // Calcular el nuevo promedio
         const nuevoPromedio = await calcularPromedioValoraciones(id_producto);
         
-        // Actualizar el producto con el nuevo promedio
         await productosRepository.update(
             { id_producto: parseInt(id_producto) },
             { prom_valoraciones: nuevoPromedio }

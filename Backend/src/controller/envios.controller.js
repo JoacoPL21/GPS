@@ -4,9 +4,6 @@ import Envios from "../entity/envio.entity.js";
 import { AppDataSource } from "../config/configDB.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
 
-/**
- * Procesa un envío creando la orden de transporte en Chilexpress
- */
 export async function procesarEnvioController(req, res) {
     try {
         const { id_compra, serviceCode, destinationCoverage } = req.body;
@@ -40,9 +37,6 @@ export async function procesarEnvioController(req, res) {
     }
 }
 
-/**
- * Obtiene el tracking de un envío específico
- */
 export async function getTrackingController(req, res) {
     try {
         const { id_compra } = req.params;
@@ -61,31 +55,58 @@ export async function getTrackingController(req, res) {
     }
 }
 
-/**
- * Obtiene todos los envíos para el panel de administración
- */
 export async function getAllEnviosController(req, res) {
     try {
         const envioRepository = AppDataSource.getRepository(Envios);
         const envios = await envioRepository.find({
-            relations: ["Compras", "Compras.Usuario"],
+            relations: ["Compras", "Compras.Usuarios"],
             order: { createdAt: "DESC" }
         });
 
-        const enviosConDetalles = envios.map(envio => ({
-            ...envio,
-            compra: {
-                id_compra: envio.Compras.id_compra,
-                payment_amount: envio.Compras.payment_amount,
-                nombre: envio.Compras.nombre,
-                apellido: envio.Compras.apellido,
-                email: envio.Compras.email,
-                telefono: envio.Compras.telefono,
-                direccion: envio.Compras.direccion,
-                ciudad: envio.Compras.ciudad,
-                region: envio.Compras.region
-            }
-        }));
+        const enviosConDetalles = envios.map(envio => {
+            const compra = envio.Compras;
+            const usuario = compra?.Usuarios;
+            
+            return {
+                id_envio: envio.id_envio,
+                id_compra: envio.id_compra,
+                estado: envio.estado,
+                transport_order_number: envio.transport_order_number,
+                certificate_number: envio.certificate_number,
+                tracking_reference: envio.tracking_reference,
+                service_code: envio.service_code,
+                service_description: envio.service_description,
+                current_status: envio.current_status,
+                current_location: envio.current_location,
+                last_tracking_update: envio.last_tracking_update,
+                delivered_date: envio.delivered_date,
+                delivered_to: envio.delivered_to,
+                createdAt: envio.createdAt,
+                updatedAt: envio.updatedAt,
+                compra: {
+                    id_compra: compra?.id_compra,
+                    payment_amount: compra?.payment_amount,
+                    nombre: compra?.nombre,
+                    apellido: compra?.apellido,
+                    email: compra?.email,
+                    telefono: compra?.telefono,
+                    direccion: compra?.direccion,
+                    ciudad: compra?.ciudad,
+                    region: compra?.region,
+                    codigo_postal: compra?.codigo_postal,
+                    estado_envio: compra?.estado_envio,
+                    payment_status: compra?.payment_status,
+                    payment_type: compra?.payment_type,
+                    createdAt: compra?.createdAt
+                },
+                usuario: usuario ? {
+                    id_usuario: usuario.id_usuario,
+                    nombreCompleto: usuario.nombreCompleto,
+                    email: usuario.email,
+                    telefono: usuario.telefono
+                } : null
+            };
+        });
 
         return handleSuccess(res, 200, "Envíos obtenidos exitosamente", enviosConDetalles);
 
@@ -95,9 +116,6 @@ export async function getAllEnviosController(req, res) {
     }
 }
 
-/**
- * Reimprime una etiqueta de envío
- */
 export async function reimprimirEtiquetaController(req, res) {
     try {
         const { transport_order_number } = req.body;
@@ -150,9 +168,6 @@ export async function reimprimirEtiquetaController(req, res) {
     }
 }
 
-/**
- * Obtiene el envío de una compra específica
- */
 export async function getEnvioPorCompraController(req, res) {
     try {
         const { id_compra } = req.params;

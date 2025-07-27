@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaShoppingBag } from 'react-icons/fa';
-import { useMisCompras } from '../../hooks/compras/useMisCompras';
+import useMisCompras from '../../hooks/compras/useMisCompras';
 import CompraCardModern from '../../components/compras/CompraCardModern';
 import PurchaseDetailsModal from '../../components/PurchaseDetailsModal';
 import Pagination from '../../components/compras/Pagination';
