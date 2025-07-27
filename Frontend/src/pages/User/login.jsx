@@ -34,7 +34,6 @@ const Login = () => {
 
   //redirigir al usuario si ya está autenticado
   useEffect(() => {
-    console.log("isAuthenticated:", isAuthenticated);
     if (isAuthenticated) {
       navigate("/");
     }
@@ -42,7 +41,7 @@ const Login = () => {
   const loginSubmit = async (data) => {
     try {
       const response = await login(data);
-      console.log('Respuesta del login:', response);
+
       
       if (response.status === "Success") {
         setSuccess(true);
@@ -50,7 +49,7 @@ const Login = () => {
         setIsAuthenticated(true);
         setAuthUser(response.data);
         
-        console.log('Usuario autenticado:', response.data);
+
         navigate("/");
       } else {
         // Manejar errores de validación del backend

@@ -181,6 +181,7 @@ export const useProductos = () => {
     productos,
     loading,
     error,
+    setProductos,
     loadProductos,
     addProducto,
     editProducto,

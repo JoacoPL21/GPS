@@ -18,9 +18,9 @@ router.use(authenticateToken);
 router.post("/procesar", isAdmin, procesarEnvioController);
 router.get("/admin/all", isAdmin, getAllEnviosController);
 router.post("/reimprimir-etiqueta", isAdmin, reimprimirEtiquetaController);
+router.patch('/compras/:id_compra/estado-envio', isAdmin, updateEstadoEnvioCompra);
 
 router.get("/tracking/:id_compra", getTrackingController);
 router.get("/compra/:id_compra", getEnvioPorCompraController);
-router.patch('/compras/:id_compra/estado-envio', updateEstadoEnvioCompra);
 
 export default router; 

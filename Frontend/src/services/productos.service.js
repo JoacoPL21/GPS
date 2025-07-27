@@ -573,15 +573,4 @@ export async function getConteoProductosDestacados() {
   }
 }
 
-export async function getValoracionesPorProducto(id_producto) {
-  try {
-    const response = await axios.get(`/valoraciones/producto/${id_producto}`)
-    return { data: response.data, error: null }
-  } catch (error) {
-    console.error("Error al obtener valoraciones del producto:", error)
-    return {
-      data: null,
-      error: error.response ? error.response.data : "Error al obtener valoraciones del producto",
-    }
-  }
-}
+

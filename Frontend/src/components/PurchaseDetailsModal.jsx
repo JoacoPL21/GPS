@@ -67,10 +67,6 @@ const PurchaseDetailsModal = ({ compra, isOpen, onClose, envio }) => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Método de pago:</span>
-                  <span className="font-medium">{getMetodoPagoTexto(compra.payment_method || compra.metodo_pago)}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">Total pagado:</span>
                   <span className="font-medium text-lg">{formatearPrecio(compra.payment_amount || compra.total)}</span>
                 </div>

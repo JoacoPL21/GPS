@@ -410,58 +410,114 @@ async function createCompras() {
 
     await Promise.all([
       ComprasRepository.save(ComprasRepository.create({
-        id_usuario: 1,
+        id_usuario: 2,
+        payment_id: "41324185892",
         payment_status: "approved",
-        payment_amount: 12000,
-        nombre: "Usuario Test",
-        apellido: "Apellido Test",
-        email: "test@example.com",
-        telefono: "123456789",
-        direccion: "Dirección Test",
-        region: "Región Test",
-        ciudad: "Ciudad Test",
-        codigo_postal: "12345",
-        facturacion: "1234567890",
+        payment_amount: 45000,
+        payment_type: "debit_card",
+        external_reference: "ORD-1753512926966",
+        merchant_order: "32690836821",
+        nombre: "Benjamin",
+        apellido: "Ortiz",
+        email: "benjamin@gmail.com",
+        telefono: "966433091",
+        direccion: "Av. Providencia 1234",
+        region: "Metropolitana",
+        ciudad: "Santiago",
+        codigo_postal: "7500000",
+        facturacion: "12345678-9",
         estado_envio: "entregado",
-        total: 12000,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        total: 45000,
+        createdAt: new Date('2024-01-15'),
+        updatedAt: new Date('2024-01-15')
       })),
       ComprasRepository.save(ComprasRepository.create({
-        id_usuario: 1,
-        facturacion: "1234567890",
-        estado_envio: "en_preparacion",
-        total: 12000,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        id_usuario: 3,
+        payment_id: "41324185893",
         payment_status: "approved",
-        payment_amount: 15000,
-        nombre: "Usuario Test 2",
-        apellido: "Apellido Test 2",
-        email: "test2@example.com",
-        telefono: "987654321",
-        direccion: "Dirección Test 2",
-        region: "Región Test 2",
-        ciudad: "Ciudad Test 2",
-        codigo_postal: "54321"
+        payment_amount: 120000,
+        payment_type: "credit_card",
+        external_reference: "ORD-1753512926967",
+        merchant_order: "32690836822",
+        nombre: "Joaquin",
+        apellido: "Perez",
+        email: "joaquin@gmail.com",
+        telefono: "978294813",
+        direccion: "Calle Las Condes 567",
+        region: "Metropolitana",
+        ciudad: "Las Condes",
+        codigo_postal: "7550000",
+        facturacion: "87654321-0",
+        estado_envio: "en_transito",
+        total: 120000,
+        createdAt: new Date('2024-02-20'),
+        updatedAt: new Date('2024-02-20')
       })),
       ComprasRepository.save(ComprasRepository.create({
-        id_usuario: 1,
-        payment_status: "pending",
-        payment_amount: 8000,
-        nombre: "Usuario Test 3",
-        apellido: "Apellido Test 3",
-        email: "test3@example.com",
-        telefono: "555666777",
-        direccion: "Dirección Test 3",
-        region: "Región Test 3",
-        ciudad: "Ciudad Test 3",
-        codigo_postal: "11111",
-        facturacion: "1234567890",
+        id_usuario: 4,
+        payment_id: "41324185894",
+        payment_status: "approved",
+        payment_amount: 35000,
+        payment_type: "debit_card",
+        external_reference: "ORD-1753512926968",
+        merchant_order: "32690836823",
+        nombre: "Jonathan",
+        apellido: "Olivares",
+        email: "jonathan@gmail.com",
+        telefono: "912345678",
+        direccion: "Av. Vitacura 890",
+        region: "Metropolitana",
+        ciudad: "Vitacura",
+        codigo_postal: "7630000",
+        facturacion: "11223344-5",
+        estado_envio: "en_preparacion",
+        total: 35000,
+        createdAt: new Date('2024-03-10'),
+        updatedAt: new Date('2024-03-10')
+      })),
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 5,
+        payment_id: "41324185895",
+        payment_status: "approved",
+        payment_amount: 80000,
+        payment_type: "credit_card",
+        external_reference: "ORD-1753512926969",
+        merchant_order: "32690836824",
+        nombre: "Pablo",
+        apellido: "Sanchez",
+        email: "pablo@gmail.com",
+        telefono: "9987654321",
+        direccion: "Calle Apoquindo 2345",
+        region: "Metropolitana",
+        ciudad: "Las Condes",
+        codigo_postal: "7550000",
+        facturacion: "55667788-9",
+        estado_envio: "entregado",
+        total: 80000,
+        createdAt: new Date('2024-01-28'),
+        updatedAt: new Date('2024-01-28')
+      })),
+      ComprasRepository.save(ComprasRepository.create({
+        id_usuario: 6,
+        payment_id: "41324185896",
+        payment_status: "approved",
+        payment_amount: 25000,
+        payment_type: "debit_card",
+        external_reference: "ORD-1753512926970",
+        merchant_order: "32690836825",
+        nombre: "Tomas",
+        apellido: "Saez",
+        email: "tomas@gmail.com",
+        telefono: "912345678",
+        direccion: "Av. Manquehue 123",
+        region: "Metropolitana",
+        ciudad: "Providencia",
+        codigo_postal: "7500000",
+        facturacion: "99887766-5",
         estado_envio: "en_transito",
-        total: 12000,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        total: 25000,
+        createdAt: new Date('2024-02-05'),
+        updatedAt: new Date('2024-02-05')
       })),
     ]);
 
@@ -482,35 +538,85 @@ async function createCompra_Producto() {
     }
 
     await Promise.all([
+      // Compra 1 - Benjamin Ortiz
       Compra_ProductoRepository.save(Compra_ProductoRepository.create({
         id_compra: 1,
-        id_producto: 1,
+        id_producto: 1, // Jardinera
+        cantidad: 1,
+        precio_unitario: 20000,
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 1,
+        id_producto: 2, // Macetero
+        cantidad: 1,
+        precio_unitario: 10000,
+      })),
+      // Compra 2 - Joaquin Perez
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 2,
+        id_producto: 4, // Escaño
+        cantidad: 1,
+        precio_unitario: 120000,
+      })),
+      
+      // Compra 3 - Jonathan Olivares
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 3,
+        id_producto: 9, // Juguete de madera
         cantidad: 1,
         precio_unitario: 10000,
       })),
       Compra_ProductoRepository.save(Compra_ProductoRepository.create({
-        id_compra: 1,
-        id_producto: 2,
-        precio_unitario: 20000,
-        cantidad: 2,
-      })),
-      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
-        id_compra: 1,
-        id_producto: 3,
+        id_compra: 3,
+        id_producto: 10, // Puzzle de madera
         cantidad: 1,
-        precio_unitario: 30000,
-      })),
-      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
-        id_compra: 2,
-        id_producto: 4,
-        cantidad: 1,
-        precio_unitario: 30000,
+        precio_unitario: 15000,
       })),
       Compra_ProductoRepository.save(Compra_ProductoRepository.create({
         id_compra: 3,
-        id_producto: 1,
+        id_producto: 18, // Marco de fotos
         cantidad: 1,
-        precio_unitario: 30000,
+        precio_unitario: 4000,
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 3,
+        id_producto: 19, // Reloj de pared
+        cantidad: 1,
+        precio_unitario: 6000,
+      })),
+      
+      // Compra 4 - Pablo Sanchez
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 4,
+        id_producto: 5, // Mesa de centro
+        cantidad: 1,
+        precio_unitario: 69000,
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 4,
+        id_producto: 6, // Silla de madera
+        cantidad: 1,
+        precio_unitario: 25000,
+      })),
+      
+      // Compra 5 - Tomas Saez
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 5,
+        id_producto: 11, // Lotes de madera
+        cantidad: 1,
+        precio_unitario: 12000,
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 5,
+        id_producto: 12, // Madera prensada
+        cantidad: 1,
+        precio_unitario: 8000,
+      })),
+      Compra_ProductoRepository.save(Compra_ProductoRepository.create({
+        id_compra: 5,
+        id_producto: 13, // Tablero de madera
+        cantidad: 1,
+        precio_unitario: 5000,
       })),
     ]);
 
@@ -533,7 +639,7 @@ async function createEnvios() {
     await Promise.all([
       EnviosRepository.save(EnviosRepository.create({
         id_compra: 1,
-        estado: "pendiente",
+        estado: "entregado",
       })),
       EnviosRepository.save(EnviosRepository.create({
         id_compra: 2,
@@ -541,7 +647,15 @@ async function createEnvios() {
       })),
       EnviosRepository.save(EnviosRepository.create({
         id_compra: 3,
+        estado: "en_preparacion",
+      })),
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 4,
         estado: "entregado",
+      })),
+      EnviosRepository.save(EnviosRepository.create({
+        id_compra: 5,
+        estado: "en_transito",
       })),
     ]);
 
@@ -560,29 +674,110 @@ async function createValoraciones() {
       return;
     }
     await Promise.all([
+      // Valoraciones de Benjamin Ortiz (usuario 2)
       ValoracionesRepository.save(ValoracionesRepository.create({
-        id_usuario: 1,
-        id_producto: 1,
+        id_usuario: 2,
+        id_producto: 1, // Jardinera
         puntuacion: 5,
-        descripcion: "Excelente producto",
-        createdAt: new Date(),
-        updatedAt: new Date()
+        descripcion: "Excelente jardinera, perfecta para mi terraza. La madera es de muy buena calidad y el acabado es impecable. Muy recomendada!",
+        createdAt: new Date('2024-01-20'),
+        updatedAt: new Date('2024-01-20')
       })),
       ValoracionesRepository.save(ValoracionesRepository.create({
-        id_usuario: 1,
-        id_producto: 2,
+        id_usuario: 2,
+        id_producto: 2, // Macetero
         puntuacion: 4,
-        descripcion: "Buen producto",
-        createdAt: new Date(),
-        updatedAt: new Date()
+        descripcion: "Muy buen macetero, ideal para plantas pequeñas. El tamaño es perfecto y la madera se ve muy natural.",
+        createdAt: new Date('2024-01-20'),
+        updatedAt: new Date('2024-01-20')
+      })),
+      
+      // Valoraciones de Joaquin Perez (usuario 3)
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 3,
+        id_producto: 4, // Escaño
+        puntuacion: 5,
+        descripcion: "El escaño es espectacular! Perfecto para mi jardín. Muy resistente y cómodo. La madera maciza se nota en la calidad.",
+        createdAt: new Date('2024-02-25'),
+        updatedAt: new Date('2024-02-25')
+      })),
+      
+      // Valoraciones de Jonathan Olivares (usuario 4)
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 4,
+        id_producto: 9, // Juguete de madera
+        puntuacion: 5,
+        descripcion: "A mi hijo le encantó el juguete! Es muy seguro y duradero. Perfecto para niños pequeños.",
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
       })),
       ValoracionesRepository.save(ValoracionesRepository.create({
-        id_usuario: 1,
-        id_producto: 3,
+        id_usuario: 4,
+        id_producto: 10, // Puzzle de madera
+        puntuacion: 4,
+        descripcion: "Muy buen puzzle, ayuda mucho al desarrollo cognitivo. Las piezas encajan perfectamente.",
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 4,
+        id_producto: 18, // Marco de fotos
         puntuacion: 3,
-        descripcion: "Producto regular",
-        createdAt: new Date(),
-        updatedAt: new Date()
+        descripcion: "El marco está bien, pero es un poco pequeño para mis fotos. La calidad de la madera es buena.",
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 4,
+        id_producto: 19, // Reloj de pared
+        puntuacion: 4,
+        descripcion: "Hermoso reloj de pared, muy elegante. Funciona perfectamente y se ve muy bien en mi sala.",
+        createdAt: new Date('2024-03-15'),
+        updatedAt: new Date('2024-03-15')
+      })),
+      
+      // Valoraciones de Pablo Sanchez (usuario 5)
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 5,
+        id_producto: 5, // Mesa de centro
+        puntuacion: 5,
+        descripcion: "La mesa de centro es perfecta para mi sala. El diseño es elegante y la madera es de excelente calidad.",
+        createdAt: new Date('2024-02-05'),
+        updatedAt: new Date('2024-02-05')
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 5,
+        id_producto: 6, // Silla de madera
+        puntuacion: 4,
+        descripcion: "Muy buena silla, cómoda y resistente. Perfecta para el comedor.",
+        createdAt: new Date('2024-02-05'),
+        updatedAt: new Date('2024-02-05')
+      })),
+      
+      // Valoraciones de Tomas Saez (usuario 6)
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 6,
+        id_producto: 11, // Lotes de madera
+        puntuacion: 4,
+        descripcion: "Excelente calidad de madera para mis proyectos de carpintería. Muy bien cortada y sin imperfecciones.",
+        createdAt: new Date('2024-02-10'),
+        updatedAt: new Date('2024-02-10')
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 6,
+        id_producto: 12, // Madera prensada
+        puntuacion: 3,
+        descripcion: "La madera prensada es buena para manualidades, aunque es un poco frágil para proyectos grandes.",
+        createdAt: new Date('2024-02-10'),
+        updatedAt: new Date('2024-02-10')
+      })),
+      ValoracionesRepository.save(ValoracionesRepository.create({
+        id_usuario: 6,
+        id_producto: 13, // Tablero de madera
+        puntuacion: 5,
+        descripcion: "Perfecto tablero de madera para mis proyectos. Muy resistente y de excelente calidad.",
+        createdAt: new Date('2024-02-10'),
+        updatedAt: new Date('2024-02-10')
       })),
     ]);
     console.log(chalk.green("✅ Valoraciones creadas exitosamente."));
