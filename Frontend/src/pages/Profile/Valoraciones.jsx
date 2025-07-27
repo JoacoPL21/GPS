@@ -71,7 +71,15 @@ const Valoraciones = () => {
       {/* Header */}
       <div className="mb-8 max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold mb-2">Mis Valoraciones</h2>
-        <p className="text-gray-500">Gestiona las valoraciones de tus productos comprados</p>
+        <p className="text-gray-500">Gestiona las valoraciones de tus productos comprados y entregados</p>
+      </div>
+
+      {/* Información sobre el requisito de entrega */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-4xl mx-auto">
+        <p className="text-blue-800 text-sm">
+          <strong>Nota:</strong> Solo puedes valorar productos que hayas comprado y recibido. 
+          Los productos que aún están en tránsito no aparecerán en esta lista.
+        </p>
       </div>
 
       {/* Estadísticas rápidas */}
