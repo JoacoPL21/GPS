@@ -91,6 +91,12 @@ const Compra = new EntitySchema({
             length: 20,
             nullable: true,
         },
+        estado_envio: {
+            type: "varchar",
+            length: 30,
+            nullable: true,
+            default: null,
+        },
         instrucciones: { 
             type: "varchar",
             length: 500,
@@ -109,7 +115,7 @@ const Compra = new EntitySchema({
         },
     },
     relations: {
-        Usuario: {
+        Usuarios: {
             type: "many-to-one",
             target: "Usuario",
             joinColumn: {

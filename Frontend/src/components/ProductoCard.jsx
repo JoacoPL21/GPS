@@ -1,6 +1,14 @@
 "use client"
 
-const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, selectionMode = false }) => {
+const ProductoCard = ({ 
+  producto, 
+  onEditar, 
+  onEliminar, 
+  onRestaurar,
+  isSelected = false, 
+  selectionMode = false, 
+  showDeleted = false 
+}) => {
   const getStockStatus = (stock) => {
     if (stock === 0) return { color: "bg-red-100 text-red-800", text: "Sin stock" }
     if (stock <= 5) return { color: "bg-yellow-100 text-yellow-800", text: "Stock bajo" }
@@ -42,6 +50,13 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
     }
   }
 
+  const handleRestoreClick = (e) => {
+    e.stopPropagation() // Evitar que se active la selección
+    if (!selectionMode && onRestaurar) {
+      onRestaurar(producto.id_producto)
+    }
+  }
+
   return (
     <div
       className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative ${
@@ -67,11 +82,12 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
       >
         <img
           src={producto.imagen|| "/placeholder.png"}
+          alt={producto.nombre}
           className="object-cover w-full h-full"
         />
 
         {/* Badge de estado en la esquina superior derecha */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 z-10">
           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${estadoStatus.color}`}>
             {estadoStatus.text}
           </span>
@@ -79,7 +95,7 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
 
         {/* Badge de stock bajo si aplica */}
         {producto.stock <= 5 && (
-          <div className="absolute bottom-3 left-3">
+          <div className="absolute bottom-3 left-3 z-10">
             <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -97,16 +113,16 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
         {/* Overlay de selección */}
         {selectionMode && (
           <div
-            className={`absolute inset-0 transition-all duration-300 ${
-              isSelected ? "bg-blue-500 bg-opacity-20" : "bg-black bg-opacity-0 group-hover:bg-opacity-10"
+            className={`absolute inset-0 z-20 transition-all duration-300 ${
+              isSelected ? "bg-blue-500 bg-opacity-30" : "bg-black bg-opacity-0 group-hover:bg-opacity-20"
             }`}
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <div
                 className={`w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
                   isSelected
-                    ? "border-blue-500 bg-blue-500 text-white"
-                    : "border-white bg-white bg-opacity-80 text-gray-600 group-hover:border-blue-300"
+                    ? "border-blue-500 bg-blue-500 text-white shadow-lg"
+                    : "border-white bg-white bg-opacity-90 text-gray-600 group-hover:border-blue-300"
                 }`}
               >
                 {isSelected ? (
@@ -131,7 +147,7 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
           <div className="flex items-start justify-between mb-2">
             <h3
               className={`text-xl font-bold transition-colors ${
-                isSelected ? "text-blue-600" : "text-gray-800 group-hover:text-orange-600"
+                isSelected ? "text-blue-600" : "text-gray-800 group-hover:text-[#a47148]"
               }`}
             >
               {producto.nombre}
@@ -148,8 +164,8 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
           {/* Precio */}
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-500">Precio:</span>
-            <span className={`text-2xl font-bold ${isSelected ? "text-blue-600" : "text-orange-600"}`}>
-              ${producto.precio.toLocaleString()}
+            <span className={`text-2xl font-bold ${isSelected ? "text-blue-600" : "text-[#a47148]"}`}>
+              ${producto.precio.toLocaleString("es-CL", { minimumFractionDigits: 0 })}
             </span>
           </div>
 
@@ -170,35 +186,56 @@ const ProductoCard = ({ producto, onEditar, onEliminar, isSelected = false, sele
         {/* Botones de acción - Solo mostrar si no está en modo selección */}
         {!selectionMode && (
           <div className="flex space-x-3">
-            <button
-              onClick={handleEditClick}
-              className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              <span>Editar</span>
-            </button>
+            {showDeleted ? (
+              // Botón de restaurar para productos eliminados
+              <button
+                onClick={handleRestoreClick}
+                className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span>Restaurar</span>
+              </button>
+            ) : (
+              // Botones normales para productos activos
+              <>
+                <button
+                  onClick={handleEditClick}
+                  className="flex-1 flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  <span>Editar</span>
+                </button>
 
-            <button
-              onClick={handleDeleteClick}
-              className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              <span>Eliminar</span>
-            </button>
+                <button
+                  onClick={handleDeleteClick}
+                  className="flex-1 flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  <span>Eliminar</span>
+                </button>
+              </>
+            )}
           </div>
         )}
 

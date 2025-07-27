@@ -4,17 +4,14 @@ import { AppDataSource } from "../config/configDB.js";
 import Valoraciones from "../entity/valoraciones.entity.js";
 import { getUrlImage } from "../services/minio.service.js";
 
-// Obtener todas las compras de un usuario con sus productos
 export async function getComprasUsuario(id_usuario) {
     try {
         const comprasRepository = AppDataSource.getRepository(Compras);
         const compras = await comprasRepository.find({
             where: { id_usuario: parseInt(id_usuario) },
-            relations: ["Usuarios"],
-            order: { createdAt: "DESC" }
+            order: { id_compra: "DESC" }
         });
 
-        // Para cada compra, obtener los productos asociados
         const comprasConProductos = await Promise.all(
             compras.map(async (compra) => {
                 const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
@@ -23,7 +20,6 @@ export async function getComprasUsuario(id_usuario) {
                     relations: ["Productos"]
                 });
 
-                // Obtener la URL firmada de la imagen para cada producto
                 const productos = await Promise.all(productosCompra.map(async cp => {
                   let imagen = null;
                   if (cp.Productos?.image_url) {
@@ -39,7 +35,29 @@ export async function getComprasUsuario(id_usuario) {
                 }));
 
                 return {
-                    ...compra,
+                    id: compra.id_compra,
+                    id_compra: compra.id_compra,
+                    fecha: compra.createdAt,
+                    createdAt: compra.createdAt,
+                    total: compra.payment_amount,
+                    payment_amount: compra.payment_amount,
+                    estado: compra.payment_status,
+                    payment_status: compra.payment_status,
+                    estado_envio: compra.estado_envio,
+                    metodo_pago: compra.payment_type,
+                    payment_method: compra.payment_type,
+                    payment_id: compra.payment_id,
+                    id_pago: compra.payment_id,
+                    external_reference: compra.external_reference,
+                    merchant_order: compra.merchant_order,
+                    nombre: compra.nombre,
+                    apellido: compra.apellido,
+                    email: compra.email,
+                    telefono: compra.telefono,
+                    direccion: compra.direccion,
+                    region: compra.region,
+                    ciudad: compra.ciudad,
+                    codigo_postal: compra.codigo_postal,
                     productos
                 };
             })
@@ -52,13 +70,10 @@ export async function getComprasUsuario(id_usuario) {
     }
 }
 
-// Verificar si un usuario ha comprado un producto específico
 export async function verificarCompraProducto(id_usuario, id_producto) {
     try {
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
         
-        // Usar una consulta más específica que incluya la relación con Compras
-        // y filtre directamente por el usuario
         const compraProducto = await compraProductoRepository
             .createQueryBuilder("cp")
             .leftJoinAndSelect("cp.Compras", "compra")
@@ -87,11 +102,11 @@ export async function getProductosCompradosConValoracion(id_usuario) {
         const comprasRepository = AppDataSource.getRepository(Compras);
         const compras = await comprasRepository.find({
             where: { id_usuario: parseInt(id_usuario) },
-            order: { createdAt: "DESC" }
+            order: { id_compra: "DESC" }
         });
 
         const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
-        const productosMap = new Map(); // Usar Map para evitar duplicados por id_producto
+        const productosMap = new Map();
 
         for (const compra of compras) {
             const productosCompra = await compraProductoRepository.find({
@@ -100,9 +115,7 @@ export async function getProductosCompradosConValoracion(id_usuario) {
             });
 
             for (const cp of productosCompra) {
-                // Solo agregar si el producto no existe ya en el Map
                 if (!productosMap.has(cp.id_producto)) {
-                    // Buscar valoración del usuario para ese producto
                     const valoracion = await AppDataSource.getRepository(Valoraciones).findOne({
                         where: {
                             id_usuario: parseInt(id_usuario),
@@ -110,7 +123,6 @@ export async function getProductosCompradosConValoracion(id_usuario) {
                         }
                     });
 
-                    // Obtener la URL firmada de la imagen
                     let imagen = null;
                     if (cp.Productos?.image_url) {
                       imagen = await getUrlImage(cp.Productos.image_url);
@@ -134,12 +146,74 @@ export async function getProductosCompradosConValoracion(id_usuario) {
             }
         }
 
-        // Convertir el Map a array
         const productos = Array.from(productosMap.values());
 
         return [productos, null];
     } catch (error) {
         console.error("Error al obtener productos comprados con valoración:", error);
         return [null, "Error al obtener productos comprados con valoración"];
+    }
+} 
+
+export async function getAllCompras() {
+    try {
+        const comprasRepository = AppDataSource.getRepository(Compras);
+        const compraProductoRepository = AppDataSource.getRepository(Compra_Producto);
+        const compras = await comprasRepository.find({
+            order: { id_compra: "DESC" },
+            relations: ["Usuarios"]
+        });
+        const comprasAdmin = await Promise.all(compras.map(async (compra) => {
+            const usuario = compra.Usuarios;
+            const productosCompra = await compraProductoRepository.find({
+                where: { id_compra: compra.id_compra },
+                relations: ["Productos"]
+            });
+            const productos = await Promise.all(productosCompra.map(async cp => {
+                let imagen = null;
+                if (cp.Productos?.image_url) {
+                    imagen = await getUrlImage(cp.Productos.image_url);
+                }
+                return {
+                    id_producto: cp.id_producto,
+                    cantidad: cp.cantidad,
+                    precio: cp.precio_unitario,
+                    nombre: cp.Productos?.nombre || 'Producto no disponible',
+                    imagen: imagen
+                };
+            }));
+            let estado = 'pendiente';
+            if (compra.estado_envio === 'entregado') {
+                estado = 'entregada';
+            } else if (compra.estado_envio === 'en_elaboracion' || compra.estado_envio === 'en_transito') {
+                estado = 'enviada';
+            }
+            return {
+                id_compra: compra.id_compra,
+                cliente: usuario?.nombreCompleto || 'Desconocido',
+                email: usuario?.email || '',
+                telefono: usuario?.telefono || 'No registra',
+                direccion: compra.direccion,
+                region: compra.region,
+                ciudad: compra.ciudad,
+                codigo_postal: compra.codigo_postal,
+                nombre: compra.nombre,
+                apellido: compra.apellido,
+                fecha: compra.createdAt,
+                total: compra.payment_amount,
+                estado: compra.estado_envio,
+                estado_pago: compra.payment_status,
+                metodo_pago: compra.payment_type,
+                payment_method: compra.payment_type,
+                tracking: compra.tracking || '', 
+                id_pago: compra.payment_id || 'Pendiente',
+                productos
+            };
+        }));
+        console.log('Compras mapeadas para admin:', comprasAdmin);
+        return [comprasAdmin, null];
+    } catch (error) {
+        console.error("Error al obtener todas las compras para admin:", error);
+        return [null, "Error al obtener todas las compras para admin"];
     }
 } 

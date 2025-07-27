@@ -110,14 +110,15 @@ const CategoriasModal = ({
   }
 
   useEffect(() => {
-    // Solo actualizar el form si estamos editando y la categoría existe
+    // Solo actualizar el form cuando se empieza a editar una categoría (no durante la edición)
     if (editingId && categorias.length > 0) {
       const cat = categorias.find((c) => c.id_categoria === editingId)
-      if (cat && cat.nombre !== form.nombre) {
+      if (cat) {
+        // Solo establecer el valor inicial una vez, no durante la edición
         setForm({ nombre: cat.nombre })
       }
     }
-  }, [categorias, editingId, form.nombre])
+  }, [editingId, categorias]) // Removido form.nombre de las dependencias
 
 
   return (
@@ -148,7 +149,7 @@ const CategoriasModal = ({
             >
               <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 px-8 py-6 text-white">
+                <div className="bg-blue-400 px-8 py-6 text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="bg-white/20 p-2 rounded-full">
@@ -196,7 +197,7 @@ const CategoriasModal = ({
                             name="nombre"
                             value={form.nombre}
                             onChange={handleInputChange}
-                            className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                            className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all ${
                               errors.nombre ? "border-red-300 bg-red-50" : "border-gray-200 hover:border-gray-300"
                             }`}
                             placeholder="Ej: Artesanía"
@@ -208,7 +209,7 @@ const CategoriasModal = ({
                           <button
                             type="submit"
                             disabled={submitting}
-                            className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 transition-all"
+                            className="flex-1 bg-blue-400 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl disabled:bg-gray-400 transition-all"
                           >
                             {submitting ? "Procesando..." : editingId ? "Actualizar" : "Crear"}
                           </button>
@@ -217,7 +218,7 @@ const CategoriasModal = ({
                             <button
                               type="button"
                               onClick={resetForm}
-                              className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                              className="px-4 py-3 bg-gray-400 hover:bg-gray-500 text-white rounded-xl transition-colors"
                             >
                               Cancelar
                             </button>
@@ -235,7 +236,7 @@ const CategoriasModal = ({
                       <div className="max-h-96 overflow-y-auto space-y-3">
                         {loading ? (
                           <div className="text-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
                             <p className="mt-2 text-gray-600">Cargando...</p>
                           </div>
                         ) : categorias.length > 0 ? (
@@ -254,7 +255,7 @@ const CategoriasModal = ({
                                 <div className="flex space-x-2">
                                   <button
                                     onClick={() => handleEdit(categoria)}
-                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                    className="p-2 text-blue-400 hover:bg-blue-100 rounded-lg transition-colors"
                                   >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path

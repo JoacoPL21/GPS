@@ -130,3 +130,40 @@ export const direccionValidation = Joi.object({
     "object.unknown": "Los campos adicionales no están permitidos",
     "any.required": "Todos los campos son obligatorios",
 });
+
+
+export const forgotPasswordValidation = Joi.object({
+  email: Joi.string()
+    .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    .email()
+    .required()
+    .messages({
+      "string.email": "El correo electrónico debe ser válido",
+      "any.required": "El correo electrónico es obligatorio",
+      "string.pattern.base": "El formato del correo electrónico es incorrecto",
+      "string.empty": "El correo electrónico no puede estar vacío",
+      "string.base": "El correo electrónico debe ser una cadena de texto",
+    }),
+}).unknown(false);
+
+
+export const resetPasswordValidation = Joi.object({
+  token: Joi.string()
+    .required()
+    .messages({
+      "any.required": "El token es obligatorio",
+      "string.empty": "El token no puede estar vacío",
+    }),
+  newPassword: Joi.string()
+    .min(6)
+    .max(20)
+    .pattern(/^[a-zA-Z0-9!@#$%^&*()_+={}\[\]:;"'<>,.?\/\\-]+$/)
+    .required()
+    .messages({
+      "string.min": "La nueva contraseña debe tener al menos 6 caracteres",
+      "any.required": "La nueva contraseña es obligatoria",
+      "string.max": "La nueva contraseña no puede tener más de 20 caracteres",
+      "string.pattern.base": "La nueva contraseña solo puede contener letras, números y caracteres especiales",
+      "string.empty": "La nueva contraseña no puede estar vacía",
+    }),
+}).unknown(false);

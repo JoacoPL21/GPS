@@ -1,9 +1,44 @@
 "use client"
 import { Dialog, Transition } from "@headlessui/react"
 import { useCategorias } from "../hooks/productos/useCategorias";
-import { Fragment } from "react"
+import { Fragment, useEffect, useState } from "react"
 
-const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEditing, submitting }) => {
+const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEditing, submitting, uploadProgress = 0 }) => {
+
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+
+  // Crear URL para preview de imagen
+  useEffect(() => {
+    if (form.imagen && form.imagen instanceof File) {
+      // Imagen nueva seleccionada - mostrar preview del archivo
+      const url = URL.createObjectURL(form.imagen);
+      setImagePreviewUrl(url);
+      
+      // Cleanup function para liberar memoria
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else if (isEditing && form.imagen_url && !form.imagen) {
+      // Modo edición con imagen existente y sin nueva imagen seleccionada
+      setImagePreviewUrl(form.imagen_url);
+    } else {
+      // Si no hay imagen o no es un File, limpiar el preview
+      if (imagePreviewUrl && !form.imagen_url) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+      setImagePreviewUrl(null);
+    }
+  }, [form.imagen, form.imagen_url, isEditing]);
+
+  // Cleanup cuando se cierra el modal
+  useEffect(() => {
+    if (!isOpen) {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+        setImagePreviewUrl(null);
+      }
+    }
+  }, [isOpen]);
 
 
   const { categorias } = useCategorias();
@@ -51,7 +86,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v2M7 7h10"
           />
         </svg>
       ),
@@ -164,7 +199,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
             >
               <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all">
                 {/* Header del Modal */}
-                <div className="bg-gradient-to-r from-orange-500 to-red-500 px-8 py-6 text-white">
+                <div className="bg-orange-400 px-8 py-6 text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="bg-white/20 p-2 rounded-full">
@@ -302,7 +337,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             value={form.precio}
                             onChange={onChange}
                             min="0"
-                            step="100"
+                            step="10"
                             className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                               errors.precio
                                 ? "border-red-300 bg-red-50"
@@ -377,10 +412,10 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             name="id_categoria"
                             value={form.id_categoria}
                             onChange={onChange}
-                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all appearance-none bg-white ${
+                            className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all appearance-none bg-white ${
                               errors.categoria
                                 ? "border-red-300 bg-red-50"
-                                : "border-gray-200 hover:border-gray-300 focus:border-orange-500"
+                                : "border-gray-200 hover:border-gray-300 focus:border-orange-400"
                             }`}
                           >
                             <option value="">Selecciona una categoría</option>
@@ -449,7 +484,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                       {/* Imagen */}
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          {getFieldLabel("imagen")} *
+                          {getFieldLabel("imagen")} {!isEditing && "*"}
                         </label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -458,7 +493,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                           <input
                             type="file"
                             name="imagen"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,image/webp"
                             onChange={onChange}
                             className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                               errors.imagen
@@ -467,6 +502,60 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                             }`}
                           />
                         </div>
+                        
+                        {/* Preview de imagen */}
+                        {imagePreviewUrl && (
+                          <div className="mt-4">
+                            <p className="text-sm font-medium text-gray-700 mb-2">Vista previa:</p>
+                            <div className="relative w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden">
+                              <img
+                                src={imagePreviewUrl}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute top-1 right-1">
+                                <button
+                                  type="button"
+                                  onClick={() => onChange({ target: { name: 'imagen', type: 'file', files: [] } })}
+                                  className="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            </div>
+                            <div className="mt-2 text-xs text-gray-500">
+                              {form.imagen && form.imagen instanceof File ? (
+                                // Información de archivo nuevo
+                                <>
+                                  <p>📁 {form.imagen?.name || 'Sin nombre'}</p>
+                                  <p>📊 {form.imagen?.size ? (form.imagen.size / 1024).toFixed(1) : '0'} KB</p>
+                                </>
+                              ) : (
+                                // Información de imagen existente
+                                <p>🖼️ Imagen actual del producto</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {errors.imagen && (
+                          <p className="mt-2 text-sm text-red-600 flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            {errors.imagen}
+                          </p>
+                        )}
+                        {isEditing && (
+                          <p className="mt-2 text-sm text-gray-500">
+                            Opcional: Sube una nueva imagen solo si quieres cambiar la actual.
+                          </p>
+                        )}
                       </div>
 
                       {/* Separador visual para dimensiones */}
@@ -635,12 +724,28 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                       </div>
                     </div>
 
+                    {/* Barra de progreso */}
+                    {submitting && uploadProgress > 0 && form.imagen && form.imagen instanceof File && (
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium text-gray-700">Subiendo imagen...</span>
+                          <span className="text-sm text-gray-500">{uploadProgress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-orange-400 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Botones de acción */}
                     <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
+                        className="flex-1 flex items-center justify-center space-x-2 bg-orange-400 hover:bg-orange-500 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none"
                       >
                         {submitting ? (
                           <>
@@ -691,7 +796,7 @@ const ProductoModal = ({ isOpen, onClose, onSubmit, form, onChange, errors, isEd
                         type="button"
                         onClick={onClose}
                         disabled={submitting}
-                        className="flex-1 flex items-center justify-center space-x-2 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 text-gray-700 disabled:text-gray-400 font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+                        className="flex-1 flex items-center justify-center space-x-2 bg-gray-400 hover:bg-gray-500 disabled:bg-gray-300 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

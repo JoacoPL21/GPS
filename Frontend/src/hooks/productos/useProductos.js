@@ -7,6 +7,7 @@ import {
   createProducto,
   updateProducto,
   deleteProducto,
+  restoreProducto,
   handleApiError,
   formatProductoData,
 } from "../../services/productos.service.js"
@@ -38,13 +39,13 @@ export const useProductos = () => {
   }
 
   // Crear producto
-  const addProducto = async (productoData) => {
+  const addProducto = async (productoData, onProgress) => {
     setLoading(true)
     setError(null)
 
     try {
       const formattedData = formatProductoData(productoData)
-      const response = await createProducto(formattedData)
+      const response = await createProducto(formattedData, onProgress)
       if (response.data && !response.error) {
         await loadProductos()
         return { success: true, data: response.data }
@@ -63,13 +64,13 @@ export const useProductos = () => {
   }
 
   // Actualizar producto
-  const editProducto = async (id, productoData) => {
+  const editProducto = async (id, productoData, onProgress) => {
     setLoading(true)
     setError(null)
 
     try {
       const formattedData = formatProductoData(productoData)
-      const response = await updateProducto(id, formattedData)
+      const response = await updateProducto(id, formattedData, onProgress)
 
       if (response.data && !response.error) {
         await loadProductos()
@@ -90,12 +91,41 @@ export const useProductos = () => {
 
   // Eliminar producto
   const removeProducto = async (id) => {
+    
     setLoading(true)
     setError(null)
 
     try {
       const response = await deleteProducto(id)
+      
+      if (response.data && !response.error) {
+        // Solo recargar si la eliminación fue exitosa
+        await loadProductos()
+        return { success: true }
+      } else {
+        const errorMsg = handleApiError(response.error)
+        setError(errorMsg)
+        
+        // No recargar automáticamente en caso de error
+        // El componente padre decidirá si refrescar o no
+        return { success: false, error: errorMsg }
+      }
+    } catch (err) {
+      const errorMsg = handleApiError(err.message)
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    } finally {
+      setLoading(false)
+    }
+  }
 
+  // Restaurar producto
+  const restoreProductoHook = async (id) => {
+    setLoading(true)
+    setError(null)
+
+    try {const response = await restoreProducto(id)
+      
       if (response.data && !response.error) {
         await loadProductos()
         return { success: true }
@@ -105,6 +135,7 @@ export const useProductos = () => {
         return { success: false, error: errorMsg }
       }
     } catch (err) {
+      
       const errorMsg = handleApiError(err.message)
       setError(errorMsg)
       return { success: false, error: errorMsg }
@@ -122,10 +153,12 @@ export const useProductos = () => {
     productos,
     loading,
     error,
+    setProductos,
     loadProductos,
     addProducto,
     editProducto,
     removeProducto,
+    restoreProductoHook,
   }
 }
 

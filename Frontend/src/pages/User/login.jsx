@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import useLogin from "../../hooks/auth/useLogin";
 import Swal from "sweetalert2";
@@ -34,7 +34,6 @@ const Login = () => {
 
   //redirigir al usuario si ya está autenticado
   useEffect(() => {
-    console.log("isAuthenticated:", isAuthenticated);
     if (isAuthenticated) {
       navigate("/");
     }
@@ -42,7 +41,7 @@ const Login = () => {
   const loginSubmit = async (data) => {
     try {
       const response = await login(data);
-      console.log('Respuesta del login:', response);
+
       
       if (response.status === "Success") {
         setSuccess(true);
@@ -50,7 +49,7 @@ const Login = () => {
         setIsAuthenticated(true);
         setAuthUser(response.data);
         
-        console.log('Usuario autenticado:', response.data);
+
         navigate("/");
       } else {
         // Manejar errores de validación del backend
@@ -152,6 +151,17 @@ const Login = () => {
               Iniciar Sesión
             </button>
           </form>
+          
+          {/* AGREGAR ESTE ENLACE */}
+          <div className="text-center text-sm mt-3 mb-4">
+            <Link 
+              to="/forgot-password" 
+              className="text-blue-600 hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+          
           <p className="text-center text-sm mt-4">
             ¿No tienes una cuenta?{" "}
             <a href="/register" className="text-blue-600 hover:underline">

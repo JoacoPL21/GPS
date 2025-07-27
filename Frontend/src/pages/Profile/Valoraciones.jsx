@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import { useProductosCompradosConValoracion } from '../../hooks/valoraciones/useProductosComprados.js';
 import { useNavigate } from 'react-router-dom';
 import { FaStar, FaCalendarAlt, FaClock, FaCheckCircle } from 'react-icons/fa';
+import ValoracionModal from '../../components/ValoracionModal';
+import { createOrUpdateValoracion } from '../../services/valoraciones.service';
+import { toast } from '../../services/toast.service';
 
 const Valoraciones = () => {
-  const { pendientes, realizados, loading, error } = useProductosCompradosConValoracion();
+  const { pendientes, realizados, loading, error, fetchProductos } = useProductosCompradosConValoracion();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('pending');
+  const [selectedProducto, setSelectedProducto] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -25,16 +31,51 @@ const Valoraciones = () => {
     });
   };
 
+  const handleOpenModal = (producto, valoracionExistente = null) => {
+    setSelectedProducto({
+      ...producto,
+      valoracionExistente
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProducto(null);
+  };
+
+  const handleSubmitValoracion = async (data) => {
+    setSubmitting(true);
+    try {
+      const res = await createOrUpdateValoracion({
+        ...data,
+        id_producto: Number(selectedProducto.id_producto)
+      });
+      
+      if (res.data && !res.error) {
+        toast.success('Acción completada', 'Valoración guardada exitosamente');
+        handleCloseModal();
+        fetchProductos();
+      } else {
+        toast.error('Error en la operación', res.error || 'No se pudo guardar la valoración');
+      }
+    } catch {
+      toast.error('Error en la operación', 'No se pudo guardar la valoración');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold mb-2">Mis Valoraciones</h2>
         <p className="text-gray-500">Gestiona las valoraciones de tus productos comprados</p>
       </div>
 
       {/* Estadísticas rápidas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-sm border-gray-400 p-6 flex items-center gap-3">
           <FaClock className="w-8 h-8 text-orange-500" />
           <div>
@@ -52,7 +93,7 @@ const Valoraciones = () => {
       </div>
 
       {/* Tabs visuales con animación */}
-      <div className="w-full bg-white mb-6 relative">
+      <div className="w-full bg-white mb-6 relative max-w-4xl mx-auto">
         <div className="grid grid-cols-2 border-gray-400 rounded-lg overflow-hidden relative">
           {/* Highlight animado sólido */}
           <div
@@ -83,9 +124,9 @@ const Valoraciones = () => {
       ) : error ? (
         <div className="text-center text-red-500 py-8">{error}</div>
       ) : activeTab === 'pending' ? (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-4xl mx-auto">
           {pendientes.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border-gray-400 p-6 text-center">
+            <div className="bg-white rounded-lg shadow-sm border-gray-400 p-6 text-center max-w-4xl mx-auto">
               <FaCheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
               <p className="text-lg font-medium mb-2">¡Excelente!</p>
               <p className="text-gray-500">No tienes productos pendientes de valorar.</p>
@@ -124,7 +165,7 @@ const Valoraciones = () => {
                     <div className="flex gap-2">
                       <button
                         className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors"
-                        onClick={() => navigate(`/profile/valoraciones/valorar/${item.id_producto}`)}
+                        onClick={() => handleOpenModal(item)}
                       >Escribir valoración</button>
                       <button
                         className="px-4 py-2 border border-[#A47048] text-[#A47048] rounded hover:bg-[#FFF8F0] font-medium transition-colors"
@@ -138,9 +179,9 @@ const Valoraciones = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-4xl mx-auto">
           {realizados.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
+            <div className="bg-white rounded-lg shadow-sm border-0 p-6 text-center max-w-4xl mx-auto">
               <FaStar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-lg font-medium mb-2">Sin valoraciones</p>
               <p className="text-gray-500">Aún no has valorado ningún producto.</p>
@@ -170,7 +211,7 @@ const Valoraciones = () => {
                     <div className="flex gap-2">
                       <button
                         className="px-4 py-2 bg-[#A47048] text-white rounded hover:bg-[#8a5a36] font-medium transition-colors"
-                        onClick={() => navigate(`/profile/valoraciones/valorar/${review.id_producto}`)}
+                        onClick={() => handleOpenModal(review, review.valoracion)}
                       >Editar reseña</button>
                       <button
                         className="px-4 py-2 border border-[#A47048] text-[#A47048] rounded hover:bg-[#FFF8F0] font-medium transition-colors"
@@ -197,6 +238,16 @@ const Valoraciones = () => {
           )}
         </div>
       )}
+
+      {/* Modal de valoración */}
+      <ValoracionModal
+        producto={selectedProducto}
+        valoracionExistente={selectedProducto?.valoracionExistente}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitValoracion}
+        submitting={submitting}
+      />
     </div>
   );
 };
