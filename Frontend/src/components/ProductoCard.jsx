@@ -147,7 +147,7 @@ const ProductoCard = ({
           <div className="flex items-start justify-between mb-2">
             <h3
               className={`text-xl font-bold transition-colors ${
-                isSelected ? "text-blue-600" : "text-gray-800 group-hover:text-orange-600"
+                isSelected ? "text-blue-600" : "text-gray-800 group-hover:text-[#a47148]"
               }`}
             >
               {producto.nombre}
@@ -164,8 +164,8 @@ const ProductoCard = ({
           {/* Precio */}
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-500">Precio:</span>
-            <span className={`text-2xl font-bold ${isSelected ? "text-blue-600" : "text-orange-600"}`}>
-              ${producto.precio.toLocaleString()}
+            <span className={`text-2xl font-bold ${isSelected ? "text-blue-600" : "text-[#a47148]"}`}>
+              ${producto.precio.toLocaleString("es-CL", { minimumFractionDigits: 0 })}
             </span>
           </div>
 

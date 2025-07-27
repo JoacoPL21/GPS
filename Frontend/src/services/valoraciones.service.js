@@ -14,19 +14,7 @@ export async function getValoracionesPorProducto(id_producto) {
   }
 }
 
-// Obtener las compras del usuario para verificar si puede valorar
-export async function getComprasUsuario() {
-  try {
-    const response = await axios.get('/user/compras');
-    return { data: response.data, error: null };
-  } catch (error) {
-    console.error("Error al obtener compras del usuario:", error);
-    return {
-      data: null,
-      error: error.response?.data?.message || error.message || "Error al obtener compras",
-    };
-  }
-}
+
 
 // Verificar si el usuario ha comprado un producto específico
 export async function verificarCompraProducto(id_producto) {

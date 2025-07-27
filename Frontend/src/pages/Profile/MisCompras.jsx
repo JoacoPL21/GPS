@@ -1,22 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { FaShoppingBag } from 'react-icons/fa';
-import { useMisCompras } from '../../hooks/compras/useMisCompras';
+import useMisCompras from '../../hooks/compras/useMisCompras';
 import CompraCardModern from '../../components/compras/CompraCardModern';
 import PurchaseDetailsModal from '../../components/PurchaseDetailsModal';
 import Pagination from '../../components/compras/Pagination';
 
 const MisCompras = () => {
   const {
-    // State
     compras,
     loading,
     error,
     enviosData,
-
-    // Actions
     cargarCompras,
-    
-    // Paginación
     currentPage,
     itemsPerPage,
     totalPages,
@@ -84,12 +80,12 @@ const MisCompras = () => {
           <FaShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Aún no tienes compras</h3>
           <p className="text-gray-600 mb-6">Cuando realices tu primera compra, aparecerá aquí tu historial.</p>
-          <a
-            href="/catalogo"
-            className="inline-flex items-center px-6 py-3 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors"
+          <Link
+            to="/catalogo"
+            className="inline-flex items-center px-6 py-3 bg-yellow-600 !text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors"
           >
             <FaShoppingBag className="w-5 h-5 mr-2" /> Ir al catálogo
-          </a>
+          </Link>
         </div>
       ) : (
         <>

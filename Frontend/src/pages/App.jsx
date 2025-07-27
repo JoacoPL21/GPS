@@ -1,9 +1,7 @@
 import './../styles/App.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useState, useEffect } from 'react'; 
 import Root from "./Root.jsx";
 import Homepage from "./Homepage/Homepage.jsx";
-import Cart from "./Carrito/shopping_cart.jsx";
 import Catalogo from "./Catalogo/Catalogo.jsx";
 import Productos from "./ProductosManager/ProductosManager.jsx";
 import Login from "./User/login.jsx";
@@ -14,15 +12,12 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import Dashboard from "./Dashboard/dashboard.jsx";
 import Producto from "./Catalogo/Producto.jsx";
 import Profile from "./Profile/profile.jsx";
-import Sidebar from '../components/Sidebar'; 
-import ContactSection from './Contact/contact_us.jsx';   
 import SuccessPage from './Carrito/success.jsx';
 import FailurePage from './Carrito/failure.jsx';
 import MultiStepCart from './Carrito/multi-step-cart.jsx';
 import MisCompras from "./Profile/MisCompras.jsx";
 import GestionDestacados from "../components/GestionDestacados.jsx";
 import Valoraciones from "./Profile/Valoraciones.jsx";
-import ValoracionFormPage from "./Profile/ValoracionFormPage.jsx";
 import ForgotPassword from "./User/ForgotPassword.jsx";
 import ResetPassword from "./User/ResetPassword.jsx";
 import AdminCompras from "./Dashboard/AdminCompras.jsx";
@@ -63,7 +58,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "gestiondestac",
+        path: "gestion-destacados",
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
             <GestionDestacados />
@@ -99,14 +94,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Valoraciones />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "profile/valoraciones/valorar/:id_producto",
-        element: (
-          <ProtectedRoute>
-            <ValoracionFormPage />
           </ProtectedRoute>
         ),
       },

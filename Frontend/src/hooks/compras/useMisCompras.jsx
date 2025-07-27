@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getComprasUsuario } from '../../services/valoraciones.service';
+import { getComprasUsuario } from '../../services/compras.service';
 import { getEnvioPorCompra } from '../../services/envios.service';
 
-export const useMisCompras = () => {
+const useMisCompras = () => {
   const { authUser } = useAuth();
   const [compras, setCompras] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +11,6 @@ export const useMisCompras = () => {
   const [enviosData, setEnviosData] = useState({});
   const [compraExpandida, setCompraExpandida] = useState(null);
   
-  // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -37,7 +36,7 @@ export const useMisCompras = () => {
   };
 
   const cargarEnvioCompra = async (id_compra) => {
-    if (enviosData[id_compra]) return; // Ya está cargado
+    if (enviosData[id_compra]) return; 
 
     try {
       const { data, error } = await getEnvioPorCompra(id_compra);
@@ -47,9 +46,9 @@ export const useMisCompras = () => {
           [id_compra]: data.data
         }));
       }
-      // Si no hay envío (404), es normal, no hacer nada
+     
     } catch (error) {
-      // Error silencioso para 404s
+     
       if (!error.message?.includes('404')) {
         console.error('Error al cargar envío:', error);
       }
@@ -72,7 +71,7 @@ export const useMisCompras = () => {
     }
   }, [compras]);
 
-  // Lógica de paginación
+  
   const totalPages = Math.ceil(compras.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -106,4 +105,6 @@ export const useMisCompras = () => {
     handlePageChange,
     handleItemsPerPageChange,
   };
-}; 
+};
+
+export default useMisCompras; 

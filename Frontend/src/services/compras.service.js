@@ -22,4 +22,18 @@ export async function getAllComprasAdmin() {
       message: error.response?.data?.message || error.message || 'Error al obtener compras'
     };
   }
+}
+
+// Obtener las compras del usuario
+export async function getComprasUsuario() {
+  try {
+    const response = await axios.get('/user/compras');
+    return { data: response.data, error: null };
+  } catch (error) {
+    console.error("Error al obtener compras del usuario:", error);
+    return {
+      data: null,
+      error: error.response?.data?.message || error.message || "Error al obtener compras",
+    };
+  }
 } 
