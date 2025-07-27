@@ -74,11 +74,9 @@ export const useGestorProductos = () => {
       if (response.success && response.data) {
         setProductosActivos(response.data);
       } else {
-        console.error("Error al cargar productos:", response.error);
         setProductosActivos([]);
       }
     } catch (error) {
-      console.error("Error inesperado al cargar productos:", error);
       setProductosActivos([]);
     } finally {
       setCargando(false);
@@ -92,11 +90,9 @@ export const useGestorProductos = () => {
       if (response.success && response.data) {
         setProductosEliminados(response.data);
       } else {
-        console.error("Error al cargar productos eliminados:", response.error);
         setProductosEliminados([]);
       }
     } catch (error) {
-      console.error("Error inesperado al cargar productos eliminados:", error);
       setProductosEliminados([]);
     }
   };
@@ -109,11 +105,9 @@ export const useGestorProductos = () => {
       if (response.success && response.data?.data) {
         setCategoriasPersonalizadas(response.data.data[0]);
       } else {
-        console.error("Error al cargar categorías:", response.error);
         setCategoriasPersonalizadas([]);
       }
     } catch (error) {
-      console.error("Error inesperado al cargar categorías:", error);
       setCategoriasPersonalizadas([]);
     } finally {
       setCargandoCategorias(false);

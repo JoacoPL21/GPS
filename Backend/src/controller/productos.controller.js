@@ -1,7 +1,7 @@
 "use strict";
 import { getProductos, getProductosDisponibles, getProductoById, createProducto, updateProductoService, deleteProductoService, restoreProductoService, getProductosEliminados, getProductosDestacados, getUltimosProductos, toggleProductoDestacado, getConteoProductosDestacados, updateProductoStock } from "../services/productos.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../handlers/responseHandlers.js";
-import { productoCreateValidation } from "../validations/productos.validation.js";
+import { productoCreateValidation, productoUpdateValidation } from "../validations/productos.validation.js";
 import { postImagen } from "./minio.controller.js";
 
 
@@ -98,8 +98,6 @@ export async function createProductoController(req, res) {
   }
 }
 
-
-
 export const updateProductoController = async (req, res) => {
   try {
     console.log("🎯 === ACTUALIZAR PRODUCTO ===");
@@ -144,48 +142,40 @@ export const updateProductoController = async (req, res) => {
       console.log("✅ Nueva imagen subida a MinIO:", imagen_nombre);
     }
 
-    // Construir datos del producto
-    const productoData = {
-      nombre: body.nombre,
-      precio: body.precio ? Number(body.precio) : undefined,
-      stock: body.stock ? Number(body.stock) : undefined,
-      descripcion: body.descripcion,
-      estado: body.estado,
-      id_categoria: body.id_categoria ? Number(body.id_categoria) : undefined,
-      peso: body.peso ? Number(body.peso) : undefined,
-      ancho: body.ancho ? Number(body.ancho) : undefined,
-      alto: body.alto ? Number(body.alto) : undefined,
-      profundidad: body.profundidad ? Number(body.profundidad) : undefined,
-      ...(imagen_nombre && { image_url: imagen_nombre })
-    };
-
-    // Remover campos undefined para no sobrescribir con undefined
-    Object.keys(productoData).forEach(key => {
-      if (productoData[key] === undefined) {
-        delete productoData[key];
-      }
-    });
+    // Construir datos del producto (solo campos que se van a actualizar)
+    const productoData = {};
+    
+    if (body.nombre !== undefined) productoData.nombre = body.nombre;
+    if (body.precio !== undefined) productoData.precio = Number(body.precio);
+    if (body.stock !== undefined) productoData.stock = Number(body.stock);
+    if (body.descripcion !== undefined) productoData.descripcion = body.descripcion;
+    if (body.estado !== undefined) productoData.estado = body.estado;
+    if (body.id_categoria !== undefined) productoData.id_categoria = Number(body.id_categoria);
+    if (body.peso !== undefined) productoData.peso = Number(body.peso);
+    if (body.ancho !== undefined) productoData.ancho = Number(body.ancho);
+    if (body.alto !== undefined) productoData.alto = Number(body.alto);
+    if (body.profundidad !== undefined) productoData.profundidad = Number(body.profundidad);
+    if (imagen_nombre) productoData.image_url = imagen_nombre;
 
     console.log("💾 Datos que se actualizarán en BD:", productoData);
 
-    // Validar datos requeridos
-    const { nombre, precio, stock, id_categoria } = productoData;
-    if (!nombre || precio === undefined || stock === undefined || !id_categoria) {
+    // Validar que al menos un campo se está actualizando
+    if (Object.keys(productoData).length === 0) {
       return res.status(400).json({
-        message: "Faltan datos requeridos: nombre, precio, stock, id_categoria",
+        message: "No se proporcionaron datos para actualizar",
         data: null
       });
     }
 
-    // Validar campos numéricos opcionales (dimensiones y peso)
-    const camposNumericos = ['peso', 'ancho', 'alto', 'profundidad'];
-    for (const campo of camposNumericos) {
-      if (productoData[campo] !== undefined && (isNaN(productoData[campo]) || productoData[campo] < 0)) {
-        return res.status(400).json({
-          message: `El campo ${campo} debe ser un número positivo`,
-          data: null
-        });
-      }
+    // Validar datos con Joi
+    const { error } = productoUpdateValidation.validate(productoData);
+    if (error) {
+      console.log("❌ Error de validación:", error.message);
+      return res.status(400).json({
+        message: "Datos inválidos",
+        error: error.message,
+        data: null
+      });
     }
 
     console.log("📊 Actualizando en base de datos...");

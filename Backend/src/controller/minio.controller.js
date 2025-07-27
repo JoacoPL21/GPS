@@ -22,14 +22,6 @@ export async function getrUrlImagen(req, res) {
 }
 export async function postImagen(fileBuffer, nombreProducto) {
     try {
-        console.log("🎯 === SUBIR IMAGEN A MINIO ===");
-        console.log("📝 Nombre del producto:", nombreProducto);
-        console.log("📁 Buffer recibido:", {
-            size: fileBuffer?.length,
-            type: typeof fileBuffer,
-            isBuffer: Buffer.isBuffer(fileBuffer)
-        });
-
           const nombreLimpio = nombreProducto
               .trim()
               .toLowerCase()
