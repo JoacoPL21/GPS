@@ -29,7 +29,9 @@ export async function login(dataUser) {
                 nombreCompleto: userInfo.nombreCompleto,
                 email: userInfo.email,
                 rol: userInfo.rol,
-                telefono: userInfo.telefono || ''
+                telefono: userInfo.telefono || '',
+                createdAt: userInfo.createdAt,  // ← AGREGAR ESTA LÍNEA
+                updatedAt: userInfo.updatedAt   // ← AGREGAR ESTA LÍNEA TAMBIÉN (opcional)
             };
 
             // Guardar en storage
@@ -141,12 +143,23 @@ export async function getUserProfile() {
             const userProfile = response.data.data;
             
             // Actualizar la información del usuario en localStorage
-            localStorage.setItem('usuario', JSON.stringify(userProfile));
-            sessionStorage.setItem('usuario', JSON.stringify(userProfile));
+            // Asegurar que incluya todos los campos necesarios
+            const completeUserData = {
+                id: userProfile.id_usuario,
+                nombreCompleto: userProfile.nombreCompleto,
+                email: userProfile.email,
+                rol: userProfile.rol,
+                telefono: userProfile.telefono || '',
+                createdAt: userProfile.createdAt,  // ← AGREGAR
+                updatedAt: userProfile.updatedAt   // ← AGREGAR
+            };
+            
+            localStorage.setItem('usuario', JSON.stringify(completeUserData));
+            sessionStorage.setItem('usuario', JSON.stringify(completeUserData));
             
             return {
                 status: 'Success',
-                data: userProfile,
+                data: completeUserData,
                 message: 'Perfil obtenido correctamente'
             };
         }

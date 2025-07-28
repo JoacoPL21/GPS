@@ -155,10 +155,6 @@ const MenuCarrito = ({ open, setOpen }) => {
                                           Precio unitario: $
                                           {item.precio.toLocaleString()}
                                         </p>
-                                        {/* Mostrar información de stock */}
-                                        <p className="mt-1 text-xs text-gray-400">
-                                          Stock disponible: {item.stock}
-                                        </p>
                                         {exceedeStock && (
                                           <p className="mt-1 text-xs text-red-500">
                                             ⚠️ Cantidad excede stock disponible

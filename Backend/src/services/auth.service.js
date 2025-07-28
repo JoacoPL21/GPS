@@ -48,7 +48,8 @@ export async function loginService(user) {
       email: userFound.email,
       rol: userFound.rol,
       telefono: userFound.telefono || "",
-
+      createdAt: userFound.createdAt,  // ← AGREGAR ESTA LÍNEA
+      updatedAt: userFound.updatedAt   // ← AGREGAR ESTA LÍNEA TAMBIÉN (opcional)
     };
 
     return [accessToken, null, userInfo];

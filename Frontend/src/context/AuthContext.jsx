@@ -52,11 +52,17 @@ export function AuthProvider(props) {
       ...updatedUserData
     }));
     
-    // También actualizar el localStorage
+    // También actualizar el localStorage manteniendo campos importantes
     try {
-      const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
-      const newUserData = { ...currentUserData, ...updatedUserData };
-      localStorage.setItem('user', JSON.stringify(newUserData));
+      const currentUserData = JSON.parse(localStorage.getItem('usuario') || '{}');
+      const newUserData = { 
+        ...currentUserData, 
+        ...updatedUserData,
+        // Asegurar que se mantengan campos importantes si no vienen en la actualización
+        createdAt: updatedUserData.createdAt || currentUserData.createdAt,
+        id: updatedUserData.id || currentUserData.id
+      };
+      localStorage.setItem('usuario', JSON.stringify(newUserData));
     } catch (error) {
       console.error('Error updating user in localStorage:', error);
     }

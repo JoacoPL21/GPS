@@ -36,6 +36,7 @@ export const useValoraciones = (id_producto) => {
           const valoracionExistente = data.data?.find(
             v => v.id_usuario === authUser.id
           );
+          console.log('useValoraciones - Valoración encontrada para usuario:', valoracionExistente);
           setValoracionUsuario(valoracionExistente || null);
         }
       }
@@ -51,19 +52,23 @@ export const useValoraciones = (id_producto) => {
   // Verificar si el usuario puede valorar (ha comprado el producto)
   const verificarPuedeValorar = useCallback(async () => {
     if (!authUser || !id_producto) {
+      console.log('No hay usuario autenticado o ID de producto');
       setPuedeValorar(false);
       return;
     }
 
     try {
+      console.log(`Verificando compra para usuario ${authUser.id} y producto ${id_producto}`);
       const { data, error } = await verificarCompraProducto(id_producto);
       
       if (error) {
         console.error('Error al verificar compra:', error);
         setPuedeValorar(false);
       } else {
+        console.log('Respuesta de verificación:', data);
         // El backend devuelve { data: { success: boolean } }
         const puedeValorar = data.data?.success || false;
+        console.log('¿Puede valorar?', puedeValorar);
         setPuedeValorar(puedeValorar);
       }
     } catch (error) {
