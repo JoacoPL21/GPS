@@ -86,7 +86,7 @@ const ContactSection = () => {
                   <div>
                     <p className="font-semibold text-amber-900">Ubicación</p>
                     <p className="text-amber-700">
-                     Los Acacios 589 Villa San Pedro, Los Alamos, Chile
+                     Los Acacios 589 Villa San Pedro, Los Álamos, Chile
                     </p>
                   </div>
                 </div>

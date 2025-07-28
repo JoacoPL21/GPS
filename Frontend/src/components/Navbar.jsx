@@ -28,7 +28,7 @@ function Navbar({ isOpen, setOpen }) {
           <Hamburger toggled={isOpen} toggle={setOpen} />
         </div>
         <Link to="/" className="cursor-pointer">
-        <h1 className="text-xl font-bold text-amber-950">Maderas Los Alamos</h1>
+        <h1 className="text-xl font-bold text-amber-950">Maderas Los Álamos</h1>
         </Link>
         <nav className="hidden md:flex absolute right-4 gap-4 items-center">
           {/* Perfil con dropdown moderno */}
